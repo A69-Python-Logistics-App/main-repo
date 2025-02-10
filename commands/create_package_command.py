@@ -18,13 +18,13 @@ class CreatePackageCommand(BaseCommand):
         try:
             weight = int(weight)
         except ValueError:
-            raise ValueError("Invalid number provided for weight!")
+            raise ValueError(f"Invalid number ({weight}) provided for weight!")
 
         # Making sure the pickup and dropoff locations are valid
         Location.validate_location(pickup)
         Location.validate_location(dropoff)
 
-        # TODO: Validate customer exists
+        # TODO: Validate customer exists or change customer implementation
         customer = Customer("test_name", "test_email@test.com")
 
         # returning the result of create_package execution
