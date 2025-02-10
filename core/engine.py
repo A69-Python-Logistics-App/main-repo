@@ -3,6 +3,7 @@ from core.command_factory import CommandFactory
 
 class Engine:
     def __init__(self, cmdf: CommandFactory):
+        # read state
         self._command_factory = cmdf
 
     def start(self):
@@ -11,6 +12,7 @@ class Engine:
             cmd = input("> ")
 
             if cmd == "exit":
+                # write state
                 self.stop()
                 break
 
