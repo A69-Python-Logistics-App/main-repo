@@ -8,7 +8,7 @@ class Status():
     _class_status_types = {0: "Collected", 1: "On Route", 2: "Delivered"}
 
     def __init__(self):
-        self._value = Status._class_status_types[0] # value by default
+        self._value = Status._class_status_types[0] # Collected value by default
         self._idx = 0 # used for advance status
 
     @property
