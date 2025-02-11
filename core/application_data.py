@@ -2,6 +2,7 @@ import json
 from datetime import datetime
 
 from models.customer import Customer
+from models.location import Location
 from models.package import Package
 from models.route import Route
 
@@ -15,7 +16,9 @@ class ApplicationData:
         self._routes = []
         self._customers = []
         self._packages = []
-        self._locations = []
+        self._locations = [] # TODO: At start trucks won't have assigned locations, so they can be deployed immediately for their first ride
+
+        self._locations = [Location(loc) for loc in Location.Cities] # TODO: init locations from cities or change locations implementation
 
     @property
     def routes(self):
@@ -34,7 +37,7 @@ class ApplicationData:
             return e.args[0]
 
         self._routes.append(route)
-        return f"Route #{route.route_id} from {locations[0]} to {locations[-1]} created."
+        return f"Route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stops created."
 
     def get_customer(self, email: str, name: str="") -> Customer:
         for customer in self._customers: # Search by email for existing customer
