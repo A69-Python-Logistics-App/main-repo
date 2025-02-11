@@ -1,5 +1,7 @@
 from commands.base.base_command import BaseCommand
 from commands.create_package_command import CreatePackageCommand
+from commands.create_route_command import CreateRouteCommand
+from commands.routes_command import RoutesCommand
 from core.application_data import ApplicationData
 
 
@@ -14,6 +16,10 @@ class CommandFactory:
         match cmd.lower():
             case "createpackage":
                 return CreatePackageCommand(params, self._app_data)
+            case "createroute":
+                return CreateRouteCommand(params, self._app_data)
+            case "routes":
+                return RoutesCommand(params, self._app_data)
             case _:
                 raise ValueError(f"Unknown command: {cmd}")
             

@@ -8,11 +8,11 @@ class CreatePackageCommand(BaseCommand):
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
-        self.validate_params(4)
+        self.validate_params(6)
 
     def execute(self):
         # Unpacking values from params
-        weight, pickup, dropoff, customer = self.params
+        weight, pickup, dropoff, *customer = self.params
 
         # Trying to parse weight into an integer value
         try:
@@ -24,7 +24,8 @@ class CreatePackageCommand(BaseCommand):
         Location.validate_locations(pickup, dropoff)
 
         # TODO: Validate customer exists or change customer implementation
-        customer = Customer("test_name", "test_email@test.com")
+        # first name + last name + email
+        customer = Customer(" ".join((customer[0], customer[1])), customer[2])
 
         # returning the result of create_package execution
         return self.app_data.create_package(weight, pickup, dropoff, customer)
