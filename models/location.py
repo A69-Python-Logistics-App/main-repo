@@ -14,8 +14,8 @@ class Location:
     def validate_locations(cls, *locations: [str]):
         """
         Checks if locations are valid
-        :param locations: accepts any number of locations as arguments
-        :raise ValueError: if location is invalid
+        :param locations: accepts at least one location or more as argument(s)
+        :raise ValueError: if any location is invalid
         """
         for location in locations:
             if not location in cls.Cities:
