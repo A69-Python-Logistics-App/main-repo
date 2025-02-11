@@ -9,3 +9,15 @@ class Location:
         self.hub_name = hub_name
         # self.list_of_trucks_on_location:list[Truck] = []
         self.list_of_packages_on_location:list[Package] = []
+
+    @classmethod
+    def validate_locations(cls, *locations: [str]):
+        """
+        Checks if locations are valid
+        :param locations: accepts at least one location or more as argument(s)
+        :raise ValueError: if any location is invalid
+        """
+        for location in locations:
+            if not location in cls.Cities:
+                raise ValueError("\n".join([f"Invalid location [{location}] provided.",
+                                            f"Available locations: {', '.join(cls.Cities)}"]))
