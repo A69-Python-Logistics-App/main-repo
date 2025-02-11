@@ -1,6 +1,6 @@
 import unittest
-from models.Package import Package
-from models.Customer import Customer
+from models.package import Package
+from models.customer import Customer
 
 # CUSTOMER
 VALID_NAME = "EMKO"
