@@ -1,10 +1,14 @@
-from Package import Package
+from models.package import Package
 
-class Customer:
+class Customer():
 
     _customer_id = 1
 
     def __init__(self, name:str, email:str):
+
+        """ 
+        Customer with name and email.
+        """
         
         self._name = Customer._check_valid_name(name)
         self._email = Customer._check_valid_email(email)

@@ -1,14 +1,20 @@
 import unittest
 from models.Customer import Customer
+from tests.package_test import VALID_CUSTOMER
 
+# CUSTOMER
 VALID_NAME = "EMKO"
 VALID_EMAIL = "emko@abv.bg"
 VALID_ID = 1
 INVALID_ID = -100
-
 INVALID_NAME = "E"
 INVALID_EMAIL = "E@BG"
 INVALID_EMAIL_NO_AMP = "EMKOABV.BG"
+
+# PACKAGE
+VALID_WEIGHT = 100
+VALID_PICKUP = "RUSE"
+VALID_DROPOFF = "VARNA"
 
 class Customer_Should(unittest.TestCase):
 
@@ -54,30 +60,14 @@ class Customer_Should(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = Customer(VALID_NAME, INVALID_EMAIL_NO_AMP)
 
-    def test_setPackageId_sets_packageId_when_validId(self):
-        # ARRANGE
-        customer = Customer(VALID_NAME, VALID_EMAIL)
-        # ACT
-        old_id = customer.package_id
-        customer.set_package_id(VALID_ID)
-        id = customer.package_id
-        # ASSERT
-        self.assertNotEqual(id, old_id)
+    def test_customerId_incrementsCorrectly(self):
+        # ARRANGE + ACT
+        customer1 = Customer(VALID_NAME, VALID_EMAIL)
+        customer2 = Customer(VALID_NAME, VALID_EMAIL)
+        self.assertGreater(customer2.id, customer1.id)
 
-    def test_setPackageId_raises_ValueError_when_idNotInteger(self):
-        # ARRANGE
-        customer = Customer(VALID_NAME, VALID_EMAIL)
-        # ACT + ASSERT
+    def test_findPackageById_raises_ValueError_when_idNotFound(self):
+        # AAA
         with self.assertRaises(ValueError):
-            customer.set_package_id(INVALID_ID)
-
-    def test_setPackageId_raises_ValueError_when_idBelowZero(self):
-        # ARRANGE
-        customer = Customer(VALID_NAME, VALID_EMAIL)
-        # ACT + ASSERT
-        with self.assertRaises(ValueError):
-            customer.set_package_id(VALID_ID * -100)
-
-
-
+            _ = VALID_CUSTOMER.find_package_by_id(100)
 
