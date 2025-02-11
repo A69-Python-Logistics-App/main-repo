@@ -1,13 +1,11 @@
-from .Customer import Customer
-from .Status import Status
+from Status import Status
 from datetime import datetime
 
 class Package():
 
     _class_all_packages = []
-    _class_id = 1
 
-    def __init__(self, weight:int, pickup_loc:str, dropoff_loc:str, customer: Customer):
+    def __init__(self, weight:int, pickup_loc:str, dropoff_loc:str, customer_id:int):
 
         if weight < 0:
             raise ValueError("Package weight cannot be < 0!")
@@ -15,26 +13,19 @@ class Package():
 
         self._pickup_loc = pickup_loc # pickup location
         self._dropoff_loc = dropoff_loc # dropoff location
+        self._id = customer_id
+
         self._current_loc = self._pickup_loc # DEFAULT current location: at pickup
-
         self._date_creation = datetime.now().strftime("%H:%M %d.%m.%Y") # time of package creation
-
         self._status = Status() # package status: Collected, On Route, Delivered
-
-        # Set and increment id only when all checks pass
-        self._id = Package._class_id
-        Package._class_id += 1
-
-        self._customer = customer # Contact info
-        self._customer.set_package_id(self._id)# set package id to customer
         
-        # Append package to all packages - used for find_package_by_id
+        # Append package to all packages - could be used for something
         Package._class_all_packages.append(self)
 
     @property
     def id(self):
         """
-        Return id.
+        Return package id.
         """
         return self._id
     
@@ -57,42 +48,13 @@ class Package():
         """
         self._status.advance_status()
 
-    def find_package_by_id(self, find_id:int):
-        """
-        Tries to find package by id. Returns package_info()
-        """
-        for package in Package._class_all_packages:
-            if package.id == find_id:
-                return package.package_info()
-        raise ValueError("Package not found!")
-
-    def package_info(self):
-        """
-        Returns full package info.
-        """
-        return "\n".join([
-            f"## Customer info: {self._customer.name}, {self._customer.email}",
-            f"#  Package id: {self.id}, Status: {self.status}",
-            f"#  Package date creation: {self._date_creation}",
-            f"#  Package pickup location: {self._pickup_loc}",
-            f"#  Package current location: {self._current_loc}",
-            f"#  Package destination: {self._dropoff_loc}",
-            f"#  Package weight: {self._weight} KG"
-        ])
-
-    def realtime_info(self):
-        """
-        Currently returns self._current_loc and creation date ONLY.\n
-        TODO: Time remaining until destination is reached. 
-        Should also return more accurate current location.
-        """
-        return "\n".join([
-            f"# Package current location: {self._current_loc}",
-            f"# Package creation date: {self._date_creation}"
-        ])
-
-# customer1 = Customer("Emanuil", "emko@abv.bg")
-# package1 = Package(100, "Ruse", "Varna", customer1)
-# package1.advance_package_status()
-# print(package1.package_info())
-# print(package1.find_package_by_id(1))
+    # def realtime_info(self):
+    #     """
+    #     Currently returns self._current_loc and creation date ONLY.\n
+    #     TODO: Time remaining until destination is reached. 
+    #     Should also return more accurate current location.
+    #     """
+    #     return "\n".join([
+    #         f"# Package current location: {self._current_loc}",
+    #         f"# Package creation date: {self._date_creation}"
+    #     ])
