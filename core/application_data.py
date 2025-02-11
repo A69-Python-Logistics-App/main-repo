@@ -25,7 +25,7 @@ class ApplicationData:
     def create_route(self, date: datetime, *locations: list[str]) -> str:
         # TODO: fix implementation with the correct location validation
         try:
-            route = Route(["SYD", "MEL"], date) # TODO: placeholder values
+            route = Route(locations, date)
         except Exception as e:
             return e.args[0]
 
