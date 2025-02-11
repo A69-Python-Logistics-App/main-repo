@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
+from models.Package import Package
 
 class Route:
+    route_counter = 1
+
     AVG_TRUCK_SPEED = 87
     SYDNEY_CODE = "SYD"
     MELBOURNE_CODE = "MEL"
@@ -23,6 +26,8 @@ class Route:
     def __init__(self, stops:list, departure_time: datetime):
         if len(stops) < 2:
             raise ValueError("Route needs to be at least 2 stops")
+        self.route_id = Route.route_counter
+        Route.route_counter += 1
         self.stops = stops
         self.route_total_distance = 0
         self.route_stop_estimated_arrival = [departure_time]
@@ -50,9 +55,15 @@ class Route:
         route_info += f"Total distance is: {self.route_total_distance} km\n"
 
         return route_info
+    
     def assign_truck(self, truck_id: int, truck_capacity: int):
-        pass
+        if truck_capacity < self.current_weight:
+            raise ValueError(f"Truck has {truck_capacity}kg capacity but {self.current_weight}kg is needed")
+        self.truck_id = truck_id
+        self.weight_capacity = truck_capacity
+
 
     def add_package(self, package):
         if self.current_weight + package.weight > self.weight_capacity:
-            pass
+            raise ValueError(f"Package weight exceeds the capacity. Capacity is {self.weight_capacity - self.current_weight}")
+        self.current_weight += package.weight
