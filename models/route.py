@@ -43,7 +43,13 @@ class Route:
             self.route_stop_estimated_arrival.append(next_stop_estimated_time_of_arrival)
 
             current_stop_estimated_time_of_arrival = next_stop_estimated_time_of_arrival
+    
+    def __str__(self):
+        route_info = f"This route has {len(self.stops)} stops:\n"
+        route_info += f"Departure time is: {self.route_stop_estimated_arrival[0]}\n"
+        route_info += f"Total distance is: {self.route_total_distance} km\n"
 
+        return route_info
     def assign_truck(self, truck_id: int, truck_capacity: int):
         pass
 
