@@ -1,0 +1,25 @@
+from commands.base.base_command import BaseCommand
+from core.application_data import ApplicationData
+
+
+class RoutesCommand(BaseCommand):
+
+    def __init__(self, params: list[str], app_data: ApplicationData):
+        super().__init__(params, app_data)
+        self.validate_params(0)
+
+    def execute(self):
+        routes = self.app_data.routes
+
+
+        output = []
+        # Check if there are any routes
+        if not len(routes):
+            output.append("There are no routes in the system.")
+        else:
+            # Print routes
+            for route in self.app_data.routes:
+                output.append(str(route))
+
+        # returning the output joined with a new line
+        return "\n".join(output)

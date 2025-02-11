@@ -13,6 +13,10 @@ class ApplicationData:
         self._packages = []
         self._locations = []
 
+    @property
+    def routes(self):
+        return tuple(self._routes)
+
     def create_package(self, weight, pickup, dropoff, customer_id) -> str:
         package = Package(weight, pickup, dropoff, customer_id)
         self._packages.append(package)
@@ -21,8 +25,9 @@ class ApplicationData:
     def create_route(self, date: datetime, *locations: [str]) -> str:
         # TODO: fix implementation with the correct location validation
         try:
-            route = Route(locations, date)
+            route = Route(["SYD", "MEL"], date) # TODO: placeholder values
         except Exception as e:
             return e.args[0]
+
         self._routes.append(route)
         return f"Route #{"route.id"} from {locations[0]} to {locations[-1]} created."
