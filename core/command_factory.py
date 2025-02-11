@@ -16,3 +16,4 @@ class CommandFactory:
                 return CreatePackageCommand(params, self._app_data)
             case _:
                 raise ValueError(f"Unknown command: {cmd}")
+            
