@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from models.Package import Package
+from models.route import Route
 
 
 class ApplicationData:
@@ -10,7 +13,16 @@ class ApplicationData:
         self._packages = []
         self._locations = []
 
-    def create_package(self, weight, pickup, dropoff, customer):
-        package = Package(weight, pickup, dropoff, customer)
-        # TODO: Implement new package storage
+    def create_package(self, weight, pickup, dropoff, customer_id) -> str:
+        package = Package(weight, pickup, dropoff, customer_id)
+        self._packages.append(package)
         return f"Package #{package.id} created."
+
+    def create_route(self, date: datetime, *locations: [str]) -> str:
+        # TODO: fix implementation with the correct location validation
+        try:
+            route = Route(locations, date)
+        except Exception as e:
+            return e.args[0]
+        self._routes.append(route)
+        return f"Route #{"route.id"} from {locations[0]} to {locations[-1]} created."
