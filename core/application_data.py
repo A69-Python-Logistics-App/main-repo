@@ -45,3 +45,58 @@ class ApplicationData:
         customer = Customer(name, email)
         self._customers.append(customer)
         return customer
+
+#
+# Saving app state to file
+#
+
+    def dump_init(self, state: dict[str:dict]):
+        # customers, packages, routes, locations, log
+        pass
+
+    def init_from_history(self):
+        # TODO: Implement loading app state from history
+        pass
+
+    def save_state_to_history(self, log: list[str]):
+        # TODO: Finish implementation for saving app state
+        state: dict[str:dict] = {
+            "customers": {},
+            "packages": {},
+            "routes": {},
+            "locations": {},
+            "log": log
+        }
+
+        for customer in self._customers:
+            state["customers"][customer.id] = {
+                "name": customer.name,
+                "email": customer.email,
+                "packages": customer.packages # TODO: customer.packages should be a list of int
+            }
+
+        for package in self._packages:
+            state["packages"][package._package_id] = { # TODO: Package doesn't have unique ID
+                "weight": package.weight,
+                "pickup": package._pickup_loc, # TODO: Package doesn't have locations getters
+                "dropoff": package._dropoff_loc,
+                "customer_id": 0, # TODO: Package doesn't have customer ID
+                "status": package.status,
+                "current_loc": package._current_loc, # TODO: Package doesn't have current location getter
+                "date_creation": package._date_creation # TODO: Package doesn't have creation date getter
+            }
+
+        for route in self._routes:
+            state["routes"][route.route_id] = {
+                "locations": route.stops,
+                "date": datetime.now().isoformat() # TODO: Route doesn't have creation date getter
+            }
+
+        for location in self._locations:
+            state["locations"][location.id] = { # TODO: Review locations implementation
+                "name": location.name,
+                "location": location.location
+            }
+
+        with open(self.HISTORY, "w") as f:
+            json.dump(state, f)
