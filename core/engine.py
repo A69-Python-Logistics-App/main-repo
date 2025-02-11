@@ -6,8 +6,9 @@ from core.command_factory import CommandFactory
 class Engine:
     def __init__(self, cmdf: CommandFactory):
         # read state
+        # TODO: implement file storage for app state during exit/init
         self._command_factory = cmdf
-        self._log = []
+        self._log = [f"[{datetime.now().strftime("%Y-%m-%d %H-%M-%S")}]: System started"]
 
     def start(self):
 
@@ -16,7 +17,7 @@ class Engine:
             cmd = input("> ")
 
             if cmd == "exit":
-                # write state
+                # write state ??
                 self.stop()
                 break
 
@@ -26,7 +27,7 @@ class Engine:
             except Exception as e:
                 log_entry = e.args[0]
 
-            print(log_entry)
+            print(log_entry) # printing to console before exit will be required for finding the best route
             self._log.append(f"[{datetime.now().strftime("%Y-%m-%d %H-%M-%S")}] " + log_entry)
 
     def stop(self):
