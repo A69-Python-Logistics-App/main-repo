@@ -1,4 +1,4 @@
-from models.Package import Package
+from models.package import Package
 
 class Customer:
 

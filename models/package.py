@@ -1,4 +1,4 @@
-from models.Status import Status
+from models.status import Status
 from datetime import datetime
 
 class Package():
