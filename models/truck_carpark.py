@@ -21,12 +21,14 @@ class TruckCarPark:
     ACTROS_MAX_RANGE = 26_000
 
     SCANIA_TRUCK_COUNT = 10
+    MAN_TRUCK_COUNT = 15
+    ACTROS_TRUCK_COUNT = 15
 
     def __init__(self):
         self.truck_types: list[TruckType] = [
-            TruckType(self.SCANIA, self.CAP_SCANIA, self.SCANIA_MAX_RANGE, self.SCANIA_ID, self.SCANIA_TRUCK_COUNT)
-            # MANN
-            # ACTROS
+            TruckType(self.SCANIA, self.CAP_SCANIA, self.SCANIA_MAX_RANGE, self.SCANIA_ID, self.SCANIA_TRUCK_COUNT),
+            TruckType(self.MAN, self.CAP_MAN, self.MAN_MAX_RANGE, self.MAN_ID, self.MAN_TRUCK_COUNT),
+            TruckType(self.ACTROS, self.CAP_ACTROS, self.ACTROS_MAX_RANGE, self.ACTROS_ID, self.ACTROS_TRUCK_COUNT)
         ]
 
     def list_all_free_trucks():
