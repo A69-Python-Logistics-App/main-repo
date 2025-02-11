@@ -1,10 +1,14 @@
+import json
 from datetime import datetime
 
+from models.customer import Customer
 from models.package import Package
 from models.route import Route
 
 
 class ApplicationData:
+
+    HISTORY = "history.json"
 
     def __init__(self):
         # TODO: Implement collections
@@ -30,4 +34,14 @@ class ApplicationData:
             return e.args[0]
 
         self._routes.append(route)
-        return f"Route #{"route.id"} from {locations[0]} to {locations[-1]} created."
+        return f"Route #{route.route_id} from {locations[0]} to {locations[-1]} created."
+
+    def get_customer(self, email: str, name: str="") -> Customer:
+        for customer in self._customers: # Search by email for existing customer
+            if customer.email == email:
+                return customer
+
+        # If customer doesn't exist, create a new one
+        customer = Customer(name, email)
+        self._customers.append(customer)
+        return customer
