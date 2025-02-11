@@ -1,5 +1,5 @@
 import unittest
-from models.Status import Status
+from models.status import Status
 
 INIT_VALID_STATUS = "Collected"
 INIT_VALID_IDX = 0
