@@ -1,4 +1,4 @@
-from Status import Status
+from models.status import Status
 from datetime import datetime
 
 class Package():
@@ -7,13 +7,19 @@ class Package():
 
     def __init__(self, weight:int, pickup_loc:str, dropoff_loc:str, customer_id:int):
 
+        """
+        Package with weight, pickup location, dropoff location and customer id.
+        """
+
         if weight < 0:
             raise ValueError("Package weight cannot be < 0!")
         self._weight = weight # weight in KGs
 
         self._pickup_loc = pickup_loc # pickup location
         self._dropoff_loc = dropoff_loc # dropoff location
-        self._id = customer_id
+        if type(customer_id) != int:
+            raise ValueError("Invalid customer_id for package!")
+        self._package_id = customer_id
 
         self._current_loc = self._pickup_loc # DEFAULT current location: at pickup
         self._date_creation = datetime.now().strftime("%H:%M %d.%m.%Y") # time of package creation
@@ -27,7 +33,7 @@ class Package():
         """
         Return package id.
         """
-        return self._id
+        return self._package_id
     
     @property
     def status(self):

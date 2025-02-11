@@ -1,13 +1,12 @@
 
 class Status():
 
-    """
-    Package status. Can be: "Collected", "On Route", "Delivered".
-    """
-
     _class_status_types = {0: "Collected", 1: "On Route", 2: "Delivered"}
 
     def __init__(self):
+        """
+        Package status. Can be: "Collected" (default), "On Route", "Delivered".
+        """
         self._value = Status._class_status_types[0] # Collected value by default
         self._idx = 0 # used for advance status
 
