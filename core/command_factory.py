@@ -12,3 +12,4 @@ class CommandFactory:
         match cmd:
             case _:
                 raise ValueError(f"Unknown command: {cmd}")
+            

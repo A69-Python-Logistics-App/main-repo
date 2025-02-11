@@ -28,3 +28,4 @@ class Status():
             self._value = Status._class_status_types[2]
         else:
             self._value = Status._class_status_types[self._idx]
+    
