@@ -11,6 +11,13 @@ class Location:
         self.list_of_packages_on_location:list[Package] = []
 
     @classmethod
-    def validate_location(cls, location: str):
-        if not location in cls.Cities:
-            raise ValueError(f"Invalid location [{location}] provided.\nAvailable locations: {', '.join(cls.Cities)}")
+    def validate_locations(cls, *locations: [str]):
+        """
+        Checks if locations are valid
+        :param locations: accepts any number of locations as arguments
+        :raise ValueError: if location is invalid
+        """
+        for location in locations:
+            if not location in cls.Cities:
+                raise ValueError("\n".join([f"Invalid location [{location}] provided.",
+                                            f"Available locations: {', '.join(cls.Cities)}"]))
