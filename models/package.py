@@ -7,6 +7,10 @@ class Package():
 
     def __init__(self, weight:int, pickup_loc:str, dropoff_loc:str, customer_id:int):
 
+        """
+        Package with weight, pickup location, dropoff location and customer id.
+        """
+
         if weight < 0:
             raise ValueError("Package weight cannot be < 0!")
         self._weight = weight # weight in KGs
