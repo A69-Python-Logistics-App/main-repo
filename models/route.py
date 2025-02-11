@@ -50,7 +50,7 @@ class Route:
             current_stop_estimated_time_of_arrival = next_stop_estimated_time_of_arrival
     
     def __str__(self):
-        route_info = f"This route has {len(self.stops)} stops:\n"
+        route_info = f"This route has {len(self.stops) -1} stops:\n"
         route_info += f"Departure time is: {self.route_stop_estimated_arrival[0]}\n"
         route_info += f"Total distance is: {self.route_total_distance} km\n"
 
