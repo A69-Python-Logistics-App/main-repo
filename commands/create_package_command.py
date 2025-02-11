@@ -12,20 +12,19 @@ class CreatePackageCommand(BaseCommand):
 
     def execute(self):
         # Unpacking values from params
-        weight, pickup, dropoff, customer = self._params
+        weight, pickup, dropoff, customer = self.params
 
         # Trying to parse weight into an integer value
         try:
             weight = int(weight)
-        except ValueError:
+        except:
             raise ValueError(f"Invalid number ({weight}) provided for weight!")
 
         # Making sure the pickup and dropoff locations are valid
-        Location.validate_location(pickup)
-        Location.validate_location(dropoff)
+        Location.validate_locations(pickup, dropoff)
 
         # TODO: Validate customer exists or change customer implementation
         customer = Customer("test_name", "test_email@test.com")
 
         # returning the result of create_package execution
-        return self._app_data.create_package(weight, pickup, dropoff, customer)
+        return self.app_data.create_package(weight, pickup, dropoff, customer)
