@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from models.Package import Package
+from models.package import Package
 from models.route import Route
 
 

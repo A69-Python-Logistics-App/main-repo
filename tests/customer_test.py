@@ -1,5 +1,5 @@
 import unittest
-from models.Customer import Customer
+from models.customer import Customer
 from tests.package_test import VALID_CUSTOMER
 
 # CUSTOMER

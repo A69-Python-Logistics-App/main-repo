@@ -1,8 +1,8 @@
 import unittest
 from models.route import Route
 from datetime import datetime, timedelta
-from models.Package import Package
-from models.Customer import Customer
+from models.package import Package
+from models.customer import Customer
 
 class TestRout_Should(unittest.TestCase):
     VALID_CUSTOMER = Customer("customer", "customer@")

@@ -1,5 +1,5 @@
 
-from models.Package import Package
+from models.package import Package
 class Location:
     Cities = ["Sydney", "Melbourne", "Adelaide", "Alice Springs", "Brisbane", "Darwin", "Perth"]
 
