@@ -1,6 +1,6 @@
 from commands.base.base_command import BaseCommand
 from core.application_data import ApplicationData
-from models.Customer import Customer
+from models.customer import Customer
 from models.location import Location
 
 
@@ -25,7 +25,7 @@ class CreatePackageCommand(BaseCommand):
 
         # TODO: Validate customer exists or change customer implementation
         # first name + last name + email
-        customer = Customer(" ".join((customer[0], customer[1])), customer[2])
+        customer = Customer(" ".join((customer[0], customer[1])), customer[2]).id
 
         # returning the result of create_package execution
         return self.app_data.create_package(weight, pickup, dropoff, customer)

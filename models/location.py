@@ -1,5 +1,5 @@
 
-from models.Package import Package
+from models.package import Package
 class Location:
     Cities = ["Sydney", "Melbourne", "Adelaide", "Alice Springs", "Brisbane", "Darwin", "Perth"]
 
@@ -8,10 +8,10 @@ class Location:
             raise ValueError("Invalid Location")
         self.hub_name = hub_name
         # self.list_of_trucks_on_location:list[Truck] = []
-        self.list_of_packages_on_location:list[Package] = []
+        self.list_of_packages_on_location: list[Package] = []
 
     @classmethod
-    def validate_locations(cls, *locations:str):
+    def validate_locations(cls, *locations: list[str]):
         """
         Checks if locations are valid
         :param locations: accepts at least one location or more as argument(s)

@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-from models.Package import Package
 
 class Route:
     route_counter = 1
