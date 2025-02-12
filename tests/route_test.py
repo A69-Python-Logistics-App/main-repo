@@ -8,6 +8,7 @@ class Route_Should(unittest.TestCase):
     VALID_CUSTOMER = Customer("customer", "customer@")
     VALID_PACKAGE = Package(5000, "SYD", "MEL", VALID_CUSTOMER.id)
     VALID_ROUTE = Route(stops=["SYD", "MEL"], departure_time=datetime.now())
+    VALID_ROUTE_2 = Route(stops=["SYD", "MEL"], departure_time=datetime.now())
 
 
     def test_route_raises_error_when_stops_less_than_two(self):
@@ -23,8 +24,8 @@ class Route_Should(unittest.TestCase):
     
     def test_add_package_raises_error_when_capacity_exceeded(self):
         package = self.VALID_PACKAGE
-        route = self.VALID_ROUTE
-        route.assign_truck(1002, 40_000)
+        route = self.VALID_ROUTE_2
+        route.assign_truck(1003, 40_000)
         route.add_package(package)
         package_2 = Package(40_000,"SYD","MEL", self.VALID_CUSTOMER.id)
 

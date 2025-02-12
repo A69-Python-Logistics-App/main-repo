@@ -23,7 +23,8 @@ class Customer():
         """
         if type(name) != str:
             raise ValueError("Name must be a string!")
-        if len(name) < 4 or len(name) > 16:
+        if len(name) < 4 or len(name) > 30:
+            # TODO: fix length check and validate alphabetic
             raise ValueError("Name lenght error!")
         return name
         

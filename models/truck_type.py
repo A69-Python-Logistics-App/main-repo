@@ -1,5 +1,4 @@
 
-
 class TruckType:
 
     def __init__(self, name, capacity, max_range, first_id, count):

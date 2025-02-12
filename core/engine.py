@@ -28,8 +28,10 @@ class Engine:
                 log_entry = e.args[0]
 
             print(log_entry) # printing to console before exit will be required for finding the best route
-            self._log.append(f"[{datetime.now().strftime("%Y-%m-%d %H-%M-%S")}] " + log_entry)
+            self._log.append(f"[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}] " + log_entry)
 
     def stop(self):
+        self._command_factory.app_data.save_state_to_history(self._log)
+        print("Event log: ")
         print("\n".join(self._log))
         print("=" * 10 + " Goodbye " + "=" * 10)

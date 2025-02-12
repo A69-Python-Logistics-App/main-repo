@@ -1,7 +1,4 @@
-
-
 from models.truck_type import TruckType
-
 
 class TruckCarPark:
     SCANIA = "Scania"
@@ -31,7 +28,8 @@ class TruckCarPark:
             TruckType(self.ACTROS, self.CAP_ACTROS, self.ACTROS_MAX_RANGE, self.ACTROS_ID, self.ACTROS_TRUCK_COUNT)
         ]
 
-    def list_all_free_trucks():
-        # for truck_type in truck_types:
-            # print_truck_type_free_info()
-        pass
+    def list_all_free_trucks(self):
+        free_trucks = []
+        for truck_type in self.truck_types:
+            free_trucks.extend(truck_type.free_truck_ids)
+        return free_trucks

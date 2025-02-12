@@ -14,7 +14,7 @@ class RoutesCommand(BaseCommand):
 
         output = []
         # Check if there are any routes
-        if not len(routes):
+        if len(routes) == 0:
             output.append("There are no routes in the system.")
         else:
             # Print routes
