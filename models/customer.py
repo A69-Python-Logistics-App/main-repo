@@ -4,12 +4,13 @@ class Customer():
 
     _customer_id = 1
 
-    def __init__(self, name:str, email:str):
+    def __init__(self, first_name:str, last_name:str, email:str):
 
         """ 
         Customer with name and email.
         """
-        self._name = Customer._check_valid_name(name)
+        self._first_name = Customer._check_valid_name(first_name)
+        self._last_name = Customer._check_valid_name(last_name)
         self._email = Customer._check_valid_email(email)
         self._packages:list[Package] = []
         self._id = Customer._customer_id
@@ -22,9 +23,10 @@ class Customer():
         """
         if type(name) != str:
             raise ValueError("Name must be a string!")
-        if len(name) < 4 or len(name) > 30:
-            # TODO: fix length check and validate alphabetic
+        if len(name) < 2 or len(name) > 12:
             raise ValueError("Name lenght error!")
+        if not name.isalpha():
+            raise ValueError("Name is not an alphabetic string!")
         return name
         
     @staticmethod

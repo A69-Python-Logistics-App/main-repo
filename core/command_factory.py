@@ -1,4 +1,5 @@
 from commands.base.base_command import BaseCommand
+from commands.create_customer_command import CreateCustomerCommand
 from commands.create_package_command import CreatePackageCommand
 from commands.create_route_command import CreateRouteCommand
 from commands.routes_command import RoutesCommand
@@ -18,6 +19,8 @@ class CommandFactory:
         cmd, *params = command.split()
 
         match cmd.lower():
+            case "createcustomer":
+                return CreateCustomerCommand(params, self._app_data)
             case "createpackage":
                 return CreatePackageCommand(params, self._app_data)
             case "createroute":
