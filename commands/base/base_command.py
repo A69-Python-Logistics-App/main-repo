@@ -26,7 +26,7 @@ class BaseCommand:
 
     def require_permission(self):
         cmd = self.__class__.__name__.replace("Command", "")
-        if not self._app_data.employee.can_execute(cmd.lower()):
+        if not self._app_data.employee.can_execute(cmd):
             raise ValueError(f"You do not have permission to use {cmd} command!")
 
     def execute(self) -> str:

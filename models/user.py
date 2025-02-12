@@ -1,5 +1,7 @@
 import string
 
+from pandas.core.computation.expressions import evaluate
+
 
 class User:
 
@@ -8,6 +10,10 @@ class User:
 
     READ_ONLY = [ # Add all read-only commands
         "routes"
+    ]
+
+    WRITE = READ_ONLY + [
+        "CreateCustomer", "CreatePackage", "CreateRoute",
     ]
 
     def __init__(self, username: str, password: str, role: str=ROLES["READ_ONLY"]):
@@ -50,3 +56,11 @@ class User:
         if self.role == self.ROLES["WRITE"]:
             return True
         return command in self.READ_ONLY
+
+### TESTING
+
+    def test(self, test):
+        return getattr(self.__class__, test)
+
+# user = User("admin", "password")
+# print(user.test("READ_ONLY"))
