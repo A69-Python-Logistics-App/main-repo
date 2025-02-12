@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from models.Package import Package
+from models.package import Package
 
 class Route:
     route_counter = 1
@@ -23,7 +23,7 @@ class Route:
         PERTH_CODE:{SYDNEY_CODE:4016, MELBOURNE_CODE:3509, ADELAIDE_CODE:2785, ALICE_SPRINGS_CODE:2481, BRISBANE_CODE:4311,DARWIN_CODE:4025,PERTH_CODE:0},    
     }
     
-    def __init__(self, stops:list, departure_time: datetime):
+    def __init__(self, stops:list[str], departure_time: datetime):
         if len(stops) < 2:
             raise ValueError("Route needs to be at least 2 stops")
         self.route_id = Route.route_counter
@@ -34,29 +34,53 @@ class Route:
         self.truck_id = None
         self.weight_capacity = None
         self.current_weight = 0
+        self.route_total_distance, self.route_stop_estimated_arrival = self.calculate_route_timeline(departure_time, stops)
 
+        
+    def calculate_route_timeline(self,departure_time, stops:list[str]):
+        route_total_distance = 0
+        route_stop_estimated_arrival = [departure_time]
         current_stop_estimated_time_of_arrival = departure_time
+
         for i in range(len(stops) -1):
             current_stop = stops[i]
             next_stop = stops[i + 1]
             distance_to_next_stop = self.distances[current_stop][next_stop]
 
-            self.route_total_distance += distance_to_next_stop
+            route_total_distance += distance_to_next_stop
 
             hours_to_next_stop = timedelta(hours=(distance_to_next_stop / self.AVG_TRUCK_SPEED))
             next_stop_estimated_time_of_arrival = current_stop_estimated_time_of_arrival + hours_to_next_stop
-            self.route_stop_estimated_arrival.append(next_stop_estimated_time_of_arrival)
+            route_stop_estimated_arrival.append(next_stop_estimated_time_of_arrival)
 
             current_stop_estimated_time_of_arrival = next_stop_estimated_time_of_arrival
+        
+        return route_total_distance,route_stop_estimated_arrival
     
     def __str__(self):
-        route_info = f"This route has {len(self.stops) -1} stops:\n"
-        route_info += f"Departure time is: {self.route_stop_estimated_arrival[0]}\n"
-        route_info += f"Total distance is: {self.route_total_distance} km\n"
+        route_id = self.route_id
+        stops = self.stops
+        total_distance = self.route_total_distance
+        estimated_arrivals = self.route_stop_estimated_arrival
+        truck = self.truck_id
+        result = f"Route ID: {route_id}\n"
+        result += f"Stops {" -> ".join(stops)}\n"
+        result += f"Total distance: {total_distance}"
+        result += f"Estimated arrivals:\n"
+        for i in range(len(stops)):
+            result += f" - {stops[i]}: {estimated_arrivals[i].strftime("%Y-%m-%d %H:%M")}\n"
+        if truck:
+            result += f"\n Assign Truck with ID: {truck} and Capacity {self.weight_capacity}kg"
+        else:
+            result += f"\n No Truck assigned"
 
-        return route_info
-    
+        
     def assign_truck(self, truck_id: int, truck_capacity: int):
+        """
+        This method assigns a truck to a route.
+        :params: truck_id:int and truck_capacity:int
+        :return: None. The truck is assigned to the route
+        """
         if truck_capacity < self.current_weight:
             raise ValueError(f"Truck has {truck_capacity}kg capacity but {self.current_weight}kg is needed")
         self.truck_id = truck_id
@@ -64,6 +88,11 @@ class Route:
 
 
     def add_package(self, package):
+        """
+        This method adds a package to the current weight and updates it.
+        :params: package(Package) the package to be added
+        Raises ValueError if the total weight exceeds the weight capacity
+        """
         if self.current_weight + package.weight > self.weight_capacity:
             raise ValueError(f"Package weight exceeds the capacity. Capacity is {self.weight_capacity - self.current_weight}")
         self.current_weight += package.weight

@@ -22,7 +22,7 @@ class ApplicationData:
         self._packages.append(package)
         return f"Package #{package.id} created."
 
-    def create_route(self, date: datetime, *locations: [str]) -> str:
+    def create_route(self, date: datetime, *locations:list[str])  -> str:
         # TODO: fix implementation with the correct location validation
         try:
             route = Route(["SYD", "MEL"], date) # TODO: placeholder values
