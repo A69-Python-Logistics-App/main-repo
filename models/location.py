@@ -8,7 +8,8 @@ class Location:
     BRISBANE_CODE = "BRI"
     DARWIN_CODE = "DAR"
     PERTH_CODE = "PER"
-    Cities = [SYDNEY_CODE, MELBOURNE_CODE, ADELAIDE_CODE, ALICE_SPRINGS_CODE, BRISBANE_CODE, DARWIN_CODE, PERTH_CODE]
+    
+    cities = [SYDNEY_CODE, MELBOURNE_CODE, ADELAIDE_CODE, ALICE_SPRINGS_CODE, BRISBANE_CODE, DARWIN_CODE, PERTH_CODE]
 
     def __init__(self,hub_name):
         if hub_name not in Location.Cities:
