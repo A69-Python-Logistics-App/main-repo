@@ -38,7 +38,6 @@ class User:
         if len(password) < 6 or len(password) > 18:
             raise ValueError(f"Invalid password provided ({len(password)} characters long, expected 6-18)!")
         if not set(password).issubset(set(string.ascii_letters + string.digits + "_-*@#$")):
-            # invalid characters in password
             raise ValueError(f"Invalid characters in password. Use only characters, digits and [_, -, *, @, #, $]!")
         self._password = password
 
@@ -50,6 +49,8 @@ class User:
     def role(self, role):
         if role not in self.ROLES.values():
             raise ValueError(f"Invalid employee role: {role}")
+        if role == self._role:
+            raise ValueError(f"Employee role is already set to {role}")
         self._role = role
 
     def can_execute(self, command: str) -> bool:
