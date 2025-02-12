@@ -48,7 +48,7 @@ class Package():
         """
         Return current package status.
         """
-        return self._status
+        return self._status.current
     
     @property
     def weight(self):

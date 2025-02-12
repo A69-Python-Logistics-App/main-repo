@@ -2,6 +2,7 @@ from commands.base.base_command import BaseCommand
 from commands.create_customer_command import CreateCustomerCommand
 from commands.create_package_command import CreatePackageCommand
 from commands.create_route_command import CreateRouteCommand
+from commands.customer_packages_command import CustomerPackagesCommand
 from commands.routes_command import RoutesCommand
 from core.application_data import ApplicationData
 
@@ -25,6 +26,8 @@ class CommandFactory:
                 return CreatePackageCommand(params, self._app_data)
             case "createroute":
                 return CreateRouteCommand(params, self._app_data)
+            case "customerpackages":
+                return CustomerPackagesCommand(params, self._app_data)
             case "routes":
                 return RoutesCommand(params, self._app_data)
             case _:

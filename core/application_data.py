@@ -36,7 +36,11 @@ class ApplicationData:
     def create_package(self, weight, pickup, dropoff, customer_id) -> str:
         package = Package(weight, pickup, dropoff, customer_id)
         self._packages.append(package)
-        return f"Package #{package.id} created."
+
+        customer = self.find_customer_by_id(customer_id)
+        customer.add_package(package) # find customer and add package
+
+        return f"Package #{package.id} created and added to customer #{customer_id}."
 
     def create_route(self, date: datetime, *locations: list[str]) -> str:
         # TODO: fix implementation with the correct location validation
@@ -65,7 +69,7 @@ class ApplicationData:
 
     def find_package_by_id(self, id_number: int) -> Package | None:
         for package in self._packages:
-            if package._package_id == id_number:
+            if package.id == id_number:
                 return package
 
     def find_route_by_id(self, id_number: int) -> Route | None:
@@ -81,7 +85,7 @@ class ApplicationData:
     def find_packages_at_hub(self, hub: str) -> list[Package]:
         packages_at_hub = []
         for package in self._packages:
-            if package.status.current == Status._class_status_types[0] and package._current_loc == hub:
+            if package.status == Status._class_status_types[0] and package.current_location == hub:
                 packages_at_hub.append(package)
         return packages_at_hub
 
@@ -151,14 +155,14 @@ class ApplicationData:
             }
 
         for package in self._packages:
-            state["packages"][package._package_id] = { # TODO: Package doesn't have unique ID
+            state["packages"][package.id] = {
                 "weight": package.weight,
-                "pickup": package._pickup_loc, # TODO: Package doesn't have locations getters
-                "dropoff": package._dropoff_loc,
-                "customer_id": 0, # TODO: Package doesn't have customer ID
+                "pickup": package.pickup_location,
+                "dropoff": package.dropoff_location,
+                "customer_id": package.customer_id,
                 "status": package.status,
-                "current_loc": package._current_loc, # TODO: Package doesn't have current location getter
-                "date_creation": package._date_creation # TODO: Package doesn't have creation date getter
+                "current_loc": package.current_location,
+                "date_creation": package.date_creation
             }
 
         for route in self._routes:
