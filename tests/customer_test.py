@@ -1,5 +1,6 @@
 import unittest
 from models.customer import Customer
+from models.package import Package
 from tests.package_test import VALID_CUSTOMER
 
 # CUSTOMER
@@ -70,4 +71,25 @@ class Customer_Should(unittest.TestCase):
         # AAA
         with self.assertRaises(ValueError):
             _ = VALID_CUSTOMER.find_package_by_id(100)
+
+    def test_infoPackageById_returns_correctType(self):
+        # ARRANGE
+        customer = Customer(VALID_NAME, VALID_EMAIL)
+        package = Package(VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, customer.id)
+        id = customer.id
+        customer.add_package(package)
+        # ACT
+        info = customer.info_package_by_id(id)
+        # ASSERT
+        self.assertIsInstance(info, str)
+    
+    def test_infoAllPackages_returns_correctType(self):
+        # ARRANGE
+        customer = Customer(VALID_NAME, VALID_EMAIL)
+        package = Package(VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, customer.id)
+        customer.add_package(package)
+        # ACT
+        info = customer.info_all_packages()
+        # ASSERT
+        self.assertIsInstance(info, str)
 

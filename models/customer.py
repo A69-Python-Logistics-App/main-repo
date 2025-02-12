@@ -9,7 +9,6 @@ class Customer():
         """ 
         Customer with name and email.
         """
-        
         self._name = Customer._check_valid_name(name)
         self._email = Customer._check_valid_email(email)
         self._packages:list[Package] = []
