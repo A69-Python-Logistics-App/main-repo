@@ -10,10 +10,6 @@ class User:
         "routes"
     ]
 
-    ADMIN = READ_ONLY + [ # Add all write commands
-        "create_customer", "create_package", "create_route"
-    ]
-
     def __init__(self, username: str, password: str, role: str=ROLES["READ_ONLY"]):
         if len(username) < 4 or len(username) > 16:
             raise ValueError(f"Invalid username provided ({len(username)}), expected 4-16 characters!")
@@ -51,6 +47,6 @@ class User:
         self._role = role
 
     def can_execute(self, command: str) -> bool:
-        if self.role == self.ROLES["all"]:
+        if self.role == self.ROLES["WRITE"]:
             return True
-        return command in self.ROLES[self.role]
+        return command in self.READ_ONLY

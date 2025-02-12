@@ -6,6 +6,7 @@ from models.location import Location
 from models.package import Package
 from models.route import Route
 from models.status import Status
+from models.user import User
 
 
 class ApplicationData:
@@ -13,6 +14,12 @@ class ApplicationData:
     HISTORY = "history.json"
 
     def __init__(self):
+
+        # TODO: Implement employee login and permissions
+        self._employees: [User] = []
+        self._current_employee = None
+
+
         # TODO: Implement collections
         self._routes = []
         self._customers = []
@@ -32,6 +39,10 @@ class ApplicationData:
     @property
     def routes(self) -> tuple:
         return tuple(self._routes)
+
+    @property
+    def employee(self) -> User | None:
+        return self._current_employee
 
     def create_package(self, weight, pickup, dropoff, customer_id) -> str:
         package = Package(weight, pickup, dropoff, customer_id)
