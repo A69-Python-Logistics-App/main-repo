@@ -5,6 +5,7 @@ from models.customer import Customer
 from models.location import Location
 from models.package import Package
 from models.route import Route
+from models.status import Status
 
 
 class ApplicationData:
@@ -80,7 +81,7 @@ class ApplicationData:
     def find_packages_at_hub(self, hub: str) -> list[Package]:
         packages_at_hub = []
         for package in self._packages:
-            if package.status.current == "Collected" and package._current_loc == hub:
+            if package.status.current == Status._class_status_types[0] and package._current_loc == hub:
                 packages_at_hub.append(package)
         return packages_at_hub
 
@@ -107,6 +108,7 @@ class ApplicationData:
         route = self.find_route_by_id(route)
         assigned = 0
         for package in packages:
+            # TODO: check if package is already assigned
             try:
                 self.assign_package_to_route(package.id, route.route_id)
                 assigned += 1

@@ -1,3 +1,5 @@
+from multiprocessing.managers import Value
+
 from commands.base.base_command import BaseCommand
 from core.application_data import ApplicationData
 from models.customer import Customer
@@ -8,11 +10,11 @@ class CreatePackageCommand(BaseCommand):
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
-        self.validate_params(6)
+        self.validate_params(4)
 
     def execute(self):
         # Unpacking values from params
-        weight, pickup, dropoff, *cdata = self.params
+        weight, pickup, dropoff, customer_email = self.params
 
         # Trying to parse weight into an integer value
         try:
@@ -24,9 +26,9 @@ class CreatePackageCommand(BaseCommand):
         Location.validate_locations(pickup, dropoff)
 
         # Trying to find existing customer or create a new one
-        customer = self.app_data.find_customer_by_email(cdata[2])
+        customer = self.app_data.find_customer_by_email(customer_email)
         if not customer:
-            customer = self.app_data.create_customer(*cdata)
+            raise ValueError(f"Customer with email {customer_email} not found!")
 
         # returning the result of create_package execution
         return self.app_data.create_package(weight, pickup, dropoff, customer.id)
