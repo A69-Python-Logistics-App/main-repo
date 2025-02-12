@@ -172,3 +172,9 @@ cython_debug/
 
 # VSCODE settings
 .vscode/
+
+# VSCODE settings
+.vscode/
+
+# pycharm
+.idea/
