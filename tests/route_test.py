@@ -1,13 +1,14 @@
 import unittest
 from models.route import Route
 from datetime import datetime, timedelta
-from models.Package import Package
-from models.Customer import Customer
+from models.package import Package
+from models.customer import Customer
 
 class TestRout_Should(unittest.TestCase):
     VALID_CUSTOMER = Customer("customer", "customer@")
-    VALID_PACKAGE = Package(5000, "SYD", "MEL", VALID_CUSTOMER)
+    VALID_PACKAGE = Package(5000, "SYD", "MEL", VALID_CUSTOMER.id)
     VALID_ROUTE = Route(stops=["SYD", "MEL"], departure_time=datetime.now())
+    VALID_ROUTE2 = Route(stops=["SYD", "MEL"], departure_time=datetime.now())
 
 
     def test_route_raises_error_when_stops_less_than_two(self):
@@ -23,10 +24,10 @@ class TestRout_Should(unittest.TestCase):
     
     def test_add_package_raises_error_when_capacity_exceeded(self):
         package = self.VALID_PACKAGE
-        route = self.VALID_ROUTE
+        route = self.VALID_ROUTE2
         route.assign_truck(1002, 40_000)
         route.add_package(package)
-        package_2 = Package(40_000,"SYD","MEL", self.VALID_CUSTOMER)
+        package_2 = Package(40_000,"SYD","MEL", self.VALID_CUSTOMER.id)
 
         with self.assertRaises(ValueError):
             route.add_package(package_2)

@@ -49,7 +49,7 @@ class ApplicationData:
         return f"Route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stops created."
 
     def create_customer(self, first_name: str, last_name: str, email: str) -> Customer:
-        customer = Customer(" ".join((first_name, last_name)), email)
+        customer = Customer(first_name, last_name, email)
         self._customers.append(customer)
         return customer
 

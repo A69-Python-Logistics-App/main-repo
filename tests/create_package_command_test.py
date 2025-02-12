@@ -12,8 +12,8 @@ VALID_EMAIL = "siso@icloud.com"
 
 # PACKAGE
 VALID_WEIGHT = 100
-VALID_PICKUP = "SYD"
-VALID_DROPOFF = "MEL"
+VALID_PICKUP = "Sydney"
+VALID_DROPOFF = "Melbourne"
 
 def invalid_params() -> list[str]:
     return [VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, VALID_FULL_NAME, VALID_EMAIL]
