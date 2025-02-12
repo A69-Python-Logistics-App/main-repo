@@ -47,6 +47,11 @@ class ApplicationData:
         self._routes.append(route)
         return f"Route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stops created."
 
+    def create_customer(self, first_name: str, last_name: str, email: str) -> Customer:
+        customer = Customer(" ".join((first_name, last_name)), email)
+        self._customers.append(customer)
+        return customer
+
     def find_customer_by_email(self, email: str) -> Customer | None:
         for customer in self._customers: # Search by email for existing customer
             if customer.email == email:
@@ -96,15 +101,14 @@ class ApplicationData:
         # TODO: Implement getting hub trucks capacity
         return 0
 
+    #
+    # Saving app state to file
+    #
 
     def __str__(self):
         # TODO: Finish __str__() implementation
         return "\n".join([f"System has {len(self._customers)} customers with a total of {len(self._packages)} packages.",
                          f"Currently there are {len(self._routes)} routes between {len(self._locations)} locations."])
-
-    #
-    # Saving app state to file
-    #
 
     def state_dump(self, state: dict[str:dict]):
         # customers, packages, routes, locations, log
