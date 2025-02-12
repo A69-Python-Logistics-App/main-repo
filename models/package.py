@@ -97,3 +97,9 @@ class Package():
         Advances package status.
         """
         self._status.advance_status()
+
+    def set_internal_id(self, ID:int):
+        """
+        Set class __ID to the given value.
+        """
+        Package.__ID = ID
