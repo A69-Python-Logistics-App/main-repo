@@ -95,11 +95,24 @@ class ApplicationData:
         package: Package = self.find_package_by_id(package_id)
         route: Route = self.find_route_by_id(route_id)
         # TODO: Implement assigning package to route
+        # Check weight capacity
 
     def get_location_capacity(self, hub: str, date: datetime) -> int:
         loc = self.find_hub_by_city(hub)
         # TODO: Implement getting hub trucks capacity
         return 0
+
+    def bulk_assign(self, hub: str, route: int) -> str:
+        packages = self.find_packages_at_hub(hub)
+        route = self.find_route_by_id(route)
+        assigned = 0
+        for package in packages:
+            try:
+                self.assign_package_to_route(package.id, route.route_id)
+                assigned += 1
+            except ValueError:
+                continue
+        return f"A total of {assigned} packages assigned to route #{route.route_id} ({len(packages) - assigned} packages remaining)."
 
     #
     # Saving app state to file
