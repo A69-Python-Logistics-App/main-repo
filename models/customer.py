@@ -2,19 +2,20 @@ from models.package import Package
 
 class Customer():
 
-    _customer_id = 1
+    __ID = 1
 
     def __init__(self, first_name:str, last_name:str, email:str):
 
         """ 
-        Customer with name and email.
+        Customer with first name, last name and email.
+        Contains a list with packages, has a sequential id, starting from 1.
         """
         self._first_name = Customer._check_valid_name(first_name)
         self._last_name = Customer._check_valid_name(last_name)
         self._email = Customer._check_valid_email(email)
         self._packages:list[Package] = []
-        self._id = Customer._customer_id
-        Customer._customer_id += 1
+        self._id = Customer.__ID
+        Customer.__ID += 1
 
     @staticmethod
     def _check_valid_name(name):
@@ -44,11 +45,18 @@ class Customer():
         return email
 
     @property
-    def name(self):
+    def first_name(self):
         """
-        Return current customer's name.
+        Return current customer's first name.
         """
-        return self._name
+        return self._first_name
+    
+    @property
+    def last_name(self):
+        """
+        Return current customer's last name.
+        """
+        return self._last_name
 
     @property
     def email(self):
@@ -63,6 +71,13 @@ class Customer():
         Return current customer's id.
         """
         return self._id
+    
+    @property
+    def packages(self):
+        """
+        Return tuple with current customer's packages.
+        """
+        return tuple(self._packages)
 
     def add_package(self, package:Package):
         """
@@ -88,12 +103,12 @@ class Customer():
         """
         package = self.find_package_by_id(id)
         return "\n".join([
-            f"## Customer info: {self.name}, {self.email}",
+            f"## Customer info: {self.first_name} {self.last_name}, {self.email}",
             f"#  Package id: {package.id}, Status: {package.status}",
-            f"#  Package date creation: {package._date_creation}",
-            f"#  Package pickup location: {package._pickup_loc}",
-            f"#  Package current location: {package._current_loc}",
-            f"#  Package destination: {package._dropoff_loc}",
+            f"#  Package date creation: {package.date_creation}",
+            f"#  Package pickup location: {package.pickup_location}",
+            f"#  Package current location: {package.current_location}",
+            f"#  Package destination: {package.dropoff_location}",
             f"#  Package weight: {package.weight} KG"
         ])
 
@@ -102,7 +117,7 @@ class Customer():
         Returns formatted string with current customer and all packages info.
         """
         package_infos = [
-            f"## Customer info: {self.name}, {self.email}"
+            f"## Customer info: {self.first_name} {self.last_name}, {self.email}"
         ]
 
         if len(self._packages) == 0:
@@ -112,21 +127,16 @@ class Customer():
             for package in self._packages:
                 package_infos.append("\n".join([
                     f"#  Package id: {package.id}, Status: {package.status}",
-                    f"#  Package date creation: {package._date_creation}",
-                    f"#  Package pickup location: {package._pickup_loc}",
-                    f"#  Package current location: {package._current_loc}",
-                    f"#  Package destination: {package._dropoff_loc}",
+                    f"#  Package date creation: {package.date_creation}",
+                    f"#  Package pickup location: {package.pickup_location}",
+                    f"#  Package current location: {package.current_location}",
+                    f"#  Package destination: {package.dropoff_location}",
                     f"#  Package weight: {package.weight} KG"
                 ]))
             return "\n\n".join(package_infos)
         
-# customer1 = Customer("Emanuil", "emko@abv.bg")
-# package1 = Package(100, "Ruse", "Varna", customer1.id)
-# customer1.add_package(package1)
-# customer1.add_package(package1)
-# customer1.add_package(package1)
-# customer1.add_package(package1)
-
-# package1.advance_package_status()
-# print(customer1.info_package_by_id(customer1.id))
-# print(customer1.info_all_packages())
+    def set_internal_id(self, ID:int):
+        """
+        Set class __ID to the given value.
+        """
+        Customer.__ID = ID
