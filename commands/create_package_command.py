@@ -25,7 +25,7 @@ class CreatePackageCommand(BaseCommand):
         # Making sure the pickup and dropoff locations are valid
         Location.validate_locations(pickup, dropoff)
 
-        # Trying to find existing customer or create a new one
+        # Trying to find existing customer or raise ValueError
         customer = self.app_data.find_customer_by_email(customer_email)
         if not customer:
             raise ValueError(f"Customer with email {customer_email} not found!")
