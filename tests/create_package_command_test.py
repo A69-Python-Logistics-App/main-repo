@@ -16,10 +16,10 @@ VALID_PICKUP = "Sydney"
 VALID_DROPOFF = "Melbourne"
 
 def invalid_params() -> list[str]:
-    return [VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, VALID_FULL_NAME, VALID_EMAIL]
+    return [VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF]
 
 def valid_params() -> list[str]:
-    return [VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, VALID_FIRST_NAME, VALID_LAST_NAME, VALID_EMAIL]
+    return [VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, VALID_EMAIL]
 
 class Create_Package_Command_Should(unittest.TestCase):
 

@@ -29,6 +29,7 @@ class Customer():
         if not name.isalpha():
             raise ValueError("Name is not an alphabetic string!")
         return name
+    #asd
         
     @staticmethod
     def _check_valid_email(email):
