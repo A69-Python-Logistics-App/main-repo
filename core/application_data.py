@@ -5,6 +5,7 @@ from models.customer import Customer
 from models.location import Location
 from models.package import Package
 from models.route import Route
+from models.status import Status
 
 
 class ApplicationData:
@@ -48,7 +49,7 @@ class ApplicationData:
         return f"Route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stops created."
 
     def create_customer(self, first_name: str, last_name: str, email: str) -> Customer:
-        customer = Customer(" ".join((first_name, last_name)), email)
+        customer = Customer(first_name, last_name, email)
         self._customers.append(customer)
         return customer
 
@@ -80,7 +81,7 @@ class ApplicationData:
     def find_packages_at_hub(self, hub: str) -> list[Package]:
         packages_at_hub = []
         for package in self._packages:
-            if package.status.current == "Collected" and package._current_loc == hub:
+            if package.status.current == Status._class_status_types[0] and package._current_loc == hub:
                 packages_at_hub.append(package)
         return packages_at_hub
 
@@ -95,11 +96,25 @@ class ApplicationData:
         package: Package = self.find_package_by_id(package_id)
         route: Route = self.find_route_by_id(route_id)
         # TODO: Implement assigning package to route
+        # Check weight capacity
 
     def get_location_capacity(self, hub: str, date: datetime) -> int:
         loc = self.find_hub_by_city(hub)
         # TODO: Implement getting hub trucks capacity
         return 0
+
+    def bulk_assign(self, hub: str, route: int) -> str:
+        packages = self.find_packages_at_hub(hub)
+        route = self.find_route_by_id(route)
+        assigned = 0
+        for package in packages:
+            # TODO: check if package is already assigned
+            try:
+                self.assign_package_to_route(package.id, route.route_id)
+                assigned += 1
+            except ValueError:
+                continue
+        return f"A total of {assigned} packages assigned to route #{route.route_id} ({len(packages) - assigned} packages remaining)."
 
     #
     # Saving app state to file
