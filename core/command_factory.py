@@ -9,6 +9,10 @@ class CommandFactory:
     def __init__(self, app_data: ApplicationData):
         self._app_data = app_data
 
+    @property
+    def app_data(self):
+        return self._app_data
+
     def create(self, command: str) -> BaseCommand:
 
         cmd, *params = command.split()
