@@ -1,15 +1,15 @@
 from models.status import Status
 from datetime import datetime
-from random import randint
 
 class Package():
 
-    _class_all_packages = []
+    __ID = 1000
 
     def __init__(self, weight:int, pickup_loc:str, dropoff_loc:str, customer_id:int):
 
         """
-        Package with weight, pickup location, dropoff location and customer id.
+        Package with weight, pickup location, dropoff location and customer id. Contains current location, \n
+        date of creation, status and a sequential id, starting from 1000.
         """
 
         if weight < 0:
@@ -18,30 +18,37 @@ class Package():
 
         self._pickup_loc = pickup_loc # pickup location
         self._dropoff_loc = dropoff_loc # dropoff location
-        if type(customer_id) != int:
-            raise ValueError("Invalid customer_id for package!")
-        self._package_id = randint(1000, 9999)
-
         self._current_loc = self._pickup_loc # DEFAULT current location: at pickup
+
         self._date_creation = datetime.now().strftime("%H:%M %d.%m.%Y") # time of package creation
         self._status = Status() # package status: Collected, On Route, Delivered
-        
-        # Append package to all packages - could be used for something
-        Package._class_all_packages.append(self)
+
+        # Set package id and increment
+        self._package_id = Package.__ID
+        Package.__ID += 1
+
+        self._customer_id = customer_id
 
     @property
     def id(self):
         """
-        Return package id.
+        Return current package id.
         """
         return self._package_id
+    
+    @property
+    def customer_id(self):
+        """
+        Return current package's customer id.
+        """
+        return self._customer_id
     
     @property
     def status(self):
         """
         Return current package status.
         """
-        return self._status.current
+        return self._status
     
     @property
     def weight(self):
