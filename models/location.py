@@ -1,7 +1,14 @@
 
 from models.package import Package
 class Location:
-    Cities = ["Sydney", "Melbourne", "Adelaide", "Alice Springs", "Brisbane", "Darwin", "Perth"]
+    SYDNEY_CODE = "SYD"
+    MELBOURNE_CODE = "MEL"
+    ADELAIDE_CODE = "ADL"
+    ALICE_SPRINGS_CODE = "ASP"
+    BRISBANE_CODE = "BRI"
+    DARWIN_CODE = "DAR"
+    PERTH_CODE = "PER"
+    Cities = [SYDNEY_CODE, MELBOURNE_CODE, ADELAIDE_CODE, ALICE_SPRINGS_CODE, BRISBANE_CODE, DARWIN_CODE, PERTH_CODE]
 
     def __init__(self,hub_name):
         if hub_name not in Location.Cities:
