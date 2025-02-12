@@ -72,7 +72,7 @@ class Customer_Should(unittest.TestCase):
         with self.assertRaises(ValueError):
             _ = VALID_CUSTOMER.find_package_by_id(100)
 
-    def test_infoPackageById_returns_string(self):
+    def test_infoPackageById_returns_correctType(self):
         # ARRANGE
         customer = Customer(VALID_NAME, VALID_EMAIL)
         package = Package(VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, customer.id)
@@ -83,7 +83,7 @@ class Customer_Should(unittest.TestCase):
         # ASSERT
         self.assertIsInstance(info, str)
     
-    def test_infoAllPackages_returns_string(self):
+    def test_infoAllPackages_returns_correctType(self):
         # ARRANGE
         customer = Customer(VALID_NAME, VALID_EMAIL)
         package = Package(VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, customer.id)
