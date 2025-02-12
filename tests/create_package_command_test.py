@@ -2,6 +2,7 @@ import unittest
 
 from commands.create_package_command import CreatePackageCommand
 from core.application_data import ApplicationData
+from models.status import Status
 
 # CUSTOMER
 VALID_FIRST_NAME = "Siso"
@@ -38,3 +39,4 @@ class Create_Package_Command_Should(unittest.TestCase):
 
         self.assertEqual(len(app_data.packages), 1)
         self.assertEqual(app_data.packages[0].weight, VALID_WEIGHT)
+        self.assertEqual(app_data.packages[0].status, Status._class_status_types[0])
