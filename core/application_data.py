@@ -26,7 +26,7 @@ class ApplicationData:
         self._packages = []
         self._locations = [] # TODO: At start trucks won't have assigned locations, so they can be deployed immediately for their first ride
 
-        self._locations = [Location(loc) for loc in Location.Cities] # TODO: init locations from cities or change locations implementation
+        self._locations = [Location(loc) for loc in Location.cities] # TODO: init locations from cities or change locations implementation
 
     @property
     def customers(self) -> tuple:
@@ -148,7 +148,7 @@ class ApplicationData:
         # TODO: Implement loading app state from history
         pass
 
-    def save_state_to_history(self, log: list[str]):
+    def save_state_to_history(self, log: [str]):
         # TODO: Finish implementation for saving app state
         state: dict[str:dict] = {
             "customers": {},
@@ -160,9 +160,10 @@ class ApplicationData:
 
         for customer in self._customers:
             state["customers"][customer.id] = {
-                "name": customer.name,
+                "first_name": customer.first_name,
+                "last_name": customer.last_name,
                 "email": customer.email,
-                "packages": customer.packages # TODO: customer.packages should be a list of int
+                "packages": list(map(str, customer.packages)) # TODO: customer.packages should be a list of int
             }
 
         for package in self._packages:
@@ -176,16 +177,16 @@ class ApplicationData:
                 "date_creation": package.date_creation
             }
 
-        for route in self._routes:
+        for route in self._routes: # TODO: Add route getters and an ID setter for initialization from history
             state["routes"][route.route_id] = {
-                "locations": route.stops,
-                "date": datetime.now().isoformat() # TODO: Route doesn't have creation date getter
+                "stops": route.stops,
+                "takeoff": datetime.now().isoformat() # TODO: Route doesn't have takeoff time getter
             }
 
         for location in self._locations:
-            state["locations"][location.id] = { # TODO: Review locations implementation
-                "name": location.name,
-                "location": location.location
+            state["locations"][location.hub_name] = { # TODO: Review locations implementation
+                "name": location.hub_name,
+                "trucks": [] # TODO: Maybe?
             }
 
         with open(self.HISTORY, "w") as f:
