@@ -55,5 +55,6 @@ class Engine:
 
     def _load_state(self):
         # TODO: Maybe move this in application_data.py?
+        self.log("Attempting to load data from history...")
         dump = self._command_factory.app_data.dump_state_to_app()
         self.log(dump)
