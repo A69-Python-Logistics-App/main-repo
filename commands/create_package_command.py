@@ -1,8 +1,6 @@
-from multiprocessing.managers import Value
 
 from commands.base.base_command import BaseCommand
 from core.application_data import ApplicationData
-from models.customer import Customer
 from models.location import Location
 
 
