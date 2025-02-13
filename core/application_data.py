@@ -28,6 +28,10 @@ class ApplicationData:
 
         self._locations = [Location(loc) for loc in Location.cities] # TODO: init locations from cities or change locations implementation
 
+    #
+    # Properties
+    #
+
     @property
     def customers(self) -> tuple:
         return tuple(self._customers)
@@ -44,6 +48,10 @@ class ApplicationData:
     def employee(self) -> User | None:
         return self._current_employee
 
+    #
+    # Write methods
+    #
+
     def create_package(self, weight, pickup, dropoff, customer_id) -> str:
         package = Package(weight, pickup, dropoff, customer_id)
         self._packages.append(package)
@@ -53,6 +61,25 @@ class ApplicationData:
 
         return f"Package #{package.id} created and added to customer #{customer_id}."
 
+    def remove_package(self, package: Package) -> str:
+        # TODO: finish implementation
+
+        # Check if package is not on route or delivered
+        match package.status:
+            case "On Route": # TODO: Make statuses accessible outside Status class
+                raise ValueError(f"Package #{package.id} is on route and can no longer be removed!")
+            case "Delivered": # Reject deletion of delivered package
+                raise ValueError(f"Package #{package.id} has already been delivered and can not be removed from history!")
+
+        customer = self.find_customer_by_id(package.customer_id)
+        hub = self.find_hub_by_city(package.current_location)
+        # customer.remove_package(package) TODO: add remove_package command to customer
+        # hub.remove_package(package) TODO: look into hub implementation
+        self._packages.remove(package)
+        output = f"Package #{package.id} removed, updated customer #{customer.id} and hub [{hub.hub_name}]."
+        del package # Remove from memory
+        return output
+
     def create_route(self, date: datetime, *locations: list[str]) -> str:
         # TODO: fix implementation with the correct location validation
         try:
@@ -61,12 +88,26 @@ class ApplicationData:
             return e.args[0]
 
         self._routes.append(route)
-        return f"Route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stops created."
+        return f"Created route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stops in-between created."
+
+    def remove_route(self, route: int) -> str:
+        route = self.find_route_by_id(route)
+
+        # Change assigned packages to unassigned
+        for package in route.packages: # TODO: Decide whether route contains IDs or Package objects
+            package.status = "Collected" # TODO: Add reverse_status method to Status class
+
+        # Remove route from app data
+        self._routes.remove(route)
 
     def create_customer(self, first_name: str, last_name: str, email: str) -> Customer:
         customer = Customer(first_name, last_name, email)
         self._customers.append(customer)
         return customer
+
+    #
+    # Read methods
+    #
 
     def find_customer_by_email(self, email: str) -> Customer | None:
         for customer in self._customers: # Search by email for existing customer
@@ -96,6 +137,7 @@ class ApplicationData:
     def find_packages_at_hub(self, hub: str) -> list[Package]:
         packages_at_hub = []
         for package in self._packages:
+            # TODO: Make statuses accessible outside Status class
             if package.status == Status._class_status_types[0] and package.current_location == hub:
                 packages_at_hub.append(package)
         return packages_at_hub
@@ -104,19 +146,23 @@ class ApplicationData:
         package: Package = self.find_package_by_id(package_id)
         routes: list[Route] = []
         # TODO: Implement finding routes for package
-        # TODO: return formatted string
         return routes
+
+    def get_location_total_package_weight(self, hub: str) -> int:
+        loc = self.find_hub_by_city(hub)
+        # TODO: Implement getting hub trucks capacity
+        # Ignore packages that are not at hub or delivered (Status: On Route/Delivered)
+        return 0
+
+    #
+    # Action methods
+    #
 
     def assign_package_to_route(self, package_id, route_id) -> None:
         package: Package = self.find_package_by_id(package_id)
         route: Route = self.find_route_by_id(route_id)
         # TODO: Implement assigning package to route
         # Check weight capacity
-
-    def get_location_capacity(self, hub: str, date: datetime) -> int:
-        loc = self.find_hub_by_city(hub)
-        # TODO: Implement getting hub trucks capacity
-        return 0
 
     def bulk_assign(self, hub: str, route: int) -> str:
         packages = self.find_packages_at_hub(hub)
@@ -131,8 +177,9 @@ class ApplicationData:
                 continue
         return f"A total of {assigned} packages assigned to route #{route.route_id} ({len(packages) - assigned} packages remaining)."
 
+
     #
-    # Saving app state to file
+    # Dunder methods
     #
 
     def __str__(self):
@@ -140,15 +187,16 @@ class ApplicationData:
         return "\n".join([f"System has {len(self._customers)} customers with a total of {len(self._packages)} packages.",
                          f"Currently there are {len(self._routes)} routes between {len(self._locations)} locations."])
 
-    def state_dump(self, state: dict[str:dict]):
+
+    #
+    # File I/O
+    #
+
+    def dump_state_to_app(self, state: dict[str:dict]) -> bool:
         # customers, packages, routes, locations, log
-        pass
+        return True
 
-    def init_from_history(self):
-        # TODO: Implement loading app state from history
-        pass
-
-    def save_state_to_history(self, log: [str]):
+    def dump_state_to_file(self, log: [str]):
         # TODO: Finish implementation for saving app state
         state: dict[str:dict] = {
             "customers": {},
