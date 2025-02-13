@@ -16,7 +16,7 @@ class ApplicationData:
     def __init__(self):
 
         # TODO: Implement employee login and permissions
-        self._employees: [User] = []
+        self._employees: list[User] = []
         self._current_employee = None
 
 
