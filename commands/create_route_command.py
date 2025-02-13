@@ -22,7 +22,7 @@ class CreateRouteCommand(BaseCommand):
         # Make sure the route isn't from one city to the same location
         for i in range(len(stops) - 1):
             if stops[i] == stops[i + 1]:
-                raise ValueError(f"Route cannot include the same locations in succession (from {stops[i]} to {stops[i]})")
+                raise ValueError(f"Route cannot include the same location in succession (from {stops[i]} to {stops[i]})")
 
         # Datetime
         date = " ".join((month, day, time))

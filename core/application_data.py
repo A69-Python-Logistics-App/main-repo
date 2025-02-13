@@ -105,6 +105,13 @@ class ApplicationData:
         self._customers.append(customer)
         return customer
 
+    def remove_customer(self, customer: Customer) -> str:
+        # TODO: Check if customer can be removed (unable to if customer has packages on route or delivered)
+        self._customers.remove(customer)
+        id_number= customer.id
+        del customer
+        return f"Customer #{id_number} removed."
+
     #
     # Read methods
     #
@@ -114,6 +121,7 @@ class ApplicationData:
             if customer.email == email:
                 return customer
 
+    # TODO: Change customer identification to email
     def find_customer_by_id(self, id_number: int) -> Customer | None:
         for customer in self._customers: # Search by id for existing customer
             if customer.id == id_number:
@@ -158,7 +166,7 @@ class ApplicationData:
     # Action methods
     #
 
-    def assign_package_to_route(self, package_id, route_id) -> None:
+    def assign_package_to_route(self, package_id: int, route_id: int) -> None:
         package: Package = self.find_package_by_id(package_id)
         route: Route = self.find_route_by_id(route_id)
         # TODO: Implement assigning package to route
@@ -177,12 +185,15 @@ class ApplicationData:
                 continue
         return f"A total of {assigned} packages assigned to route #{route.route_id} ({len(packages) - assigned} packages remaining)."
 
-    def update_customer(self, customer, new_first_name, new_last_name):
+    def update_customer(self, customer: Customer, new_first_name: str, new_last_name: str) -> str:
         old_name = customer.first_name + " " + customer.last_name
-        customer.first_name = new_first_name # TODO: Add setter
-        customer.last_name = new_last_name # TODO: Add setter
+        customer._first_name = new_first_name # TODO: Add setter for customer.first_name
+        customer._last_name = new_last_name # TODO: Add setter for customer.last_name
         new_name = customer.first_name + " " + customer.last_name
         return f"Updated customer [{customer.email}] name from {old_name} to {new_name}."
+
+    def remove_customer(self, email):
+        pass
 
     #
     # Dunder methods
