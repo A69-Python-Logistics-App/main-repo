@@ -1,8 +1,10 @@
 from datetime import datetime, timedelta
 from models.package import Package
+from models.truck_carpark import TruckCarPark
 
 class Route:
     route_counter = 1
+    list_of_all_routes = []
 
     AVG_TRUCK_SPEED = 87
     SYDNEY_CODE = "SYD"
@@ -35,6 +37,9 @@ class Route:
         self.weight_capacity = None
         self.current_weight = 0
         self.route_total_distance, self.route_stop_estimated_arrival = self.calculate_route_timeline(departure_time, stops)
+        self.list_of_packages:list[Package] = []
+
+        Route.list_of_all_routes.append(self)
 
         
     def calculate_route_timeline(self,departure_time, stops:list[str]):
@@ -68,7 +73,7 @@ class Route:
         result += f"Total distance: {total_distance}"
         result += f"Estimated arrivals:\n"
         for i in range(len(stops)):
-            result += f" - {stops[i]}: {estimated_arrivals[i].strftime("%Y-%m-%d %H:%M")}\n"
+            result += f" - {stops[i]}: {estimated_arrivals[i].strftime('%Y-%m-%d %H:%M')}\n"
         if truck:
             result += f"\n Assign Truck with ID: {truck} and Capacity {self.weight_capacity}kg"
         else:
@@ -81,6 +86,8 @@ class Route:
         :params: truck_id:int and truck_capacity:int
         :return: None. The truck is assigned to the route
         """
+        if truck_id not in TruckCarPark.list_all_free_trucks():
+            raise ValueError(f"Truck with ID:{truck_id} is not available")
         if truck_capacity < self.current_weight:
             raise ValueError(f"Truck has {truck_capacity}kg capacity but {self.current_weight}kg is needed")
         self.truck_id = truck_id
