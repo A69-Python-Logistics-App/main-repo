@@ -177,6 +177,12 @@ class ApplicationData:
                 continue
         return f"A total of {assigned} packages assigned to route #{route.route_id} ({len(packages) - assigned} packages remaining)."
 
+    def update_customer(self, customer, new_first_name, new_last_name):
+        old_name = customer.first_name + " " + customer.last_name
+        customer.first_name = new_first_name # TODO: Add setter
+        customer.last_name = new_last_name # TODO: Add setter
+        new_name = customer.first_name + " " + customer.last_name
+        return f"Updated customer [{customer.email}] name from {old_name} to {new_name}."
 
     #
     # Dunder methods
