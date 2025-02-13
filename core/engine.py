@@ -4,12 +4,13 @@ from core.command_factory import CommandFactory
 
 
 class Engine:
+
     def __init__(self, cmdf: CommandFactory):
         # read state
         # TODO: implement file storage for app state during exit/init
         self._command_factory = cmdf
-        self._load_state()
         self._log = []
+        self._load_state()
 
         # Engine loaded
         self.log("Program started")
@@ -22,13 +23,16 @@ class Engine:
 
             if cmd == "exit":
                 # write state ??
-                self.log("Program ended")
                 self.stop()
                 break
 
             try:
                 command = self._command_factory.create(cmd)
                 log_entry = command.execute()
+            except SystemExit:
+                self.log("Application Data wiped out. Restart program.")
+                self.stop()
+                break
             except Exception as e:
                 log_entry = e.args[0]
 
@@ -36,6 +40,7 @@ class Engine:
             self.log(log_entry)
 
     def stop(self):
+        self.log("Program ended")
         self._command_factory.app_data.dump_state_to_file(self._log)
         print("=" * 10 + " Goodbye " + "=" * 10)
         print("\n>> ".join(["> Event log: "] + self._log))
@@ -49,7 +54,9 @@ class Engine:
         return f"[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}][{login}]:"
 
     def _load_state(self):
+        # TODO: Maybe move this in application_data.py?
         if self._command_factory.app_data.dump_state_to_app():
-            self.log("App state loaded from file")
+            self.log("Application Data history loaded from local storage.")
         else:
-            raise Exception(f"Application data failed to load from history")
+            self.log(f"Application Data history failed to load from local storage!")
+            raise Exception(f"Application Data history failed to load from local storage!")
