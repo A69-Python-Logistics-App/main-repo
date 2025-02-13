@@ -192,9 +192,6 @@ class ApplicationData:
         new_name = customer.first_name + " " + customer.last_name
         return f"Updated customer [{customer.email}] name from {old_name} to {new_name}."
 
-    def remove_customer(self, email):
-        pass
-
     #
     # Dunder methods
     #
