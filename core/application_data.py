@@ -16,7 +16,7 @@ class ApplicationData:
     def __init__(self):
 
         # TODO: Implement employee login and permissions
-        self._employees: [User] = []
+        self._employees: list[User] = []
         self._current_employee = None
 
 
@@ -155,7 +155,6 @@ class ApplicationData:
             if customer.email == email:
                 return customer
 
-    # TODO: Change customer identification to email
     def find_customer_by_id(self, id_number: int) -> Customer | None:
         for customer in self._customers: # Search by id for existing customer
             if customer.id == id_number:
@@ -179,32 +178,41 @@ class ApplicationData:
     def find_packages_at_hub(self, hub: str) -> list[Package]:
         packages_at_hub = []
         for package in self._packages:
-            # TODO: Make statuses accessible outside Status class
             if package.status == Status._class_status_types[0] and package.current_location == hub:
                 packages_at_hub.append(package)
         return packages_at_hub
 
+    def find_all_routes(self) -> list[Route]:
+        return Route.list_of_all_routes
+
     def find_routes_for_package(self, package_id: int) -> list[Route]:
-        package: Package = self.find_package_by_id(package_id)
-        routes: list[Route] = []
-        # TODO: Implement finding routes for package
-        return routes
+        package = self.find_package_by_id(package_id)
+        routes = []
+        for route in self.find_all_routes():
+            if route.weight_capacity is None:
+                continue
+            if route.weight_capacity >= package.weight and route.current_weight + package.weight <= route.weight_capacity:
+                routes.append(route)
+        if routes:
+            routes_info = "\n".join(str(route) for route in routes)
+        else:
+            routes_info = "No routes are available for this package"
+        return routes_info
 
-    def get_location_total_package_weight(self, hub: str) -> int:
-        loc = self.find_hub_by_city(hub)
-        # TODO: Implement getting hub trucks capacity
-        # Ignore packages that are not at hub or delivered (Status: On Route/Delivered)
-        return 0
-
-    #
-    # Action methods
-    #
-
-    def assign_package_to_route(self, package_id: int, route_id: int) -> None:
+    def assign_package_to_route(self, package_id, route_id) -> None:
         package: Package = self.find_package_by_id(package_id)
         route: Route = self.find_route_by_id(route_id)
-        # TODO: Implement assigning package to route
-        # Check weight capacity
+        if route.weight_capacity < package.weight or route.current_weight + package.weight > route.weight_capacity:
+            raise ValueError("Not enough capacity for this package")
+        else:
+            route.list_of_packages.append(package)
+            route.current_weight += package.weight
+
+
+    def get_location_capacity(self, hub: str, date: datetime) -> int:
+        loc = self.find_hub_by_city(hub)
+        # TODO: Implement getting hub trucks capacity
+        return 0
 
     def bulk_assign(self, hub: str, route: int) -> str:
         packages = self.find_packages_at_hub(hub)
