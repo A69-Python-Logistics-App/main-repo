@@ -198,6 +198,9 @@ class ApplicationData:
         new_name = customer.first_name + " " + customer.last_name
         return f"Updated customer [{customer.email}] name from {old_name} to {new_name}."
 
+    def reset_app(self):
+        self._wipe()
+
     #
     # Dunder methods
     #
@@ -217,7 +220,7 @@ class ApplicationData:
         self._routes.clear()
         self._locations.clear()
         self._employees.clear()
-        raise SystemExit
+        raise SystemExit("System reset finished successfully.")
 
     def __str__(self):
         # TODO: Finish __str__() implementation
@@ -228,9 +231,6 @@ class ApplicationData:
     #
     # File I/O
     #
-
-    def reset_app(self):
-        self._wipe()
 
     def dump_state_to_app(self) -> str:
         # customers, packages, routes, locations, log

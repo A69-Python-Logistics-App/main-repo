@@ -1,7 +1,7 @@
 from commands.base.base_command import BaseCommand
 
 
-class UpdateCustomerommand(BaseCommand):
+class UpdateCustomerCommand(BaseCommand):
 
     def __init__(self, params, app_data):
         super().__init__(params, app_data)
