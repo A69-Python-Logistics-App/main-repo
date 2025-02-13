@@ -236,8 +236,7 @@ class ApplicationData:
         # customers, packages, routes, locations, log
         # TODO: Import self.HISTORY file and parse data into objects for ApplicationData
         with open(self.HISTORY, "r") as f:
-            state = json.load(f)
-            state = dict()
+            state = dict(json.load(f))
             if not state.get("customers"): # there is no history.json file, or it is empty/unreadable
                 return "There is no application data history to load from."
 
@@ -253,7 +252,7 @@ class ApplicationData:
 
         # TODO: Implements packages, routes, locations/hubs unpacking
 
-        return "Application Data history loaded from local storage."
+        return "Application Data history loaded successfully from local storage."
 
     def dump_state_to_file(self, log: [str]):
         # TODO: Finish implementation for saving app state
