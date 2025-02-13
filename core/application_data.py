@@ -45,7 +45,7 @@ class ApplicationData:
         return tuple(self._routes)
 
     @property
-    def employee(self) -> User | None:
+    def current_employee(self) -> User | None:
         return self._current_employee
 
     #
@@ -202,6 +202,23 @@ class ApplicationData:
     # Dunder methods
     #
 
+    def _wipe(self):
+        proceed = True
+        if input("!> If you proceed, all data will be permanently lost. (y/n): ").lower() != "y":
+            proceed = False
+        elif input("!!!> Final confirmation (y/n): ").lower() != "y":
+            proceed = False
+
+        if not proceed:
+            raise ValueError("System reset cancelled.")
+
+        self._customers.clear()
+        self._packages.clear()
+        self._routes.clear()
+        self._locations.clear()
+        self._employees.clear()
+        raise SystemExit
+
     def __str__(self):
         # TODO: Finish __str__() implementation
         return "\n".join([f"System has {len(self._customers)} customers with a total of {len(self._packages)} packages.",
@@ -212,9 +229,27 @@ class ApplicationData:
     # File I/O
     #
 
+    def reset_app(self):
+        self._wipe()
+
     def dump_state_to_app(self) -> bool:
-        state = {} # TODO: Import self.HISTORY file and parse as JSON
         # customers, packages, routes, locations, log
+        # TODO: Import self.HISTORY file and parse data into objects for ApplicationData
+        with open(self.HISTORY, "r") as f:
+            state = json.load(f)
+
+        # Customer unpacking
+        # customers[id_number]: data
+        max_customer_id = 0
+        for id_number, customer in state["customers"].items():
+            id_number = int(id_number)
+            c = self.create_customer(customer["first_name"], customer["last_name"], customer["email"])
+            c._id = id_number
+            max_customer_id = max(id_number, max_customer_id)
+        c.set_internal_id(max_customer_id + 1) # TODO: Make Customer.set_internal_id class method
+
+        # TODO: Implements packages, routes, locations/hubs unpacking
+
         return True
 
     def dump_state_to_file(self, log: [str]):
@@ -228,11 +263,17 @@ class ApplicationData:
         }
 
         for customer in self._customers:
-            state["customers"][customer.id] = {
+            state["customers"][customer.id] = { # TODO: Customer ID is string
                 "first_name": customer.first_name,
                 "last_name": customer.last_name,
                 "email": customer.email,
-                "packages": list(map(str, customer.packages)) # TODO: customer.packages should be a list of int
+                # TODO Issue:
+                # customer1 = Customer("Siso", "siso@icloud.com")
+                # customer1 packages = [package1, package2, package3, package4]
+                # packages are Package objects and cannot be stored in a JSON file
+                # Solution 1: store packages in Customer object as a list of package IDs
+                # Solution 2: store package IDs in history and hardcode the re-population of packages by ID
+                "packages": []
             }
 
         for package in self._packages:
