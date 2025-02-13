@@ -90,15 +90,21 @@ class ApplicationData:
         self._routes.append(route)
         return f"Created route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stops in-between created."
 
-    def remove_route(self, route: int) -> str:
-        route = self.find_route_by_id(route)
-
+    def remove_route(self, route: Route) -> str:
+        unassigned = total_weight = 0
         # Change assigned packages to unassigned
         for package in route.packages: # TODO: Decide whether route contains IDs or Package objects
             package.status = "Collected" # TODO: Add reverse_status method to Status class
+            total_weight += package.weight
+            unassigned += 1
+
+        id_number = route.route_id
 
         # Remove route from app data
         self._routes.remove(route)
+        del route
+
+        return f"Route #{id_number} removed, with {unassigned} packages (weighting a total of {total_weight}kg) unassigned."
 
     def create_customer(self, first_name: str, last_name: str, email: str) -> Customer:
         customer = Customer(first_name, last_name, email)
@@ -206,7 +212,8 @@ class ApplicationData:
     # File I/O
     #
 
-    def dump_state_to_app(self, state: dict[str:dict]) -> bool:
+    def dump_state_to_app(self) -> bool:
+        state = {} # TODO: Import self.HISTORY file and parse as JSON
         # customers, packages, routes, locations, log
         return True
 
