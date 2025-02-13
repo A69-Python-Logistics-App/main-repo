@@ -26,14 +26,19 @@ class User:
         "Reset"
     ]
 
+    USERNAMES = []
+
     def __init__(self, username: str, password: str, role: str=ROLES["READ_ONLY"]):
         if len(username) < 4 or len(username) > 16:
             raise ValueError(f"Invalid username provided ({len(username)} characters long, expected 4-16)!")
         if not set(username).issubset(set(string.ascii_letters + string.digits + "_")):
             raise ValueError(f"Invalid characters in username. Use only characters, digits and underscore (_).")
+        if username in self.USERNAMES:
+            raise ValueError(f"Employee with username {username} already exists.")
         self._role = role
         self._username = username
         self.password = password
+        self.USERNAMES.append(username)
 
     @property
     def username(self) -> str:
