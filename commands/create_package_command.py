@@ -1,6 +1,7 @@
 
 from commands.base.base_command import BaseCommand
 from core.application_data import ApplicationData
+from models.helpers.validation_helpers import parse_to_int
 from models.location import Location
 
 
@@ -15,10 +16,7 @@ class CreatePackageCommand(BaseCommand):
         weight, pickup, dropoff, customer_email = self.params
 
         # Trying to parse weight into an integer value
-        try:
-            weight = int(weight)
-        except:
-            raise ValueError(f"Invalid number ({weight}) provided for weight!")
+        weight = parse_to_int(weight)
 
         # Making sure the pickup and dropoff locations are valid
         Location.validate_locations(pickup, dropoff)
