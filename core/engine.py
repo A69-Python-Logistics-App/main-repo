@@ -86,6 +86,7 @@ class Engine:
             try:
                 username, password = input("Login ({username} {password}) > ").split()
                 app_data.employee_login(username, password)
+                self.log(f"Employee {username} logged in")
             except ValueError as e:
                 print(e.args[0])
                 continue

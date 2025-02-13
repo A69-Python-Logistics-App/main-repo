@@ -3,6 +3,7 @@ from commands.create_customer_command import CreateCustomerCommand
 from commands.create_package_command import CreatePackageCommand
 from commands.create_route_command import CreateRouteCommand
 from commands.customer_packages_command import CustomerPackagesCommand
+from commands.logout_command import LogoutCommand
 from commands.remove_customer_command import RemoveCustomerCommand
 from commands.remove_package_command import RemovePackageCommand
 from commands.remove_route_command import RemoveRouteCommand
@@ -45,6 +46,8 @@ class CommandFactory:
                 return RoutesCommand(params, self.app_data)
             case "system_reset":
                 return ResetCommand(params, self.app_data)
+            case "logout":
+                return LogoutCommand(params, self.app_data)
             case _:
                 raise ValueError(f"Unknown command: {cmd}")
             

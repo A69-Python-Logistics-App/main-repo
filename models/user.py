@@ -10,7 +10,8 @@ class User:
 
     READ_ONLY = [ # Add all read-only commands
         "Routes",
-        "CustomerPackage"
+        "CustomerPackage",
+        "Logout"
 
     ]
 

@@ -231,6 +231,9 @@ class ApplicationData:
             self._wipe()
         raise ValueError("You do not have permission to reset the application data.")
 
+    def logout(self) -> None:
+        self._current_employee = None
+
     #
     # Dunder methods
     #
