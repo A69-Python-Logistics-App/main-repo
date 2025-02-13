@@ -2,9 +2,12 @@ from ast import parse
 
 from commands.base.base_command import BaseCommand
 from models.helpers.validation_helpers import parse_to_int
+from models.user import User
 
 
 class RemovePackageCommand(BaseCommand):
+
+    PERMISSION = User.USER
 
     def __init__(self, params, app_data):
         super().__init__(params, app_data)

@@ -1,7 +1,10 @@
 from commands.base.base_command import BaseCommand
+from models.user import User
 
 
 class RemoveCustomerCommand(BaseCommand):
+
+    PERMISSION = User.SUPERVISOR
 
     def __init__(self, params, app_data):
         super().__init__(params, app_data)

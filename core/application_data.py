@@ -57,7 +57,7 @@ class ApplicationData:
     #
 
     def create_employee(self, username: str, password: str, role: str, login: bool=False) -> User:
-        employee = User(username, password)
+        employee = User(username, password, User.USER)
         employee.role = role
         self._employees.append(employee)
         if not self.current_employee and login:
@@ -227,9 +227,7 @@ class ApplicationData:
         return f"Updated customer [{customer.email}] name from {old_name} to {new_name}."
 
     def reset_app(self):
-        if self.current_employee and self.current_employee.can_execute("Reset"):
-            self._wipe()
-        raise ValueError("You do not have permission to reset the application data.")
+        self._wipe()
 
     def logout(self) -> None:
         self._current_employee = None

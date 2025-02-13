@@ -1,7 +1,10 @@
 from core.application_data import ApplicationData
+from models.user import User
 
 
 class BaseCommand:
+
+    PERMISSION = User.USER
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         self._params: list[str] = params
@@ -25,9 +28,8 @@ class BaseCommand:
             raise ValueError(f"Expected {count} parameters, got {len(self._params)} instead")
 
     def require_permission(self):
-        cmd = self.__class__.__name__.replace("Command", "")
-        if not self.employee.can_execute(cmd):
-            raise ValueError(f"You do not have permission to use {cmd} command!")
+        if not self.employee.can_execute(self.PERMISSION):
+            raise ValueError(f"You do not have permission to use this command!")
 
     def execute(self) -> str:
         raise NotImplementedError

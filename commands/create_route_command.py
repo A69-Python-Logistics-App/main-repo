@@ -3,9 +3,12 @@ from datetime import datetime
 from commands.base.base_command import BaseCommand
 from core.application_data import ApplicationData
 from models.location import Location
+from models.user import User
 
 
 class CreateRouteCommand(BaseCommand):
+
+    PERMISSION = User.MANAGER
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
