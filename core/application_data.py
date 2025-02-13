@@ -46,11 +46,33 @@ class ApplicationData:
 
     @property
     def current_employee(self) -> User | None:
-        return self._current_employee
+        return self._current_employee # Returns None if logged out
+
+    @property
+    def employees(self) -> tuple:
+        return tuple(self._employees)
 
     #
     # Write methods
     #
+
+    def create_employee(self, username: str, password: str, role: str, login: bool=False) -> User:
+        employee = User(username, password)
+        employee.role = role
+        self._employees.append(employee)
+        if not self.current_employee and login:
+            self._current_employee = employee
+        return employee
+
+    def employee_login(self, username: str, password: str):
+        validate = [not len(self._employees)]
+        validate += [True for employee in self._employees if employee.username != username or employee.password != password]
+        if any(validate):
+            raise ValueError("Invalid credentials, try again.")
+
+        employee = self.find_employee_by_username(username)
+        self._current_employee = employee
+
 
     def create_package(self, weight, pickup, dropoff, customer_id) -> str:
         package = Package(weight, pickup, dropoff, customer_id)
@@ -88,7 +110,7 @@ class ApplicationData:
             return e.args[0]
 
         self._routes.append(route)
-        return f"Created route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stops in-between created."
+        return f"Route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stop(s) in-between created."
 
     def remove_route(self, route: Route) -> str:
         unassigned = total_weight = 0
@@ -121,6 +143,12 @@ class ApplicationData:
     #
     # Read methods
     #
+
+    def find_employee_by_username(self, username: str) -> User | None:
+        for employee in self._employees:
+            if employee.username == username:
+                return employee
+
 
     def find_customer_by_email(self, email: str) -> Customer | None:
         for customer in self._customers: # Search by email for existing customer
@@ -199,22 +227,15 @@ class ApplicationData:
         return f"Updated customer [{customer.email}] name from {old_name} to {new_name}."
 
     def reset_app(self):
-        self._wipe()
+        if self.current_employee and self.current_employee.can_execute("Reset"):
+            self._wipe()
+        raise ValueError("You do not have permission to reset the application data.")
 
     #
     # Dunder methods
     #
 
     def _wipe(self):
-        proceed = True
-        if input("!> If you proceed, all data will be permanently lost. (y/n): ").lower() != "y":
-            proceed = False
-        elif input("!!!> Final confirmation (y/n): ").lower() != "y":
-            proceed = False
-
-        if not proceed:
-            raise ValueError("System reset cancelled.")
-
         self._customers.clear()
         self._packages.clear()
         self._routes.clear()
@@ -237,8 +258,13 @@ class ApplicationData:
         # TODO: Import self.HISTORY file and parse data into objects for ApplicationData
         with open(self.HISTORY, "r") as f:
             state = dict(json.load(f))
-            if not state.get("customers"): # there is no history.json file, or it is empty/unreadable
+            if not state.get("employees"):
                 return "There is no application data history to load from."
+
+        # Employees unpacking
+        # employees[username]: data
+        for username, data in state["employees"].items():
+            self.create_employee(username, data["password"], data["role"])
 
         # Customer unpacking
         # customers[id_number]: data
@@ -257,12 +283,19 @@ class ApplicationData:
     def dump_state_to_file(self, log: [str]):
         # TODO: Finish implementation for saving app state
         state: dict[str:dict] = {
+            "employees": {},
             "customers": {},
             "packages": {},
             "routes": {},
             "locations": {},
             "log": log
         }
+
+        for employee in self._employees:
+            state["employees"][employee.username] = {
+                "password": employee.password,
+                "role": employee.role
+            }
 
         for customer in self._customers:
             state["customers"][customer.id] = { # TODO: Customer ID is string

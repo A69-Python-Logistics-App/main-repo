@@ -19,12 +19,17 @@ class Engine:
 
         print("=" * 10 + " Welcome to Logistics App " + "=" * 10)
         while True:
+
+            # Make sure there is always an employee logged in
+            self.employee_login()
+
             cmd = input("> ")
 
             if cmd == "exit":
                 # write state ??
                 self.stop()
                 break
+
 
             try:
                 command = self._command_factory.create(cmd)
@@ -58,3 +63,31 @@ class Engine:
         self.log("Attempting to load data from history...")
         dump = self._command_factory.app_data.dump_state_to_app()
         self.log(dump)
+
+    def employee_login(self):
+        app_data = self._command_factory.app_data
+        while not app_data.current_employee:
+            # repeat until the user logs in an employee account
+            # check if there are employee accounts:
+            while not len(app_data.employees):
+                try:
+                    # ask user to make an employee account until it's valid
+                    username, password = input("Create admin ({username} {password}) > ").split()
+                    app_data.create_employee(username, password, "admin", True)
+                    self.log(f"Employee {app_data.current_employee.username} created and logged in")
+                except ValueError as e:
+                    print(e.args[0])
+                    continue
+
+            if app_data.current_employee:
+                break # making sure we break if employee is created (auto log in)
+
+            # There is at least one employee account
+            try:
+                username, password = input("Login ({username} {password}) > ").split()
+                app_data.employee_login(username, password)
+            except ValueError as e:
+                print(e.args[0])
+                continue
+
+        # user is logged in

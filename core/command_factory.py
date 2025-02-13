@@ -8,7 +8,7 @@ from commands.remove_package_command import RemovePackageCommand
 from commands.remove_route_command import RemoveRouteCommand
 from commands.reset_command import ResetCommand
 from commands.routes_command import RoutesCommand
-from commands.update_customer_name_command import UpdateCustomerCommand
+from commands.update_customer_command import UpdateCustomerCommand
 from core.application_data import ApplicationData
 
 

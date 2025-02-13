@@ -9,16 +9,25 @@ class User:
     ROLES = {"WRITE": "admin", "READ_ONLY": "user"}
 
     READ_ONLY = [ # Add all read-only commands
-        "routes"
+        "Routes",
+        "CustomerPackage"
+
     ]
 
     WRITE = READ_ONLY + [
-        "CreateCustomer", "CreatePackage", "CreateRoute",
+        "CreateCustomer",
+        "CreatePackage",
+        "CreateRoute",
+        "RemoveCustomer",
+        "RemovePackage",
+        "RemoveRoute",
+        "UpdateCustomer",
+        "Reset"
     ]
 
     def __init__(self, username: str, password: str, role: str=ROLES["READ_ONLY"]):
         if len(username) < 4 or len(username) > 16:
-            raise ValueError(f"Invalid username provided ({len(username)}), expected 4-16 characters!")
+            raise ValueError(f"Invalid username provided ({len(username)} characters long, expected 4-16)!")
         if not set(username).issubset(set(string.ascii_letters + string.digits + "_")):
             raise ValueError(f"Invalid characters in username. Use only characters, digits and underscore (_).")
         self._role = role
