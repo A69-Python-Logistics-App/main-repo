@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from core.command_factory import CommandFactory
+from models.helpers.validation_helpers import get_login_info
 
 
 class Engine:
@@ -20,22 +21,20 @@ class Engine:
         print("=" * 10 + " Welcome to Logistics App " + "=" * 10)
         while True:
 
-            # Make sure there is always an employee logged in
-            self.employee_login()
-
-            cmd = input("> ")
-
-            if cmd == "exit":
-                # write state ??
-                self.stop()
-                break
-
-
             try:
+                # Make sure there is always an employee logged in
+                self.employee_login()
+
+                cmd = input("> ")
+
+                if cmd == "exit":
+                    # write state ??
+                    raise SystemExit
+
                 command = self._command_factory.create(cmd)
                 log_entry = command.execute()
             except SystemExit:
-                self.log("Application Data wiped out. Restart program.")
+                self.log("Program ending")
                 self.stop()
                 break
             except Exception as e:
@@ -45,7 +44,6 @@ class Engine:
             self.log(log_entry)
 
     def stop(self):
-        self.log("Program ended")
         self._command_factory.app_data.dump_state_to_file(self._log)
         print("=" * 10 + " Goodbye " + "=" * 10)
         print("\n>> ".join(["> Event log: "] + self._log))
@@ -72,7 +70,7 @@ class Engine:
             while not len(app_data.employees):
                 try:
                     # ask user to make an employee account until it's valid
-                    username, password = input("Create admin ({username} {password}) > ").split()
+                    username, password = get_login_info("Create admin")
                     app_data.create_employee(username, password, "admin", True)
                     self.log(f"Employee {app_data.current_employee.username} created and logged in")
                 except ValueError as e:
@@ -84,7 +82,7 @@ class Engine:
 
             # There is at least one employee account
             try:
-                username, password = input("Login ({username} {password}) > ").split()
+                username, password = get_login_info("Login")
                 app_data.employee_login(username, password)
                 self.log(f"Employee {username} logged in")
             except ValueError as e:
