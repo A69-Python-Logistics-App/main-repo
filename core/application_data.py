@@ -232,11 +232,14 @@ class ApplicationData:
     def reset_app(self):
         self._wipe()
 
-    def dump_state_to_app(self) -> bool:
+    def dump_state_to_app(self) -> str:
         # customers, packages, routes, locations, log
         # TODO: Import self.HISTORY file and parse data into objects for ApplicationData
         with open(self.HISTORY, "r") as f:
             state = json.load(f)
+            state = dict()
+            if not state.get("customers"): # there is no history.json file, or it is empty/unreadable
+                return "There is no application data history to load from."
 
         # Customer unpacking
         # customers[id_number]: data
@@ -250,7 +253,7 @@ class ApplicationData:
 
         # TODO: Implements packages, routes, locations/hubs unpacking
 
-        return True
+        return "Application Data history loaded from local storage."
 
     def dump_state_to_file(self, log: [str]):
         # TODO: Finish implementation for saving app state

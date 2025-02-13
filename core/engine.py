@@ -55,8 +55,5 @@ class Engine:
 
     def _load_state(self):
         # TODO: Maybe move this in application_data.py?
-        if self._command_factory.app_data.dump_state_to_app():
-            self.log("Application Data history loaded from local storage.")
-        else:
-            self.log(f"Application Data history failed to load from local storage!")
-            raise Exception(f"Application Data history failed to load from local storage!")
+        dump = self._command_factory.app_data.dump_state_to_app()
+        self.log(dump)
