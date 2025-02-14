@@ -79,7 +79,7 @@ class ApplicationData:
         self._packages.append(package)
 
         customer = self.find_customer_by_id(customer_id)
-        customer.add_package(package) # find customer and add package
+        customer.add_package(package.id) # find customer and add package id
 
         return f"Package #{package.id} created and added to customer #{customer_id}."
 
@@ -289,7 +289,7 @@ class ApplicationData:
 
         return "Application Data history loaded successfully from local storage."
 
-    def dump_state_to_file(self, log: [str]):
+    def dump_state_to_file(self, log: list[str]):
         # TODO: Finish implementation for saving app state
         state: dict[str:dict] = {
             "employees": {},
