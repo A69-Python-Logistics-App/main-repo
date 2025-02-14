@@ -134,9 +134,10 @@ class Customer():
                     f"#  Package weight: {package.weight} KG"
                 ]))
             return "\n\n".join(package_infos)
-        
-    def set_internal_id(self, ID:int):
+
+    @classmethod
+    def set_internal_id(cls, idn: int):
         """
         Set class __ID to the given value.
         """
-        Customer.__ID = ID
+        cls.__ID = idn

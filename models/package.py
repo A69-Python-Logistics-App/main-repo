@@ -42,7 +42,7 @@ class Package():
         Return current package's customer id.
         """
         return self._customer_id
-    
+
     @property
     def status(self):
         """
@@ -56,35 +56,35 @@ class Package():
         Return package weight.
         """
         return self._weight
-    
+
     @property
     def pickup_location(self):
         """
         Return package pickup location.
         """
         return self._pickup_loc
-    
+
     @property
     def dropoff_location(self):
         """
         Return package dropoff location.
         """
         return self._dropoff_loc
-    
+
     @property
     def current_location(self):
         """
         Return current package location.
         """
         return self._current_loc
-    
+
     @property
     def date_creation(self):
         """
         Return creation date of package. Formatted in "hours:minutes day.month.year".
         """
         return self._date_creation
-    
+
     @current_location.setter
     def current_location(self, location:str):
         """

@@ -3,7 +3,13 @@ from commands.create_customer_command import CreateCustomerCommand
 from commands.create_package_command import CreatePackageCommand
 from commands.create_route_command import CreateRouteCommand
 from commands.customer_packages_command import CustomerPackagesCommand
+from commands.logout_command import LogoutCommand
+from commands.remove_customer_command import RemoveCustomerCommand
+from commands.remove_package_command import RemovePackageCommand
+from commands.remove_route_command import RemoveRouteCommand
+from commands.reset_command import ResetCommand
 from commands.routes_command import RoutesCommand
+from commands.update_customer_command import UpdateCustomerCommand
 from core.application_data import ApplicationData
 
 
@@ -21,15 +27,27 @@ class CommandFactory:
 
         match cmd.lower():
             case "createcustomer":
-                return CreateCustomerCommand(params, self._app_data)
-            case "createpackage":
-                return CreatePackageCommand(params, self._app_data)
-            case "createroute":
-                return CreateRouteCommand(params, self._app_data)
+                return CreateCustomerCommand(params, self.app_data)
+            case "removecustomer":
+                return RemoveCustomerCommand(params, self.app_data)
+            case "updatecustomer":
+                return UpdateCustomerCommand(params, self.app_data)
             case "customerpackages":
-                return CustomerPackagesCommand(params, self._app_data)
+                return CustomerPackagesCommand(params, self.app_data)
+            case "createpackage":
+                return CreatePackageCommand(params, self.app_data)
+            case "removepackage":
+                return RemovePackageCommand(params, self.app_data)
+            case "createroute":
+                return CreateRouteCommand(params, self.app_data)
+            case "removeroute":
+                return RemoveRouteCommand(params, self.app_data)
             case "routes":
-                return RoutesCommand(params, self._app_data)
+                return RoutesCommand(params, self.app_data)
+            case "system_reset":
+                return ResetCommand(params, self.app_data)
+            case "logout":
+                return LogoutCommand(params, self.app_data)
             case _:
                 raise ValueError(f"Unknown command: {cmd}")
             
