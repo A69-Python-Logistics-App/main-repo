@@ -178,7 +178,7 @@ class ApplicationData:
     def find_packages_at_hub(self, hub: str) -> list[Package]:
         packages_at_hub = []
         for package in self._packages:
-            if package.status == Status._class_status_types[0] and package.current_location == hub:
+            if package.status == Status.STATUSES[0] and package.current_location == hub:
                 packages_at_hub.append(package)
         return packages_at_hub
 

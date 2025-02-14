@@ -1,14 +1,17 @@
 
-class Status():
+class Status:
 
-    _class_status_types = {0: "Collected", 1: "On Route", 2: "Delivered"}
+    STATUSES = {
+        0: "Collected",
+        1: "On Route",
+        2: "Delivered"}
 
     def __init__(self):
         """
         Package status. Can be: "Collected" (default), "On Route", "Delivered".
         """
-        self._value = Status._class_status_types[0] # Collected value by default
-        self._idx = 0 # used for advance status
+        self._sts = 0 # 'Collected' by def
+        self._value = Status.STATUSES[self._sts] # 'Collected' by def
 
     @property
     def current(self):
@@ -16,15 +19,15 @@ class Status():
         Return current package status.
         """
         return self._value
-    
+
+    def _advance_status(self):
+        self._sts += 1
+
     def advance_status(self):
         """
         Advance package status.
         """
-        self._idx += 1
-        if self._idx not in [1, 2]:
-            # raise ValueError(f"Invalid status (index = {self._idx})!")
-            self._value = Status._class_status_types[2]
+        if self._sts >= 2:
+            raise ValueError(f"Cannot advance product status, limit already reached. Final: {self.current}.")
         else:
-            self._value = Status._class_status_types[self._idx]
-    
+            self._advance_status()

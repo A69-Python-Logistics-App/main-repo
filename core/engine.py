@@ -65,7 +65,7 @@ class Engine:
     def employee_login(self):
         app_data = self._command_factory.app_data
         while not app_data.current_employee:
-            # repeat until the user logs in an employee account
+            # repeat until the user logs in an employee
             # check if there are employee accounts:
             while not len(app_data.employees):
                 try:
