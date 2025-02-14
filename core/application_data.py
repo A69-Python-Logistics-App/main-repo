@@ -26,7 +26,7 @@ class ApplicationData:
         self._packages = []
         self._locations = [] # TODO: At start trucks won't have assigned locations, so they can be deployed immediately for their first ride
 
-        self._locations = [Location(loc) for loc in Location.Cities] # TODO: init locations from cities or change locations implementation
+        self._locations = [Location(loc) for loc in Location.cities] # TODO: init locations from cities or change locations implementation
 
     @property
     def customers(self) -> tuple:
@@ -54,7 +54,6 @@ class ApplicationData:
         return f"Package #{package.id} created and added to customer #{customer_id}."
 
     def create_route(self, date: datetime, *locations: list[str]) -> str:
-        # TODO: fix implementation with the correct location validation
         try:
             route = Route(locations, date)
         except Exception as e:
