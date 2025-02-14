@@ -3,9 +3,12 @@ from datetime import datetime
 from commands.base.base_command import BaseCommand
 from core.application_data import ApplicationData
 from models.location import Location
+from models.user import User
 
 
 class CreateRouteCommand(BaseCommand):
+
+    PERMISSION = User.MANAGER
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
@@ -22,7 +25,7 @@ class CreateRouteCommand(BaseCommand):
         # Make sure the route isn't from one city to the same location
         for i in range(len(stops) - 1):
             if stops[i] == stops[i + 1]:
-                raise ValueError(f"Route cannot include the same locations in succession (from {stops[i]} to {stops[i]})")
+                raise ValueError(f"Route cannot include the same location in succession (from {stops[i]} to {stops[i]})")
 
         # Datetime
         date = " ".join((month, day, time))

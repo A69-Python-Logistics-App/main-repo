@@ -39,4 +39,4 @@ class Create_Package_Command_Should(unittest.TestCase):
 
         self.assertEqual(len(app_data.packages), 1)
         self.assertEqual(app_data.packages[0].weight, VALID_WEIGHT)
-        self.assertEqual(app_data.packages[0].status, Status._class_status_types[0])
+        self.assertEqual(app_data.packages[0].status, Status.STATUSES[0])

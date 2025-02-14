@@ -6,28 +6,31 @@ from pandas.core.computation.expressions import evaluate
 class User:
 
     # Permissions
-    ROLES = {"WRITE": "admin", "READ_ONLY": "user"}
+    USER = "user"
+    MANAGER = "manager"
+    SUPERVISOR = "supervisor"
+    ADMIN = "admin"
 
-    READ_ONLY = [ # Add all read-only commands
-        "routes"
-    ]
+    USERNAMES = []
 
-    WRITE = READ_ONLY + [
-        "CreateCustomer", "CreatePackage", "CreateRoute",
-    ]
-
-    def __init__(self, username: str, password: str, role: str=ROLES["READ_ONLY"]):
-        if len(username) < 4 or len(username) > 16:
-            raise ValueError(f"Invalid username provided ({len(username)}), expected 4-16 characters!")
-        if not set(username).issubset(set(string.ascii_letters + string.digits + "_")):
-            raise ValueError(f"Invalid characters in username. Use only characters, digits and underscore (_).")
-        self._role = role
-        self._username = username
+    def __init__(self, username: str, password: str, role: str):
+        self.role = role
+        self._username = self.validate_username(username)
         self.password = password
+        self.USERNAMES.append(username)
 
     @property
     def username(self) -> str:
         return self._username
+
+    def validate_username(self, username: str) -> str:
+        if len(username) < 4 or len(username) > 16:
+            raise ValueError(f"Invalid username provided ({len(username)} characters long, expected 4-16)!")
+        if not set(username).issubset(set(string.ascii_letters + string.digits + "_")):
+            raise ValueError(f"Invalid characters in username. Use only characters, digits and underscore (_).")
+        if username in self.USERNAMES:
+            raise ValueError(f"Employee with username {username} already exists.")
+        return username
 
     @property
     def password(self) -> str:
@@ -38,9 +41,19 @@ class User:
         if len(password) < 6 or len(password) > 18:
             raise ValueError(f"Invalid password provided ({len(password)} characters long, expected 6-18)!")
         if not set(password).issubset(set(string.ascii_letters + string.digits + "_-*@#$")):
-            # invalid characters in password
             raise ValueError(f"Invalid characters in password. Use only characters, digits and [_, -, *, @, #, $]!")
         self._password = password
+
+    @classmethod
+    def role_exists(cls, value) -> bool:
+        return value in (cls.USER, cls.MANAGER, cls.SUPERVISOR, cls.ADMIN)
+
+    def can_execute(self, role: str) -> bool:
+        if any((role == self.ADMIN and self.role != self.ADMIN,
+                role == self.SUPERVISOR and self.role not in (self.SUPERVISOR, self.MANAGER, self.USER),
+                role == self.MANAGER and self.role not in (self.MANAGER, self.USER))):
+            return False
+        return True
 
     @property
     def role(self) -> str:
@@ -48,19 +61,6 @@ class User:
 
     @role.setter
     def role(self, role):
-        if role not in self.ROLES.values():
-            raise ValueError(f"Invalid employee role: {role}")
+        if not self.role_exists(role):
+            raise ValueError(f"Invalid role {role}")
         self._role = role
-
-    def can_execute(self, command: str) -> bool:
-        if self.role == self.ROLES["WRITE"]:
-            return True
-        return command in self.READ_ONLY
-
-### TESTING
-
-    def test(self, test):
-        return getattr(self.__class__, test)
-
-# user = User("admin", "password")
-# print(user.test("READ_ONLY"))
