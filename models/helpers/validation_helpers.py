@@ -3,7 +3,7 @@
 #
 
 def get_login_info(msg: str) -> list[str]:
-    cmd = input(msg + " ({username} {password}) > ").split()
+    cmd = input(msg + " > ").split()
     if cmd[0] == "exit":
         raise SystemExit
     if len(cmd) != 2:

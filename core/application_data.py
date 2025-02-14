@@ -62,6 +62,7 @@ class ApplicationData:
         self._employees.append(employee)
         if not self.current_employee and login:
             self._current_employee = employee
+            self._login()
         return employee
 
     def employee_login(self, username: str, password: str):
@@ -183,7 +184,7 @@ class ApplicationData:
         return packages_at_hub
 
     def find_all_routes(self) -> list[Route]:
-        return Route.list_of_all_routes
+        return Route.listв_of_all_routes
 
     def find_routes_for_package(self, package_id: int) -> list[Route]:
         package = self.find_package_by_id(package_id)
@@ -199,6 +200,15 @@ class ApplicationData:
             routes_info = "No routes are available for this package"
         return routes_info
 
+    def get_location_capacity(self, hub: str, date: datetime) -> int:
+        loc = self.find_hub_by_city(hub)
+        # TODO: Implement getting hub trucks capacity
+        return 0
+
+    #
+    # Action methods
+    #
+
     def assign_package_to_route(self, package_id, route_id) -> None:
         package: Package = self.find_package_by_id(package_id)
         route: Route = self.find_route_by_id(route_id)
@@ -207,12 +217,6 @@ class ApplicationData:
         else:
             route.list_of_packages.append(package)
             route.current_weight += package.weight
-
-
-    def get_location_capacity(self, hub: str, date: datetime) -> int:
-        loc = self.find_hub_by_city(hub)
-        # TODO: Implement getting hub trucks capacity
-        return 0
 
     def bulk_assign(self, hub: str, route: int) -> str:
         packages = self.find_packages_at_hub(hub)
@@ -243,6 +247,11 @@ class ApplicationData:
     #
     # Dunder methods
     #
+
+    def _login(self):
+        if not self._current_employee:
+            raise ValueError("self._login called when there is no current employee set.")
+        return f"User {self.current_employee.username} logged in."
 
     def _wipe(self):
         self._customers.clear()
@@ -312,12 +321,6 @@ class ApplicationData:
                 "first_name": customer.first_name,
                 "last_name": customer.last_name,
                 "email": customer.email,
-                # TODO Issue:
-                # customer1 = Customer("Siso", "siso@icloud.com")
-                # customer1 packages = [package1, package2, package3, package4]
-                # packages are Package objects and cannot be stored in a JSON file
-                # Solution 1: store packages in Customer object as a list of package IDs
-                # Solution 2: store package IDs in history and hardcode the re-population of packages by ID
                 "packages": []
             }
 

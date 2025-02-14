@@ -25,7 +25,7 @@ class Engine:
                 # Make sure there is always an employee logged in
                 self.employee_login()
 
-                cmd = input("> ")
+                cmd = input(f"{self._command_factory.app_data.current_employee.role} > ")
 
                 if cmd == "exit":
                     # write state ??
@@ -70,7 +70,6 @@ class Engine:
             while not len(app_data.employees):
                 try:
                     # ask user to make an employee account until it's valid
-                    username, password = get_login_info("Create admin")
                     app_data.create_employee(username, password, "admin", True)
                     self.log(f"Employee {app_data.current_employee.username} created and logged in")
                 except ValueError as e:

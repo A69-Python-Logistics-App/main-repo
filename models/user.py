@@ -8,7 +8,7 @@ class User:
     # Permissions
     USER = "user"
     MANAGER = "manager"
-    SUPERVISOR = "super"
+    SUPERVISOR = "supervisor"
     ADMIN = "admin"
 
     USERNAMES = []
