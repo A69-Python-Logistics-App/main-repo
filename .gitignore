@@ -180,4 +180,4 @@ cython_debug/
 .idea/
 
 # history.json
-history.json
+.history.json
