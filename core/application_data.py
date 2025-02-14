@@ -278,6 +278,7 @@ class ApplicationData:
         # Customer unpacking
         # customers[id_number]: data
         max_customer_id = 0
+        c = Customer
         for id_number, customer in state["customers"].items():
             id_number = int(id_number)
             c = self.create_customer(customer["first_name"], customer["last_name"], customer["email"])
