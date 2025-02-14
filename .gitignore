@@ -179,5 +179,4 @@ cython_debug/
 # pycharm
 .idea/
 
-# history.json
-.history.json
+history.json
