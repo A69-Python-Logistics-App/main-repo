@@ -11,7 +11,10 @@ class Engine:
         # TODO: implement file storage for app state during exit/init
         self._command_factory = cmdf
         self._log = []
-        self._load_state()
+
+        # Ask to load from history
+        if input("system > Load from local history? (y for yes): ").lower() == "y":
+            self._load_state()
 
         # Engine loaded
         self.log("Program started")
