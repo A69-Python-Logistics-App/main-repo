@@ -21,7 +21,7 @@ class ApplicationData:
 
 
         # TODO: Implement collections
-        self._routes = []
+        self._routes: list[Route] = []
         self._customers = []
         self._packages = []
         self._locations = [] # TODO: At start trucks won't have assigned locations, so they can be deployed immediately for their first ride
@@ -183,13 +183,10 @@ class ApplicationData:
                 packages_at_hub.append(package)
         return packages_at_hub
 
-    def find_all_routes(self) -> list[Route]:
-        return Route.listв_of_all_routes
-
-    def find_routes_for_package(self, package_id: int) -> list[Route]:
+    def find_routes_for_package(self, package_id: int) -> str:
         package = self.find_package_by_id(package_id)
         routes = []
-        for route in self.find_all_routes():
+        for route in self.routes:
             if route.weight_capacity is None:
                 continue
             if route.weight_capacity >= package.weight and route.current_weight + package.weight <= route.weight_capacity:

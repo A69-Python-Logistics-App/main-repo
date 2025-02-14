@@ -70,6 +70,7 @@ class Engine:
             while not len(app_data.employees):
                 try:
                     # ask user to make an employee account until it's valid
+                    username, password = input("Create admin > ").split()
                     app_data.create_employee(username, password, "admin", True)
                     self.log(f"Employee {app_data.current_employee.username} created and logged in")
                 except ValueError as e:
