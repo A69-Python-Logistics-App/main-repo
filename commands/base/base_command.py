@@ -9,6 +9,7 @@ class BaseCommand:
     def __init__(self, params: list[str], app_data: ApplicationData):
         self._params: list[str] = params
         self._app_data: ApplicationData = app_data
+        self._app_data.update_state()
         self.require_permission()
 
     @property

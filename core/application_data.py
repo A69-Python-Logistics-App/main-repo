@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from models.customer import Customer
 from models.location import Location
@@ -18,7 +18,6 @@ class ApplicationData:
         # TODO: Implement employee login and permissions
         self._employees: list[User] = []
         self._current_employee = None
-
 
         # TODO: Implement collections
         self._routes: list[Route] = []
@@ -206,6 +205,10 @@ class ApplicationData:
     # Action methods
     #
 
+    def update_state(self):
+
+        pass
+
     def assign_package_to_route(self, package_id, route_id) -> None:
         package: Package = self.find_package_by_id(package_id)
         route: Route = self.find_route_by_id(route_id)
@@ -284,14 +287,22 @@ class ApplicationData:
         # Customer unpacking
         # customers[id_number]: data
         max_customer_id = 0
-        c = Customer
         for id_number, customer in state["customers"].items():
             id_number = int(id_number)
             c = self.create_customer(customer["first_name"], customer["last_name"], customer["email"])
             c._id = id_number
             max_customer_id = max(id_number, max_customer_id)
-        c.set_internal_id(max_customer_id + 1) # TODO: Make Customer.set_internal_id class method
+        Customer.set_internal_id(max_customer_id + 1)
 
+        # Routes unpacking
+        # routes[id_number]: data
+        max_route_id = 0
+        for id_number, route in state["routes"].items():
+            id_number = int(id_number)
+            r = Route(route["locations"], datetime.fromisoformat(route["takeoff"]))
+            self._routes.append(r)
+            max_route_id = max(id_number, r.route_id)
+        Route.set_internal_id(max_route_id + 1)
         # TODO: Implements packages, routes, locations/hubs unpacking
 
         return "Application Data history loaded successfully from local storage."
@@ -335,7 +346,7 @@ class ApplicationData:
         for route in self._routes: # TODO: Add route getters and an ID setter for initialization from history
             state["routes"][route.route_id] = {
                 "stops": route.stops,
-                "takeoff": datetime.now().isoformat() # TODO: Route doesn't have takeoff time getter
+                "takeoff": route.date.isoformat() # TODO: Route doesn't have takeoff time getter
             }
 
         for location in self._locations:
