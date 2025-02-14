@@ -17,6 +17,13 @@ class Customer():
         self._id = Customer.__ID
         Customer.__ID += 1
 
+    @classmethod
+    def set_internal_id(self, ID:int):
+        """
+        Set class __ID to the given value.
+        """
+        Customer.__ID = ID
+
     @staticmethod
     def _check_valid_name(name):
         """
@@ -95,47 +102,3 @@ class Customer():
             if id == package_id:
                 return True
         return False
-        
-    def set_internal_id(self, ID:int):
-        """
-        Set class __ID to the given value.
-        """
-        Customer.__ID = ID
-
-    # def info_package_by_id(self, id:int):
-    #     """
-    #     Uses find_package_by_id. Returns formatted string with current customer and package info.
-    #     """
-    #     package = self.find_package_by_id(id)
-    #     return "\n".join([
-    #         f"## Customer info: {self.first_name} {self.last_name}, {self.email}",
-    #         f"#  Package id: {package.id}, Status: {package.status}",
-    #         f"#  Package date creation: {package.date_creation}",
-    #         f"#  Package pickup location: {package.pickup_location}",
-    #         f"#  Package current location: {package.current_location}",
-    #         f"#  Package destination: {package.dropoff_location}",
-    #         f"#  Package weight: {package.weight} KG"
-    #     ])
-
-    # def info_all_packages(self):
-    #     """
-    #     Returns formatted string with current customer and all packages info.
-    #     """
-    #     package_infos = [
-    #         f"## Customer info: {self.first_name} {self.last_name}, {self.email}"
-    #     ]
-
-    #     if len(self._packages) == 0:
-    #         return package_infos.append(f"#  CUSTOMER HAS NO PACKAGES.")
-        
-    #     else:
-    #         for package in self._packages:
-    #             package_infos.append("\n".join([
-    #                 f"#  Package id: {package.id}, Status: {package.status}",
-    #                 f"#  Package date creation: {package.date_creation}",
-    #                 f"#  Package pickup location: {package.pickup_location}",
-    #                 f"#  Package current location: {package.current_location}",
-    #                 f"#  Package destination: {package.dropoff_location}",
-    #                 f"#  Package weight: {package.weight} KG"
-    #             ]))
-    #         return "\n\n".join(package_infos)
