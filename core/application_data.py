@@ -61,37 +61,13 @@ class ApplicationData:
     # Write methods
     #
 
-    def create_user(self, username: str, password: str, login: bool=False) -> User:
-        employee = User(username, password, User.USER)
+    def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:
+        employee = User(username, password, role)
         self._employees.append(employee)
         if not self.current_employee and login:
             self._current_employee = employee
             self._login()
         return employee
-
-    def create_manager(self, username:str, password:str, login:bool=False) -> User:
-        manager = User(username, password, User.MANAGER)
-        self._employees.append(manager)
-        if not self.current_employee and login:
-            self._current_employee = manager
-            self._login()
-        return manager
-    
-    def create_supervisor(self, username:str, password:str, login:bool=False) -> User:
-        supervisor = User(username, password, User.SUPERVISOR)
-        self._employees.append(supervisor)
-        if not self.current_employee and login:
-            self._current_employee = supervisor
-            self._login()
-        return supervisor
-    
-    def create_admin(self, username:str, password:str, login:bool=False) -> User:
-        admin = User(username, password, User.ADMIN)
-        self._employees.append(admin)
-        if not self.current_employee and login:
-            self._current_employee = admin
-            self._login()
-        return admin
     
     def employee_login(self, username: str, password: str):
         validate = [not len(self._employees)]
@@ -302,7 +278,7 @@ class ApplicationData:
                     # ask user to make an employee account until it's valid
                     username, password = self.ask_for_credentials("Create admin")
 
-                    self.create_admin(username, password, "admin", True)
+                    self.create_employee(username, password, User.ADMIN, True)
                     self.log_entry(f"Employee {self.current_employee.username} created and logged in")
                     return True
                 except Exception as e:

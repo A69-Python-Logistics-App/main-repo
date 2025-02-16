@@ -19,10 +19,10 @@ def dump_to_app(app_data) -> str:
 
     # Employees unpacking
     # employees[username]: data
-    # employees = state.get("employees")
-    # if isinstance(employees, dict):
-    #     for username, data in employees.items():
-    #         app_data.create_employee(username, data["password"], data["role"])
+    employees = state.get("employees")
+    if isinstance(employees, dict):
+        for username, data in employees.items():
+            app_data.create_employee(username, data["password"], data["role"])
 
     # Customer unpacking
     # customers[id_number]: data

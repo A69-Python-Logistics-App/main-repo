@@ -55,7 +55,7 @@ class User:
             self.SUPERVISOR: [self.USER, self.MANAGER, self.SUPERVISOR],
             self.ADMIN: [self.USER, self.MANAGER, self.SUPERVISOR, self.ADMIN]
         }
-        if role not in perms[role]:
+        if role not in perms[self.role]:
             return False
         return True
 
