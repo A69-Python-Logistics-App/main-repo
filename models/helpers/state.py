@@ -43,7 +43,7 @@ def dump_to_app(app_data) -> str:
     if isinstance(routes, dict):
         for id_number, data in routes.items():
             id_number = int(id_number)
-            r = app_data.create_route(data["takeoff"], data["locations"])
+            r = app_data.create_route(datetime.fromisoformat(data["takeoff"]), data["stops"])
             r.route_id = id_number
             max_routes_id = max(id_number, max_routes_id)
         Route.set_internal_id(max_routes_id + 1)  # TODO: Add route set_internal_id class method
