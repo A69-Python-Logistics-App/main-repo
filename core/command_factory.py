@@ -1,4 +1,5 @@
 from commands.base.base_command import BaseCommand
+from commands.change_employee_role_command import ChangeEmployeeRoleCommand
 from commands.create_customer_command import CreateCustomerCommand
 from commands.create_package_command import CreatePackageCommand
 from commands.create_route_command import CreateRouteCommand
@@ -48,6 +49,8 @@ class CommandFactory:
                 return ResetCommand(params, self.app_data)
             case "logout":
                 return LogoutCommand(params, self.app_data)
+            case "changeemployeerole":
+                return ChangeEmployeeRoleCommand(params, self.app_data)
             case "exit":
                 return None
             case _:
