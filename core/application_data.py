@@ -18,6 +18,7 @@ class ApplicationData:
     def __init__(self):
 
         self._log = []
+        self._hlog = []
 
         # TODO: Implement employee login and permissions
         self._employees: list[User] = []
@@ -82,14 +83,14 @@ class ApplicationData:
         self._current_employee = employee
 
 
-    def create_package(self, weight, pickup, dropoff, customer_id) -> str:
+    def create_package(self, weight, pickup, dropoff, customer_id) -> Package:
         package = Package(weight, pickup, dropoff, customer_id)
         self._packages.append(package)
 
         customer = self.find_customer_by_id(customer_id)
         customer.add_package(package.id) # find customer and add package id
 
-        return f"Package #{package.id} created and added to customer #{customer_id}."
+        return package
 
     def remove_package(self, package: Package) -> str:
         # TODO: finish implementation
@@ -300,6 +301,7 @@ class ApplicationData:
         self._routes.clear()
         self._locations.clear()
         self._employees.clear()
+        self._log.clear()
         raise SystemExit("System reset finished successfully.")
 
     def __str__(self):
@@ -313,38 +315,61 @@ class ApplicationData:
     #
 
     def dump_state_to_app(self) -> str:
-        # customers, packages, routes, locations, log
-        # TODO: Import self.HISTORY file and parse data into objects for ApplicationData
+
+        # Import log
         with open(self.HISTORY, "r") as f:
-            state = dict(json.load(f))
-            if not state.get("employees"):
-                return "There is no application data history to load from."
+            try:
+                state = dict(json.load(f))
+            except Exception as e:
+                return "\n".join([f"Failed to parse state from history file."])
 
         # Employees unpacking
         # employees[username]: data
-        for username, data in state["employees"].items():
-            self.create_employee(username, data["password"], data["role"])
+        employees = state.get("employees")
+        if isinstance(employees, dict):
+            for username, data in employees.items():
+                self.create_employee(username, data["password"], data["role"])
 
         # Customer unpacking
         # customers[id_number]: data
-        max_customer_id = 0
-        for id_number, customer in state["customers"].items():
-            id_number = int(id_number)
-            c = self.create_customer(customer["first_name"], customer["last_name"], customer["email"])
-            c._id = id_number
-            max_customer_id = max(id_number, max_customer_id)
-        Customer.set_internal_id(max_customer_id + 1)
+        customers = state.get("customers")
+        if isinstance(customers, dict):
+            max_customer_id = 0
+            for id_number, data in customers.items():
+                id_number = int(id_number)
+                c = self.create_customer(data["first_name"], data["last_name"], data["email"])
+                c._id = id_number
+                max_customer_id = max(id_number, max_customer_id)
+            Customer.set_internal_id(max_customer_id + 1)
 
         # Routes unpacking
         # routes[id_number]: data
-        max_route_id = 0
-        for id_number, route in state["routes"].items():
-            id_number = int(id_number)
-            r = Route(route["locations"], datetime.fromisoformat(route["takeoff"]))
-            self._routes.append(r)
-            max_route_id = max(id_number, r.route_id)
-        Route.set_internal_id(max_route_id + 1)
-        # TODO: Implements packages, routes, locations/hubs unpacking
+        routes = state.get("routes")
+        max_routes_id = 0
+        if isinstance(routes, dict):
+            for id_number, data in routes.items():
+                id_number = int(id_number)
+                r = self.create_route(data["takeoff"], *data["locations"])
+                r.route_id = id_number
+                max_routes_id = max(id_number, max_routes_id)
+            # Route.set_internal_id(max_routes_id + 1) # TODO: Add route set_internal_id class method
+
+        # Packages unpacking
+        # packages[id_number]: data
+        max_package_id = 0
+        packages = state.get("packages")
+        if isinstance(packages, dict):
+            for id_number, data in packages.items():
+                id_number = int(id_number)
+                p = self.create_package(data["weight"], data["pickup"], data["dropoff"], data["customer_id"])
+                p._package_id = id_number
+                p._status = data["status"]
+                max_package_id = max(id_number, max_package_id)
+            Package.set_internal_id(max_package_id + 1)
+
+        log = state.get("log")
+        if log:
+            self._log = log
 
         return "Application Data history loaded successfully from local storage."
 
@@ -356,7 +381,7 @@ class ApplicationData:
             "packages": {},
             "routes": {},
             "locations": {},
-            "log": self._log
+            "log": self._log + [f" >>> Program Ended <<< "]
         }
 
         for employee in self._employees:
@@ -387,13 +412,13 @@ class ApplicationData:
         for route in self._routes: # TODO: Add route getters and an ID setter for initialization from history
             state["routes"][route.route_id] = {
                 "stops": route.stops,
-                "takeoff": route.date.isoformat() # TODO: Route doesn't have takeoff time getter
+                "takeoff": datetime.now() #route.date.isoformat() # TODO: Route doesn't have takeoff date getter
             }
 
         for location in self._locations:
-            state["locations"][location.hub_name] = { # TODO: Review locations implementation
+            state["locations"][location.hub_name] = {
                 "name": location.hub_name,
-                "trucks": [] # TODO: Maybe?
+                "packages": location.packages
             }
 
         with open(self.HISTORY, "w") as f:

@@ -18,6 +18,10 @@ class Location:
         # self.list_of_trucks_on_location:list[Truck] = []
         self.list_of_packages_on_location: list[Package] = []
 
+    @property
+    def packages(self):
+        return self.list_of_packages_on_location.copy()
+
     @classmethod
     def validate_locations(cls, *locations: list[str]):
         """

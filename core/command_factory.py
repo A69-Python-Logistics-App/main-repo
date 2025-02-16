@@ -21,7 +21,7 @@ class CommandFactory:
     def app_data(self):
         return self._app_data
 
-    def create(self, command: str) -> BaseCommand:
+    def create(self, command: str) -> BaseCommand | None:
 
         cmd, *params = command.split()
 
@@ -48,6 +48,8 @@ class CommandFactory:
                 return ResetCommand(params, self.app_data)
             case "logout":
                 return LogoutCommand(params, self.app_data)
+            case "exit":
+                return None
             case _:
                 raise ValueError(f"Unknown command: {cmd}")
             
