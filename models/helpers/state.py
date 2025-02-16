@@ -108,7 +108,7 @@ def dump_to_file(app_data):
     for route in app_data._routes:  # TODO: Add route getters and an ID setter for initialization from history
         state["routes"][route.route_id] = {
             "stops": route.stops,
-            "takeoff": datetime.now()  # route.date.isoformat() # TODO: Route doesn't have takeoff date getter
+            "takeoff": datetime.now().isoformat()  # route.date.isoformat() # TODO: Route doesn't have takeoff date getter
         }
 
     for location in app_data._locations:
