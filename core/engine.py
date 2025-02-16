@@ -11,6 +11,10 @@ class Engine:
         # Ask to load from history
         self._init_history()
 
+    @property
+    def app_data(self):
+        return self.app_data
+
     def start(self):
 
         # Engine loaded
@@ -22,16 +26,15 @@ class Engine:
         while True:
 
             # Ensure employee has logged in
-            while not self._command_factory.app_data.current_employee:
-                self._command_factory.app_data.login()
+            while not self.app_data.current_employee:
+                self.app_data.login()
 
             try:
                 if cmd == "exit":
-                    print(cmd)
                     self.stop()
                     break
 
-                cmd = input(f"{self._command_factory.app_data.current_employee.role} > ")
+                cmd = input(f"{self.app_data.current_employee.role} > ")
 
                 command = self._command_factory.create(cmd)
                 if command:
@@ -48,18 +51,18 @@ class Engine:
 
     def stop(self):
         self.log("Program exited.")
-        state.dump_to_file(self._command_factory.app_data)
+        state.dump_to_file(self.app_data)
         print("=" * 10 + " Goodbye " + "=" * 10)
-        print("\n>> ".join(["> Event log: "] + self._command_factory.app_data.log))
+        print("\n>> ".join(["> Event log: "] + self.app_data.log))
 
     def log(self, entry: str):
-        self._command_factory.app_data.log_entry(entry)
+        self.app_data.log_entry(entry)
 
     def _load_state(self):
         # TODO: Maybe move this in application_data.py?
         self.log("Attempting to load data from history...")
-        #dump = self._command_factory.app_data.dump_state_to_app()
-        dump = state.dump_to_app(self._command_factory.app_data)
+        #dump = self.app_data.dump_state_to_app()
+        dump = state.dump_to_app(self.app_data)
         self.log(dump)
 
     def _init_history(self):

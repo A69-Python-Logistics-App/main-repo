@@ -65,7 +65,7 @@ def dump_to_app(app_data) -> str:
     if log:
         app_data._log = log
 
-    return "Application Data loaded successfully from local storage."
+    return "Application Data (if any) loaded successfully from local storage."
 
 
 def dump_to_file(app_data):
