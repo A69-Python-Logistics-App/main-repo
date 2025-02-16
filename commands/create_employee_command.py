@@ -28,15 +28,15 @@ class CreateEmployeeCommand(BaseCommand):
             return f"Employee with username '{employee.username}' and role {employee.role.upper()} created."
         
         if role == User.MANAGER:
-            employee = self.app_data.create_user(username, password, role)
+            employee = self.app_data.create_manager(username, password, role)
             return f"Employee with username '{employee.username}' and role {employee.role.upper()} created."
 
         if role == User.SUPERVISOR:
-            employee = self.app_data.create_user(username, password, role)
+            employee = self.app_data.create_supervisor(username, password, role)
             return f"Employee with username '{employee.username}' and role {employee.role.upper()} created."
         
         if role == User.ADMIN:
-            employee = self.app_data.create_user(username, password, role)
+            employee = self.app_data.create_admin(username, password, role)
             return f"Employee with username '{employee.username}' and role {employee.role.upper()} created."
         
         

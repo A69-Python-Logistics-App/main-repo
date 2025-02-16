@@ -61,36 +61,32 @@ class ApplicationData:
     # Write methods
     #
 
-    def create_user(self, username: str, password: str, role: str, login: bool=False) -> User:
+    def create_user(self, username: str, password: str, login: bool=False) -> User:
         employee = User(username, password, User.USER)
-        employee.role = role
         self._employees.append(employee)
         if not self.current_employee and login:
             self._current_employee = employee
             self._login()
         return employee
 
-    def create_manager(self, username:str, password:str, role:str, login:bool=False) -> User:
+    def create_manager(self, username:str, password:str, login:bool=False) -> User:
         manager = User(username, password, User.MANAGER)
-        manager.role = role
         self._employees.append(manager)
         if not self.current_employee and login:
             self._current_employee = manager
             self._login()
         return manager
     
-    def create_supervisor(self, username:str, password:str, role:str, login:bool=False) -> User:
+    def create_supervisor(self, username:str, password:str, login:bool=False) -> User:
         supervisor = User(username, password, User.SUPERVISOR)
-        supervisor.role = role
         self._employees.append(supervisor)
         if not self.current_employee and login:
             self._current_employee = supervisor
             self._login()
         return supervisor
     
-    def create_admin(self, username:str, password:str, role:str, login:bool=False) -> User:
+    def create_admin(self, username:str, password:str, login:bool=False) -> User:
         admin = User(username, password, User.ADMIN)
-        admin.role = role
         self._employees.append(admin)
         if not self.current_employee and login:
             self._current_employee = admin
