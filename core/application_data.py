@@ -16,7 +16,6 @@ class ApplicationData:
     def __init__(self):
 
         self._log = []
-        self._hlog = []
 
         # TODO: Implement employee login and permissions
         self._employees: list[User] = []
@@ -24,9 +23,9 @@ class ApplicationData:
 
         # TODO: Implement collections
         self._routes: list[Route] = []
-        self._customers = []
-        self._packages = []
-        self._locations = [] # TODO: At start trucks won't have assigned locations, so they can be deployed immediately for their first ride
+        self._customers: list[Customer] = []
+        self._packages: list[Route] = []
+        self._locations: list[Location] = []
 
         self._locations = [Location(loc) for loc in Location.cities] # TODO: init locations from cities or change locations implementation
 
@@ -138,20 +137,20 @@ class ApplicationData:
         del package # Remove from memory
         return output
 
-    def create_route(self, date: datetime, *locations: list[str]) -> str:
+    def create_route(self, date: datetime, *locations: list[str]) -> Route:
         # TODO: fix implementation with the correct location validation
         try:
-            route = Route(locations, date)
+            route = Route(locations[0], date)
         except Exception as e:
             return e.args[0]
 
         self._routes.append(route)
-        return f"Route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stop(s) in-between created."
+        return route
 
     def remove_route(self, route: Route) -> str:
         unassigned = total_weight = 0
         # Change assigned packages to unassigned
-        for package in route.packages: # TODO: Decide whether route contains IDs or Package objects
+        for package in route.list_of_packages: # TODO: Decide whether route contains IDs or Package objects
             package.status = "Collected" # TODO: Add reverse_status method to Status class
             total_weight += package.weight
             unassigned += 1
@@ -286,7 +285,7 @@ class ApplicationData:
         if command == "exit":
             self.log_entry("System exited.")
             state.dump_to_file(self)
-            raise SystemExit("System exited.")
+            exit("System exited.")
         if command.count(" ") != 1:
             raise ValueError("Invalid parameters, two expected - username and password separated by space!")
         return command.split()
@@ -304,8 +303,6 @@ class ApplicationData:
                     self.log_entry(f"Employee {self.current_employee.username} created and logged in")
                     return True
                 except Exception as e:
-                    if e.args[0] == "System exited.":
-                        return False
                     self.log_entry(e.args[0])
                     print(e.args[0])
                     continue
@@ -323,6 +320,12 @@ class ApplicationData:
                 self.log_entry(e.args[0])
                 print(e.args[0])
                 continue
+
+    def update_employee_role(self, employee: str, role: str) -> str:
+        employee = self.find_employee_by_username(employee)
+        old_role = employee.role
+        employee.role = role
+        return f"Updated employee {employee.username} from {old_role} role to {role}."
 
     #
     # Dunder methods

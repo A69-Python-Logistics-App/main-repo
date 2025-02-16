@@ -79,6 +79,8 @@ class Route:
         else:
             result += f"\n No Truck assigned"
 
+        return result
+
         
     def assign_truck(self, truck_id: int, truck_capacity: int):
         """

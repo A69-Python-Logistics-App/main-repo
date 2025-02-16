@@ -14,7 +14,7 @@ class Engine:
 
     @property
     def app_data(self):
-        return self.app_data
+        return self._command_factory.app_data
 
     def start(self):
 
@@ -27,8 +27,7 @@ class Engine:
         while True:
 
             # Ensure employee has logged in
-            while not self.app_data.current_employee:
-                self.app_data.login()
+            self.app_data.login()
 
             try:
                 if cmd == "exit":
@@ -59,20 +58,15 @@ class Engine:
     def log(self, entry: str):
         self.app_data.log_entry(entry)
 
-    def _load_state(self):
-        # TODO: Maybe move this in application_data.py?
-        self.log("Attempting to load data from history...")
-        #dump = self.app_data.dump_state_to_app()
-        dump = state.dump_to_app(self.app_data)
-        self.log(dump)
-
     def _init_history(self):
         load = None
         while load not in ("y", "n"):
             load = input("system > Load application data from local storage? (y/n): ").lower()
             match load:
                 case "y":
-                    self._load_state()
+                    self.log("Attempting to load data from history...")
+                    dump = state.dump_to_app(self.app_data)
+                    self.log(dump)
                 case "n":
                     break
                 case _:

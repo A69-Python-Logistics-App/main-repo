@@ -6,19 +6,21 @@ from tests.create_package_command_test import valid_params
 
 class ChangeEmployeeRoleCommand(BaseCommand):
 
-    PERMISSION = User.ADMIN
+    PERMISSION = User.SUPERVISOR
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
         self.validate_params(2)
-        # changeemployeerole {employee.email} {role}
+        # changeemployeerole {employee} {role}
 
     def execute(self):
-        customer, role = self.params
+        employee, role = self.params
 
-        customer = self.app_data.find_customer_by_email(email)
+        if employee == self.employee.username:
+            raise ValueError("You cannot change your own role!")
 
-        if not customer:
-            raise ValueError(f"Customer with email {email} not found!")
+        if not self.employee.can_execute(User.ADMIN):
+            if role not in (User.MANAGER, User.USER):
+                raise ValueError("You do not have permission to apply this change.")
 
-        return self.app_data.update_customer(customer, new_first_name, new_last_name)
+        return self.app_data.update_employee_role(employee, role)
