@@ -24,7 +24,7 @@ class ApplicationData:
         # TODO: Implement collections
         self._routes: list[Route] = []
         self._customers: list[Customer] = []
-        self._packages: list[Route] = []
+        self._packages: list[Package] = []
         self._locations: list[Location] = []
 
         self._locations = [Location(loc) for loc in Location.cities] # TODO: init locations from cities or change locations implementation
@@ -275,6 +275,13 @@ class ApplicationData:
 
     def logout(self) -> None:
         self._current_employee = None
+
+    def employee_login(self, username: str, password: str):
+        if not self._employees or all(
+                employee.username != username or employee.password != password for employee in self._employees):
+            raise ValueError("Invalid credentials, try again.")
+
+        self._current_employee = self.find_employee_by_username(username)
 
     def ask_for_credentials(self, role: str) -> list[str]:
         command = input(f"{role} > ")
