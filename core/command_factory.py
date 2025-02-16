@@ -1,4 +1,5 @@
 from commands.base.base_command import BaseCommand
+from commands.create_employee_command import CreateEmployeeCommand
 from commands.create_customer_command import CreateCustomerCommand
 from commands.create_package_command import CreatePackageCommand
 from commands.create_route_command import CreateRouteCommand
@@ -26,6 +27,8 @@ class CommandFactory:
         cmd, *params = command.split()
 
         match cmd.lower():
+            case "createemployee":
+                return CreateEmployeeCommand(params, self.app_data)
             case "createcustomer":
                 return CreateCustomerCommand(params, self.app_data)
             case "removecustomer":

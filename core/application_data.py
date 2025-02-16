@@ -62,7 +62,7 @@ class ApplicationData:
     # Write methods
     #
 
-    def create_employee(self, username: str, password: str, role: str, login: bool=False) -> User:
+    def create_user(self, username: str, password: str, role: str, login: bool=False) -> User:
         employee = User(username, password, User.USER)
         employee.role = role
         self._employees.append(employee)
@@ -71,6 +71,33 @@ class ApplicationData:
             self._login()
         return employee
 
+    def create_manager(self, username:str, password:str, role:str, login:bool=False) -> User:
+        manager = User(username, password, User.MANAGER)
+        manager.role = role
+        self._employees.append(manager)
+        if not self.current_employee and login:
+            self._current_employee = manager
+            self._login()
+        return manager
+    
+    def create_supervisor(self, username:str, password:str, role:str, login:bool=False) -> User:
+        supervisor = User(username, password, User.SUPERVISOR)
+        supervisor.role = role
+        self._employees.append(supervisor)
+        if not self.current_employee and login:
+            self._current_employee = supervisor
+            self._login()
+        return supervisor
+    
+    def create_admin(self, username:str, password:str, role:str, login:bool=False) -> User:
+        admin = User(username, password, User.ADMIN)
+        admin.role = role
+        self._employees.append(admin)
+        if not self.current_employee and login:
+            self._current_employee = admin
+            self._login()
+        return admin
+    
     def employee_login(self, username: str, password: str):
         validate = [not len(self._employees)]
         validate += [True for employee in self._employees if employee.username != username or employee.password != password]
@@ -79,7 +106,6 @@ class ApplicationData:
 
         employee = self.find_employee_by_username(username)
         self._current_employee = employee
-
 
     def create_package(self, weight, pickup, dropoff, customer_id) -> Package:
         package = Package(weight, pickup, dropoff, customer_id)
@@ -274,7 +300,7 @@ class ApplicationData:
                     # ask user to make an employee account until it's valid
                     username, password = self.ask_for_credentials("Create admin")
 
-                    self.create_employee(username, password, "admin", True)
+                    self.create_admin(username, password, "admin", True)
                     self.log_entry(f"Employee {self.current_employee.username} created and logged in")
                     return True
                 except Exception as e:
