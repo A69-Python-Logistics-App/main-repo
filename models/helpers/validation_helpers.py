@@ -5,7 +5,7 @@
 def get_login_info(msg: str) -> list[str]:
     cmd = input(msg + " > ").split()
     if cmd[0] == "exit":
-        raise SystemExit
+        raise SystemExit("System exited.")
     if len(cmd) != 2:
         raise ValueError("Invalid parameters, two expected ({username} {password})!")
     return cmd

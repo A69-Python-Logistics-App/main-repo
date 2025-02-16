@@ -1,7 +1,9 @@
 import json
+import traceback
 from datetime import datetime, timedelta
 
 from models.customer import Customer
+from models.helpers.validation_helpers import get_login_info
 from models.location import Location
 from models.package import Package
 from models.route import Route
@@ -14,6 +16,8 @@ class ApplicationData:
     HISTORY = "history.json"
 
     def __init__(self):
+
+        self._log = []
 
         # TODO: Implement employee login and permissions
         self._employees: list[User] = []
@@ -50,6 +54,10 @@ class ApplicationData:
     @property
     def employees(self) -> tuple:
         return tuple(self._employees)
+
+    @property
+    def log(self):
+        return self._log.copy()
 
     #
     # Write methods
@@ -205,9 +213,9 @@ class ApplicationData:
     # Action methods
     #
 
-    def update_state(self):
-
-        pass
+    def log_entry(self, entry: str) -> None:
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self._log.append(f"[{date}][{None if not self.current_employee else self.current_employee.username}] {entry}")
 
     def assign_package_to_route(self, package_id, route_id) -> None:
         package: Package = self.find_package_by_id(package_id)
@@ -239,10 +247,43 @@ class ApplicationData:
         return f"Updated customer [{customer.email}] name from {old_name} to {new_name}."
 
     def reset_app(self):
+        self.log_entry(f"Employee [{self.current_employee.username}] initiated system reset.")
         self._wipe()
 
     def logout(self) -> None:
         self._current_employee = None
+
+    def login(self) -> bool:
+        while not self.current_employee:
+            # repeat until the user logs in an employee
+            # check if there are employee accounts:
+            while not len(self.employees):
+                try:
+                    # ask user to make an employee account until it's valid
+                    username, password = get_login_info("Create admin")
+                    self.create_employee(username, password, "admin", True)
+                    self.log_entry(f"Employee {self.current_employee.username} created and logged in")
+                    return True
+                except Exception as e:
+                    if e.args[0] == "System exited.":
+                        return False
+                    self.log_entry(e.args[0])
+                    print(e.args[0])
+                    continue
+
+            if self.current_employee:
+                return True
+
+            # There is at least one employee account
+            try:
+                username, password = get_login_info("Login")
+                self.employee_login(username, password)
+                self.log_entry(f"Employee {username} logged in")
+                return True
+            except ValueError as e:
+                self.log_entry(e.args[0])
+                print(e.args[0])
+                continue
 
     #
     # Dunder methods
@@ -307,7 +348,7 @@ class ApplicationData:
 
         return "Application Data history loaded successfully from local storage."
 
-    def dump_state_to_file(self, log: list[str]):
+    def dump_state_to_file(self):
         # TODO: Finish implementation for saving app state
         state: dict[str:dict] = {
             "employees": {},
@@ -315,7 +356,7 @@ class ApplicationData:
             "packages": {},
             "routes": {},
             "locations": {},
-            "log": log
+            "log": self._log
         }
 
         for employee in self._employees:
