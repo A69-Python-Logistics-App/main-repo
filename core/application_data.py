@@ -349,10 +349,10 @@ class ApplicationData:
         if isinstance(routes, dict):
             for id_number, data in routes.items():
                 id_number = int(id_number)
-                r = self.create_route(data["takeoff"], *data["locations"])
+                r = self.create_route(data["takeoff"], data["locations"])
                 r.route_id = id_number
                 max_routes_id = max(id_number, max_routes_id)
-            # Route.set_internal_id(max_routes_id + 1) # TODO: Add route set_internal_id class method
+            Route.set_internal_id(max_routes_id + 1) # TODO: Add route set_internal_id class method
 
         # Packages unpacking
         # packages[id_number]: data
@@ -371,7 +371,7 @@ class ApplicationData:
         if log:
             self._log = log
 
-        return "Application Data history loaded successfully from local storage."
+        return "Application Data Oct 06 10:00 SYD MEL SYDstory loaded successfully from local storage."
 
     def dump_state_to_file(self):
         # TODO: Finish implementation for saving app state

@@ -49,9 +49,13 @@ class User:
         return value in (cls.USER, cls.MANAGER, cls.SUPERVISOR, cls.ADMIN)
 
     def can_execute(self, role: str) -> bool:
-        if any((role == self.ADMIN and self.role != self.ADMIN,
-                role == self.SUPERVISOR and self.role not in (self.SUPERVISOR, self.MANAGER, self.USER),
-                role == self.MANAGER and self.role not in (self.MANAGER, self.USER))):
+        perms = {
+            self.USER: [self.USER],
+            self.MANAGER: [self.USER, self.MANAGER],
+            self.SUPERVISOR: [self.USER, self.MANAGER, self.SUPERVISOR],
+            self.ADMIN: [self.USER, self.MANAGER, self.SUPERVISOR, self.ADMIN]
+        }
+        if role not in perms[role]:
             return False
         return True
 

@@ -21,7 +21,8 @@ class Package():
         self._current_loc = self._pickup_loc # DEFAULT current location: at pickup
 
         self._date_creation = datetime.now().strftime("%H:%M %d.%m.%Y") # time of package creation
-        self._status = Status() # package status: Collected, On Route, Delivered
+        self._package_Status = Status() # TODO: Fix implementation of Status()
+        self._status = self._package_Status.current # package status: Collected, On Route, Delivered
 
         # Set package id and increment
         self._package_id = Package.__ID
@@ -55,7 +56,7 @@ class Package():
         """
         Return current package status.
         """
-        return self._status.current
+        return self._status
     
     @property
     def weight(self):
