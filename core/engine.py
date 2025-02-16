@@ -1,7 +1,6 @@
-from datetime import datetime
 
 from core.command_factory import CommandFactory
-from models.helpers.validation_helpers import get_login_info
+from models.helpers import state
 
 
 class Engine:
@@ -23,12 +22,12 @@ class Engine:
         while True:
 
             # Ensure employee has logged in
-            self._command_factory.app_data.login()
+            while not self._command_factory.app_data.current_employee:
+                self._command_factory.app_data.login()
 
             try:
                 if cmd == "exit":
                     print(cmd)
-                    # write state ??
                     self.stop()
                     break
 
@@ -39,19 +38,17 @@ class Engine:
                     log_entry = command.execute()
                 else:
                     continue
-            except SystemExit:
-                self.log("Program ending")
-                self.stop()
-                break
             except Exception as e:
+                # print(traceback.print_tb(e.__traceback__))
                 log_entry = e.args[0]
+                # exit()
 
             print(log_entry) # printing to console before exit will be required for finding the best route
             self.log(log_entry)
 
     def stop(self):
         self.log("Program exited.")
-        self._command_factory.app_data.dump_state_to_file()
+        state.dump_to_file(self._command_factory.app_data)
         print("=" * 10 + " Goodbye " + "=" * 10)
         print("\n>> ".join(["> Event log: "] + self._command_factory.app_data.log))
 
@@ -61,7 +58,8 @@ class Engine:
     def _load_state(self):
         # TODO: Maybe move this in application_data.py?
         self.log("Attempting to load data from history...")
-        dump = self._command_factory.app_data.dump_state_to_app()
+        #dump = self._command_factory.app_data.dump_state_to_app()
+        dump = state.dump_to_app(self._command_factory.app_data)
         self.log(dump)
 
     def _init_history(self):
