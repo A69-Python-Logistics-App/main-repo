@@ -304,7 +304,19 @@ class ApplicationData:
         employee = self.find_employee_by_username(employee)
         old_role = employee.role
         employee.role = role
-        return f"Updated employee {employee.username} from {old_role} role to {role}."
+        return f"Updated employee '{employee.username}' from role {old_role.upper()} to {role.upper()}."
+    
+    def update_employee_name(self, employee: str, new_name: str) -> str:
+        employee = self.find_employee_by_username(employee)
+        old_name = employee.username
+        employee.username = new_name
+        return f"Updated employee username from '{old_name}' to '{new_name}'."
+    
+    def update_employee_password(self, employee: str, new_password: str) -> str:
+        employee = self.find_employee_by_username(employee)
+        # old_password = employee.password
+        employee.password = new_password
+        return f"Updated the password of employee '{employee.username}'."
 
     #
     # Dunder methods

@@ -22,6 +22,10 @@ class User:
     @property
     def username(self) -> str:
         return self._username
+    
+    @username.setter
+    def username(self, username: str):
+        self._username = username
 
     def validate_username(self, username: str) -> str:
         if len(username) < 4 or len(username) > 16:
