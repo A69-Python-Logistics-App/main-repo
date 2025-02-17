@@ -72,3 +72,7 @@ class User:
         if not self.role_exists(role):
             raise ValueError(f"Invalid role {role}")
         self._role = role
+
+    def __str__(self):
+        max_username_length = max([len(usern) for usern in self.USERNAMES])
+        return f"-> {self.username.ljust(max_username_length)} [{self.role.upper()}]"
