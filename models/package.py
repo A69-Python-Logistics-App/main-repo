@@ -1,5 +1,6 @@
 from models.status import Status
 from datetime import datetime
+from models.helpers.validation_helpers import parse_to_int
 
 class Package():
 
@@ -35,7 +36,7 @@ class Package():
         """
         Set class __ID to the given value.
         """
-        Package.__ID = ID
+        Package.__ID = parse_to_int(ID)
 
     @property
     def id(self):

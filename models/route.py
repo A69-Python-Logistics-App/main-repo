@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from models.package import Package
 from models.truck_carpark import TruckCarPark
+from models.helpers.validation_helpers import parse_to_int
 
 class Route:
     route_counter = 1
@@ -109,6 +110,5 @@ class Route:
         self.current_weight += package.weight
 
     @classmethod
-    def set_internal_id(cls, param):
-        cls.route_counter = int(param)
-        pass
+    def set_internal_id(cls, ID:int):
+        cls.route_counter = parse_to_int(ID)
