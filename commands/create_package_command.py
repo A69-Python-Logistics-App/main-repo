@@ -9,7 +9,7 @@ from models.user import User
 class CreatePackageCommand(BaseCommand):
 
     PERMISSION = User.USER
-    PARAMS = 2
+    PARAMS = 4
     USAGE = "createpackage {weight_in_kg} {pickup} {dropoff} {customer_email}"
 
     def __init__(self, params: list[str], app_data: ApplicationData):

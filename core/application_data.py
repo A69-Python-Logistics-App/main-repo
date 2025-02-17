@@ -110,12 +110,7 @@ class ApplicationData:
         return output
 
     def create_route(self, date: datetime, *locations: list[str]) -> Route:
-        # TODO: fix implementation with the correct location validation
-        try:
-            route = Route(locations[0], date)
-        except Exception as e:
-            return e.args[0]
-
+        route = Route(sum(locations, []), date)
         self._routes.append(route)
         return route
 
