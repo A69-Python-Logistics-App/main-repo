@@ -110,7 +110,7 @@ class ApplicationData:
         return output
 
     def create_route(self, date: datetime, *locations: list[str]) -> Route:
-        route = Route(sum(locations, []), date)
+        route = Route(locations, date)
         self._routes.append(route)
         return route
 
