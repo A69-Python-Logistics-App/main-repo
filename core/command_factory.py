@@ -31,6 +31,7 @@ class CommandFactory:
         cmd, *params = command.split()
 
         match cmd.lower():
+            # Employee commands
             case "createemployee":
                 return CreateEmployeeCommand(params, self.app_data)
             case "changeemployeerole":
@@ -39,6 +40,8 @@ class CommandFactory:
                 return ChangeEmployeeNameCommand(params, self.app_data)
             case "changeemployeepassword":
                 return ChangeEmployeePasswordCommand(params, self.app_data)
+
+            # Customer commands
             case "createcustomer":
                 return CreateCustomerCommand(params, self.app_data)
             case "removecustomer":
@@ -47,24 +50,30 @@ class CommandFactory:
                 return UpdateCustomerCommand(params, self.app_data)
             case "customerpackages":
                 return CustomerPackagesCommand(params, self.app_data)
+
+
+            # Package commands
             case "createpackage":
                 return CreatePackageCommand(params, self.app_data)
             case "removepackage":
                 return RemovePackageCommand(params, self.app_data)
+
+            # Route commands
             case "createroute":
                 return CreateRouteCommand(params, self.app_data)
             case "removeroute":
                 return RemoveRouteCommand(params, self.app_data)
             case "routes":
                 return RoutesCommand(params, self.app_data)
+
+            # System commands
             case "system_reset":
                 return ResetCommand(params, self.app_data)
             case "logout":
                 return LogoutCommand(params, self.app_data)
-            case "changeemployeerole":
-                return ChangeEmployeeRoleCommand(params, self.app_data)
             case "exit":
                 return None
+
+            # Invalid command
             case _:
                 raise ValueError(f"Unknown command: {cmd}")
-            
