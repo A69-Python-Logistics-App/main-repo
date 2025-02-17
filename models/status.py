@@ -3,12 +3,13 @@ class Status:
 
     STATUSES = {
         0: "Collected",
-        1: "On Route",
-        2: "Delivered"}
+        1: "Loaded",
+        2: "On Route",
+        3: "Delivered"}
 
     def __init__(self):
         """
-        Package status. Can be: "Collected" (default), "On Route", "Delivered".
+        Package status. Can be: "Collected" (default), "Loaded", "On Route", "Delivered".
         """
         self._sts = 0 # 'Collected' by def
         self._value = Status.STATUSES[self._sts] # 'Collected' by def

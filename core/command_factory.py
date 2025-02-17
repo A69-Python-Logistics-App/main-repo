@@ -1,4 +1,5 @@
 from commands.base.base_command import BaseCommand
+from commands.create_employee_command import CreateEmployeeCommand
 from commands.create_customer_command import CreateCustomerCommand
 from commands.create_package_command import CreatePackageCommand
 from commands.create_route_command import CreateRouteCommand
@@ -10,6 +11,9 @@ from commands.remove_route_command import RemoveRouteCommand
 from commands.reset_command import ResetCommand
 from commands.routes_command import RoutesCommand
 from commands.update_customer_command import UpdateCustomerCommand
+from commands.change_employee_role_command import ChangeEmployeeRoleCommand
+from commands.change_employee_name_command import ChangeEmployeeNameCommand
+from commands.change_employee_password_command import ChangeEmployeePasswordCommand
 from core.application_data import ApplicationData
 
 
@@ -21,11 +25,19 @@ class CommandFactory:
     def app_data(self):
         return self._app_data
 
-    def create(self, command: str) -> BaseCommand:
+    def create(self, command: str) -> BaseCommand | None:
 
         cmd, *params = command.split()
 
         match cmd.lower():
+            case "createemployee":
+                return CreateEmployeeCommand(params, self.app_data)
+            case "changeemployeerole":
+                return ChangeEmployeeRoleCommand(params, self.app_data)
+            case "changeemployeename":
+                return ChangeEmployeeNameCommand(params, self.app_data)
+            case "changeemployeepassword":
+                return ChangeEmployeePasswordCommand(params, self.app_data)
             case "createcustomer":
                 return CreateCustomerCommand(params, self.app_data)
             case "removecustomer":
@@ -48,6 +60,8 @@ class CommandFactory:
                 return ResetCommand(params, self.app_data)
             case "logout":
                 return LogoutCommand(params, self.app_data)
+            case "exit":
+                return None
             case _:
                 raise ValueError(f"Unknown command: {cmd}")
             

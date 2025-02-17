@@ -30,4 +30,5 @@ class CreatePackageCommand(BaseCommand):
             raise ValueError(f"Customer with email {customer_email} not found!")
 
         # returning the result of create_package execution
-        return self.app_data.create_package(weight, pickup, dropoff, customer.id)
+        p = self.app_data.create_package(weight, pickup, dropoff, customer.id)
+        return f"Package #{p.id} created and added to customer #{p.customer_id}."

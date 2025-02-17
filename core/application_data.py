@@ -1,7 +1,7 @@
-import json
 from datetime import datetime
 
 from models.customer import Customer
+from models.helpers import state
 from models.location import Location
 from models.package import Package
 from models.route import Route
@@ -15,16 +15,17 @@ class ApplicationData:
 
     def __init__(self):
 
+        self._log = []
+
         # TODO: Implement employee login and permissions
         self._employees: list[User] = []
         self._current_employee = None
 
-
         # TODO: Implement collections
         self._routes: list[Route] = []
-        self._customers = []
-        self._packages = []
-        self._locations = [] # TODO: At start trucks won't have assigned locations, so they can be deployed immediately for their first ride
+        self._customers: list[Customer] = []
+        self._packages: list[Package] = []
+        self._locations: list[Location] = []
 
         self._locations = [Location(loc) for loc in Location.cities] # TODO: init locations from cities or change locations implementation
 
@@ -52,19 +53,22 @@ class ApplicationData:
     def employees(self) -> tuple:
         return tuple(self._employees)
 
+    @property
+    def log(self):
+        return self._log.copy()
+
     #
     # Write methods
     #
 
-    def create_employee(self, username: str, password: str, role: str, login: bool=False) -> User:
-        employee = User(username, password, User.USER)
-        employee.role = role
+    def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:
+        employee = User(username, password, role)
         self._employees.append(employee)
         if not self.current_employee and login:
             self._current_employee = employee
             self._login()
         return employee
-
+    
     def employee_login(self, username: str, password: str):
         validate = [not len(self._employees)]
         validate += [True for employee in self._employees if employee.username != username or employee.password != password]
@@ -74,15 +78,17 @@ class ApplicationData:
         employee = self.find_employee_by_username(username)
         self._current_employee = employee
 
-
-    def create_package(self, weight, pickup, dropoff, customer_id) -> str:
+    def create_package(self, weight, pickup, dropoff, customer_id) -> Package:
         package = Package(weight, pickup, dropoff, customer_id)
         self._packages.append(package)
 
-        customer = self.find_customer_by_id(customer_id)
-        customer.add_package(package) # find customer and add package
+        hub = self.find_hub_by_city(pickup)
+        hub.list_of_packages_on_location.append(package.id)
 
-        return f"Package #{package.id} created and added to customer #{customer_id}."
+        customer = self.find_customer_by_id(customer_id)
+        customer.add_package(package.id) # find customer and add package id
+
+        return package
 
     def remove_package(self, package: Package) -> str:
         # TODO: finish implementation
@@ -103,20 +109,20 @@ class ApplicationData:
         del package # Remove from memory
         return output
 
-    def create_route(self, date: datetime, *locations: list[str]) -> str:
+    def create_route(self, date: datetime, *locations: list[str]) -> Route:
         # TODO: fix implementation with the correct location validation
         try:
-            route = Route(locations, date)
+            route = Route(locations[0], date)
         except Exception as e:
             return e.args[0]
 
         self._routes.append(route)
-        return f"Route #{route.route_id} from {locations[0]} to {locations[-1]} with {len(locations) - 2} stop(s) in-between created."
+        return route
 
     def remove_route(self, route: Route) -> str:
         unassigned = total_weight = 0
         # Change assigned packages to unassigned
-        for package in route.packages: # TODO: Decide whether route contains IDs or Package objects
+        for package in route.list_of_packages: # TODO: Decide whether route contains IDs or Package objects
             package.status = "Collected" # TODO: Add reverse_status method to Status class
             total_weight += package.weight
             unassigned += 1
@@ -206,6 +212,10 @@ class ApplicationData:
     # Action methods
     #
 
+    def log_entry(self, entry: str) -> None:
+        date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        self._log.append(f"[{date}][{None if not self.current_employee else self.current_employee.username}] {entry}")
+
     def assign_package_to_route(self, package_id, route_id) -> None:
         package: Package = self.find_package_by_id(package_id)
         route: Route = self.find_route_by_id(route_id)
@@ -236,10 +246,77 @@ class ApplicationData:
         return f"Updated customer [{customer.email}] name from {old_name} to {new_name}."
 
     def reset_app(self):
+        self.log_entry(f"Employee [{self.current_employee.username}] initiated system reset.")
         self._wipe()
 
     def logout(self) -> None:
         self._current_employee = None
+
+    def employee_login(self, username: str, password: str):
+        if not self._employees or all(
+                employee.username != username or employee.password != password for employee in self._employees):
+            raise ValueError("Invalid credentials, try again.")
+
+        self._current_employee = self.find_employee_by_username(username)
+
+    def ask_for_credentials(self, role: str) -> list[str]:
+        command = input(f"{role} > ")
+        if command == "exit":
+            self.log_entry("System exited.")
+            state.dump_to_file(self)
+            exit("System exited.")
+        if command.count(" ") != 1:
+            raise ValueError("Invalid parameters, two expected - username and password separated by space!")
+        return command.split()
+
+    def login(self) -> bool:
+        while not self.current_employee:
+            # repeat until the user logs in an employee
+            # check if there are employee accounts:
+            while not len(self.employees):
+                try:
+                    # ask user to make an employee account until it's valid
+                    username, password = self.ask_for_credentials("Create admin")
+
+                    self.create_employee(username, password, User.ADMIN, True)
+                    self.log_entry(f"Employee {self.current_employee.username} created and logged in")
+                    return True
+                except Exception as e:
+                    self.log_entry(e.args[0])
+                    print(e.args[0])
+                    continue
+
+            if self.current_employee:
+                return True
+
+            # There is at least one employee account
+            try:
+                username, password = self.ask_for_credentials("Login")
+                self.employee_login(username, password)
+                self.log_entry(f"Employee {username} logged in")
+                return True
+            except ValueError as e:
+                self.log_entry(e.args[0])
+                print(e.args[0])
+                continue
+
+    def update_employee_role(self, employee: str, role: str) -> str:
+        employee = self.find_employee_by_username(employee)
+        old_role = employee.role
+        employee.role = role
+        return f"Updated employee '{employee.username}' from role {old_role.upper()} to {role.upper()}."
+    
+    def update_employee_name(self, employee: str, new_name: str) -> str:
+        employee = self.find_employee_by_username(employee)
+        old_name = employee.username
+        employee.username = new_name
+        return f"Updated employee username from '{old_name}' to '{new_name}'."
+    
+    def update_employee_password(self, employee: str, new_password: str) -> str:
+        employee = self.find_employee_by_username(employee)
+        # old_password = employee.password
+        employee.password = new_password
+        return f"Updated the password of employee '{employee.username}'."
 
     #
     # Dunder methods
@@ -256,93 +333,11 @@ class ApplicationData:
         self._routes.clear()
         self._locations.clear()
         self._employees.clear()
-        raise SystemExit("System reset finished successfully.")
+        self._log.clear()
+        state.dump_to_file(self)
+        exit("System reset.")
 
     def __str__(self):
         # TODO: Finish __str__() implementation
         return "\n".join([f"System has {len(self._customers)} customers with a total of {len(self._packages)} packages.",
                          f"Currently there are {len(self._routes)} routes between {len(self._locations)} locations."])
-
-
-    #
-    # File I/O
-    #
-
-    def dump_state_to_app(self) -> str:
-        # customers, packages, routes, locations, log
-        # TODO: Import self.HISTORY file and parse data into objects for ApplicationData
-        with open(self.HISTORY, "r") as f:
-            state = dict(json.load(f))
-            if not state.get("employees"):
-                return "There is no application data history to load from."
-
-        # Employees unpacking
-        # employees[username]: data
-        for username, data in state["employees"].items():
-            self.create_employee(username, data["password"], data["role"])
-
-        # Customer unpacking
-        # customers[id_number]: data
-        max_customer_id = 0
-        c = Customer
-        for id_number, customer in state["customers"].items():
-            id_number = int(id_number)
-            c = self.create_customer(customer["first_name"], customer["last_name"], customer["email"])
-            c._id = id_number
-            max_customer_id = max(id_number, max_customer_id)
-        c.set_internal_id(max_customer_id + 1) # TODO: Make Customer.set_internal_id class method
-
-        # TODO: Implements packages, routes, locations/hubs unpacking
-
-        return "Application Data history loaded successfully from local storage."
-
-    def dump_state_to_file(self, log: [str]):
-        # TODO: Finish implementation for saving app state
-        state: dict[str:dict] = {
-            "employees": {},
-            "customers": {},
-            "packages": {},
-            "routes": {},
-            "locations": {},
-            "log": log
-        }
-
-        for employee in self._employees:
-            state["employees"][employee.username] = {
-                "password": employee.password,
-                "role": employee.role
-            }
-
-        for customer in self._customers:
-            state["customers"][customer.id] = { # TODO: Customer ID is string
-                "first_name": customer.first_name,
-                "last_name": customer.last_name,
-                "email": customer.email,
-                "packages": []
-            }
-
-        for package in self._packages:
-            state["packages"][package.id] = {
-                "weight": package.weight,
-                "pickup": package.pickup_location,
-                "dropoff": package.dropoff_location,
-                "customer_id": package.customer_id,
-                "status": package.status,
-                "current_loc": package.current_location,
-                "date_creation": package.date_creation
-            }
-
-        for route in self._routes: # TODO: Add route getters and an ID setter for initialization from history
-            state["routes"][route.route_id] = {
-                "stops": route.stops,
-                "takeoff": datetime.now().isoformat() # TODO: Route doesn't have takeoff time getter
-            }
-
-        for location in self._locations:
-            state["locations"][location.hub_name] = { # TODO: Review locations implementation
-                "name": location.hub_name,
-                "trucks": [] # TODO: Maybe?
-            }
-
-        with open(self.HISTORY, "w") as f:
-            json.dump(state, f)

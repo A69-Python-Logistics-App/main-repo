@@ -79,6 +79,8 @@ class Route:
         else:
             result += f"\n No Truck assigned"
 
+        return result
+
         
     def assign_truck(self, truck_id: int, truck_capacity: int):
         """
@@ -103,3 +105,8 @@ class Route:
         if self.current_weight + package.weight > self.weight_capacity:
             raise ValueError(f"Package weight exceeds the capacity. Capacity is {self.weight_capacity - self.current_weight}")
         self.current_weight += package.weight
+
+    @classmethod
+    def set_internal_id(cls, param):
+        cls.route_counter = int(param)
+        pass

@@ -18,4 +18,4 @@ class CreateCustomerCommand(BaseCommand):
         if customer:
             raise ValueError("Customer already exists!")
         customer = self.app_data.create_customer(first_name, last_name, email)
-        return f"Customer with id {customer.id} created."
+        return f"Customer #{customer.id} ({customer.email}) created."

@@ -1,92 +1,74 @@
-from datetime import datetime
 
 from core.command_factory import CommandFactory
-from models.helpers.validation_helpers import get_login_info
+from models.helpers import state
+# import traceback
 
 
 class Engine:
 
     def __init__(self, cmdf: CommandFactory):
-        # read state
-        # TODO: implement file storage for app state during exit/init
         self._command_factory = cmdf
-        self._log = []
-        self._load_state()
+
+        # Ask to load from history
+        self._init_history()
+
+    @property
+    def app_data(self):
+        return self._command_factory.app_data
+
+    def start(self):
 
         # Engine loaded
         self.log("Program started")
 
-    def start(self):
-
         print("=" * 10 + " Welcome to Logistics App " + "=" * 10)
+        cmd = ""
+
         while True:
 
+            # Ensure employee has logged in
+            self.app_data.login()
+
             try:
-                # Make sure there is always an employee logged in
-                self.employee_login()
-
-                cmd = input(f"{self._command_factory.app_data.current_employee.role} > ")
-
                 if cmd == "exit":
-                    # write state ??
-                    raise SystemExit
+                    self.stop()
+                    break
+
+                cmd = input(f"{self.app_data.current_employee.role} > ")
 
                 command = self._command_factory.create(cmd)
-                log_entry = command.execute()
-            except SystemExit:
-                self.log("Program ending")
-                self.stop()
-                break
+                if command:
+                    log_entry = command.execute()
+                else:
+                    continue
             except Exception as e:
+                # print(traceback.print_tb(e.__traceback__))
                 log_entry = e.args[0]
+                # exit()
 
             print(log_entry) # printing to console before exit will be required for finding the best route
             self.log(log_entry)
 
     def stop(self):
-        self._command_factory.app_data.dump_state_to_file(self._log)
+        self.log("Program exited.")
+        state.dump_to_file(self.app_data)
         print("=" * 10 + " Goodbye " + "=" * 10)
-        print("\n>> ".join(["> Event log: "] + self._log))
+        print("\n>> ".join(["> Event log: "] + self.app_data.log))
 
     def log(self, entry: str):
-        self._log.append(f"{self.fdate()} {entry}")
+        self.app_data.log_entry(entry)
 
-    def fdate(self) -> str:
-        employee = self._command_factory.app_data.current_employee
-        login = employee.username if employee else "None"
-        return f"[{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}][{login}]:"
-
-    def _load_state(self):
-        # TODO: Maybe move this in application_data.py?
-        self.log("Attempting to load data from history...")
-        dump = self._command_factory.app_data.dump_state_to_app()
-        self.log(dump)
-
-    def employee_login(self):
-        app_data = self._command_factory.app_data
-        while not app_data.current_employee:
-            # repeat until the user logs in an employee
-            # check if there are employee accounts:
-            while not len(app_data.employees):
-                try:
-                    # ask user to make an employee account until it's valid
-                    username, password = input("Create admin > ").split()
-                    app_data.create_employee(username, password, "admin", True)
-                    self.log(f"Employee {app_data.current_employee.username} created and logged in")
-                except ValueError as e:
-                    print(e.args[0])
+    def _init_history(self):
+        load = None
+        while load not in ("y", "n"):
+            load = input("system > Load application data from local storage? (y/n): ").lower()
+            match load:
+                case "y":
+                    self.log("Attempting to load data from history...")
+                    dump = state.dump_to_app(self.app_data)
+                    self.log(dump)
+                case "n":
+                    break
+                case _:
+                    print("Invalid answer, expected y for yes or n for no.")
                     continue
-
-            if app_data.current_employee:
-                break # making sure we break if employee is created (auto log in)
-
-            # There is at least one employee account
-            try:
-                username, password = get_login_info("Login")
-                app_data.employee_login(username, password)
-                self.log(f"Employee {username} logged in")
-            except ValueError as e:
-                print(e.args[0])
-                continue
-
-        # user is logged in
