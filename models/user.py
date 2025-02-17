@@ -25,7 +25,7 @@ class User:
     
     @username.setter
     def username(self, username: str):
-        self._username = username
+        self._username = self.validate_username(username)
 
     def validate_username(self, username: str) -> str:
         if len(username) < 4 or len(username) > 16:
