@@ -5,6 +5,7 @@ from commands.create_customer_command import CreateCustomerCommand
 from commands.create_package_command import CreatePackageCommand
 from commands.create_route_command import CreateRouteCommand
 from commands.customer_packages_command import CustomerPackagesCommand
+from commands.employees_command import EmployeesCommand
 from commands.logout_command import LogoutCommand
 from commands.remove_customer_command import RemoveCustomerCommand
 from commands.remove_package_command import RemovePackageCommand
@@ -40,6 +41,8 @@ class CommandFactory:
                 return ChangeEmployeeNameCommand(params, self.app_data)
             case "changeemployeepassword":
                 return ChangeEmployeePasswordCommand(params, self.app_data)
+            case "employees":
+                return EmployeesCommand(params, self.app_data)
 
             # Customer commands
             case "createcustomer":
