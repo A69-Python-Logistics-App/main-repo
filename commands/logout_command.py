@@ -14,4 +14,4 @@ class LogoutCommand(BaseCommand):
     def execute(self):
         employee = self.app_data.current_employee.username
         self.app_data.logout()
-        raise ValueError(f"User {employee} successfully logged out!")
+        return f"User {employee} successfully logged out!"
