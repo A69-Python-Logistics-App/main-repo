@@ -312,6 +312,11 @@ class ApplicationData:
         # old_password = employee.password
         employee.password = new_password
         return f"Updated the password of employee '{employee.username}'."
+    
+    def remove_employee(self, employee: str):
+        employee = self.find_employee_by_username(employee)
+        self._employees.remove(employee)
+        return f"Employee '{employee.username}' has been removed."
 
     #
     # Dunder methods
