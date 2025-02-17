@@ -70,10 +70,12 @@ class Route:
         truck = self.truck_id
         result = f"Route ID: {route_id}\n"
         result += f"Stops {" -> ".join(stops)}\n"
-        result += f"Total distance: {total_distance}"
+        result += f"Total distance: {total_distance}km\n"
         result += f"Estimated arrivals:\n"
         for i in range(len(stops)):
             result += f" - {stops[i]}: {estimated_arrivals[i].strftime('%Y-%m-%d %H:%M')}\n"
+
+        result = result[:-1]
         if truck:
             result += f"\n Assign Truck with ID: {truck} and Capacity {self.weight_capacity}kg"
         else:
