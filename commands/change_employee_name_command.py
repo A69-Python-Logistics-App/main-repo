@@ -7,11 +7,11 @@ from tests.create_package_command_test import valid_params
 class ChangeEmployeeNameCommand(BaseCommand):
 
     PERMISSION = User.ADMIN
+    PARAMS = 2
+    USAGE = "changeemployeename {employee} {new username}"
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
-        self.validate_params(2)
-        # changeemployeename {employee} {new name}
 
     def execute(self):
         employee, new_name = self.params

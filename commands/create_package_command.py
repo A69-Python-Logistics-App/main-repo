@@ -9,10 +9,11 @@ from models.user import User
 class CreatePackageCommand(BaseCommand):
 
     PERMISSION = User.USER
+    PARAMS = 4
+    USAGE = "createpackage {weight_in_kg} {pickup} {dropoff} {customer_email}"
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
-        self.validate_params(4)
 
     def execute(self):
         # Unpacking values from params

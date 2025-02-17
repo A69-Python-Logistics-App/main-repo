@@ -5,11 +5,11 @@ from models.user import User
 class RemoveCustomerCommand(BaseCommand):
 
     PERMISSION = User.SUPERVISOR
+    PARAMS = 1
+    USAGE = "removecustomer {email}"
 
     def __init__(self, params, app_data):
         super().__init__(params, app_data)
-        self.validate_params(1)
-        # removecustomer {email}
 
     def execute(self) -> str:
         email = self.params[0]
