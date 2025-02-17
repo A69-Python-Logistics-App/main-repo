@@ -105,12 +105,8 @@ class ApplicationData:
         del package # Remove from memory
         return output
 
-    def create_route(self, date: datetime, *locations: list[str]) -> str:
-        try:
-            route = Route(locations, date)
-        except Exception as e:
-            return e.args[0]
-
+    def create_route(self, date: datetime, *locations: list[str]) -> Route:
+        route = Route(locations, date)
         self._routes.append(route)
         return route
 
@@ -312,6 +308,11 @@ class ApplicationData:
         # old_password = employee.password
         employee.password = new_password
         return f"Updated the password of employee '{employee.username}'."
+    
+    def remove_employee(self, employee: str):
+        employee = self.find_employee_by_username(employee)
+        self._employees.remove(employee)
+        return f"Employee '{employee.username}' has been removed."
 
     #
     # Dunder methods

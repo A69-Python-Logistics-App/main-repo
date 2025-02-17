@@ -16,6 +16,7 @@ from commands.update_customer_command import UpdateCustomerCommand
 from commands.change_employee_role_command import ChangeEmployeeRoleCommand
 from commands.change_employee_name_command import ChangeEmployeeNameCommand
 from commands.change_employee_password_command import ChangeEmployeePasswordCommand
+from commands.remove_employee_command import RemoveEmployeeCommand
 from core.application_data import ApplicationData
 
 
@@ -41,6 +42,8 @@ class CommandFactory:
                 return ChangeEmployeeNameCommand(params, self.app_data)
             case "changeemployeepassword":
                 return ChangeEmployeePasswordCommand(params, self.app_data)
+            case "removeemployee":
+                return RemoveEmployeeCommand(params, self.app_data)
             case "employees":
                 return EmployeesCommand(params, self.app_data)
 
