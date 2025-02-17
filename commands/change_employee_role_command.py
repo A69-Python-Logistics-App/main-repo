@@ -6,10 +6,14 @@ from tests.create_package_command_test import valid_params
 
 class ChangeEmployeeRoleCommand(BaseCommand):
 
+    # This will make ensure only supervisors can run the command
+    PERMISSION = User.SUPERVISOR
+    PARAMS = 2
+    USAGE = "changeemployeerole {employee} {role}"
+
+    # Missing __init__ which validates params and permission
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
-        self.validate_params(2)
-        # changeemployeerole {employee} {role}
 
     def execute(self):
         employee, role = self.params

@@ -5,10 +5,11 @@ from models.user import User
 class CustomerPackagesCommand(BaseCommand):
 
     PERMISSION = User.USER
+    PARAMS = 1
+    USAGE = "customerpackages {email}"
 
     def __init__(self, params, app_data):
         super().__init__(params, app_data)
-        self.validate_params(1)
 
     def execute(self):
         email, = self.params

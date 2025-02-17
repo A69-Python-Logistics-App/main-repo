@@ -7,11 +7,11 @@ from tests.create_package_command_test import valid_params
 class ChangeEmployeePasswordCommand(BaseCommand):
 
     PERMISSION = User.ADMIN
+    PARAMS = 2
+    USAGE = "changeemployeepassword {employee} {new password}"
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
-        self.validate_params(2)
-        # changeemployeepassword {employee} {new password}
 
     def execute(self):
         employee, new_password = self.params

@@ -9,9 +9,12 @@ from models.user import User
 class CreateRouteCommand(BaseCommand):
 
     PERMISSION = User.MANAGER
+    SPECIAL_CASE = True # Skip params validation
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
+
+        # Validate at least 5 or more params
         if len(params) < 5:
             raise ValueError(f"Expected at least 5 parameters, {len(params)} provided.")
 
