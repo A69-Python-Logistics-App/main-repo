@@ -23,9 +23,9 @@ class BaseCommand:
     def employee(self):
         return self._app_data.current_employee
 
-    def validate_params(self, count: int) -> None:
+    def validate_params(self, count: int, message: str="") -> None:
         if len(self._params) != count:
-            raise ValueError(f"Expected {count} parameters, got {len(self._params)} instead")
+            raise ValueError(f"Expected {count} parameters, got {len(self._params)} instead.{" " + message or ""}")
 
     def require_permission(self):
         if not self.employee.can_execute(self.PERMISSION):
