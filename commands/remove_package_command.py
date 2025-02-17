@@ -8,11 +8,11 @@ from models.user import User
 class RemovePackageCommand(BaseCommand):
 
     PERMISSION = User.USER
+    PARAMS = 1
+    USAGE = "removepackage {id}"
 
     def __init__(self, params, app_data):
         super().__init__(params, app_data)
-        self.validate_params(1)
-        # removepackage {id}
 
     def execute(self) -> str:
         id_number = parse_to_int(self.params[0])

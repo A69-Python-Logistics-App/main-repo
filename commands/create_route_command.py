@@ -9,9 +9,12 @@ from models.user import User
 class CreateRouteCommand(BaseCommand):
 
     PERMISSION = User.MANAGER
+    SPECIAL_CASE = True # Skip params validation
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
+
+        # Validate at least 5 or more params
         if len(params) < 5:
             raise ValueError(f"Expected at least 5 parameters, {len(params)} provided.")
 
@@ -39,4 +42,5 @@ class CreateRouteCommand(BaseCommand):
             raise ValueError(f"Invalid date ({date}) provided!")
 
         # returning the result of create_route execution
-        return self.app_data.create_route(date, *stops)
+        r = self.app_data.create_route(date, *stops)
+        return f"Route #{r.route_id} from {stops[0]} to {stops[-1]} with {len(stops) - 2} stop(s) in-between created."

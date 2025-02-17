@@ -21,13 +21,21 @@ class Package():
         self._current_loc = self._pickup_loc # DEFAULT current location: at pickup
 
         self._date_creation = datetime.now().strftime("%H:%M %d.%m.%Y") # time of package creation
-        self._status = Status() # package status: Collected, On Route, Delivered
+        self._package_Status = Status() # TODO: Fix implementation of Status()
+        self._status = self._package_Status.current # package status: Collected, On Route, Delivered
 
         # Set package id and increment
         self._package_id = Package.__ID
         Package.__ID += 1
 
         self._customer_id = customer_id
+
+    @classmethod
+    def set_internal_id(self, ID:int):
+        """
+        Set class __ID to the given value.
+        """
+        Package.__ID = ID
 
     @property
     def id(self):
@@ -48,7 +56,7 @@ class Package():
         """
         Return current package status.
         """
-        return self._status.current
+        return self._status
     
     @property
     def weight(self):
@@ -97,9 +105,3 @@ class Package():
         Advances package status.
         """
         self._status.advance_status()
-
-    def set_internal_id(self, ID:int):
-        """
-        Set class __ID to the given value.
-        """
-        Package.__ID = ID

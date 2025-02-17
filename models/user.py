@@ -22,6 +22,10 @@ class User:
     @property
     def username(self) -> str:
         return self._username
+    
+    @username.setter
+    def username(self, username: str):
+        self._username = self.validate_username(username)
 
     def validate_username(self, username: str) -> str:
         if len(username) < 4 or len(username) > 16:
@@ -49,9 +53,13 @@ class User:
         return value in (cls.USER, cls.MANAGER, cls.SUPERVISOR, cls.ADMIN)
 
     def can_execute(self, role: str) -> bool:
-        if any((role == self.ADMIN and self.role != self.ADMIN,
-                role == self.SUPERVISOR and self.role not in (self.SUPERVISOR, self.MANAGER, self.USER),
-                role == self.MANAGER and self.role not in (self.MANAGER, self.USER))):
+        perms = {
+            self.USER: [self.USER],
+            self.MANAGER: [self.USER, self.MANAGER],
+            self.SUPERVISOR: [self.USER, self.MANAGER, self.SUPERVISOR],
+            self.ADMIN: [self.USER, self.MANAGER, self.SUPERVISOR, self.ADMIN]
+        }
+        if role not in perms[self.role]:
             return False
         return True
 
@@ -64,3 +72,7 @@ class User:
         if not self.role_exists(role):
             raise ValueError(f"Invalid role {role}")
         self._role = role
+
+    def __str__(self):
+        max_username_length = max([len(usern) for usern in self.USERNAMES])
+        return f"-> {self.username.ljust(max_username_length)} [{self.role.upper()}]"

@@ -9,10 +9,11 @@ from models.user import User
 class CreatePackageCommand(BaseCommand):
 
     PERMISSION = User.USER
+    PARAMS = 4
+    USAGE = "createpackage {weight_in_kg} {pickup} {dropoff} {customer_email}"
 
     def __init__(self, params: list[str], app_data: ApplicationData):
         super().__init__(params, app_data)
-        self.validate_params(4)
 
     def execute(self):
         # Unpacking values from params
@@ -30,4 +31,5 @@ class CreatePackageCommand(BaseCommand):
             raise ValueError(f"Customer with email {customer_email} not found!")
 
         # returning the result of create_package execution
-        return self.app_data.create_package(weight, pickup, dropoff, customer.id)
+        p = self.app_data.create_package(weight, pickup, dropoff, customer.id)
+        return f"Package #{p.id} created and added to customer #{p.customer_id}."
