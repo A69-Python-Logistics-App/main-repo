@@ -28,6 +28,7 @@ class Engine:
 
             # Ensure employee has logged in
             self.app_data.login()
+            # log app state till now
 
             try:
                 if cmd == "exit":
