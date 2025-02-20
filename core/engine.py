@@ -21,7 +21,11 @@ class Engine:
         # Engine loaded
         self.log("Program started")
 
+        # Welcome print
         print("=" * 10 + " Welcome to Logistics App " + "=" * 10)
+        # Startup system time print
+        print("-" * 8 + f" Time is: {self.app_data.system_time} " + "-" * 8)
+
         cmd = ""
 
         while True:

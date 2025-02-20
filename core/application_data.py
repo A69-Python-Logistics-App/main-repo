@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from models.customer import Customer
 from models.helpers import state
@@ -12,11 +12,15 @@ from models.user import User
 class ApplicationData:
 
     HISTORY = "history.json"
+    SYS_TIME_DEFAULT = "00:00 20.02.2025"
 
     def __init__(self):
 
         # Initiate log
         self._log = []
+
+        # System time - default state at startup is always the same for now
+        self._sys_time = datetime.strptime(self.SYS_TIME_DEFAULT, "%H:%M %d.%m.%Y")
 
         # Employees and current employee
         self._employees: list[User] = []
@@ -77,10 +81,40 @@ class ApplicationData:
         :return: list - Log of all actions as copy
         """
         return self._log.copy()
+    
+    @property
+    def system_time(self):
+        """
+        Returns system time, formatted in "%H:%M %d.%m.%Y"
+        :return: datetime - Time 
+        """
+        return self._sys_time
 
     #
     # Write methods
     #
+
+
+    # "00:00 20.02.2025"
+    def fast_forward(self, num:int, type:str):
+        """
+        Fast forward system time by a given number of hours or days.
+        
+        :param num: int - The number of units to add.
+        :param type: str - The type of units to add; either 'hours' or 'days'.
+        :return: The updated system time as a string, or None if the type is invalid.
+        """
+        if type in ["hour", "hours"]:
+            self._sys_time += timedelta(hours=num)
+            return f"System time is now: {self._sys_time}"
+        elif type in ["day", "days"]:
+            self._sys_time += timedelta(days=num)
+            return f"System time is now: {self._sys_time}"
+        else:
+            return None
+        
+        # TODO: fast_forward should call another function update_state or something, 
+        # that must update all of the packages in the system that have an estimated time of arrival < or = to current sys time.
 
     def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:
         """

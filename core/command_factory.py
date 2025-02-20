@@ -18,6 +18,7 @@ from commands.change_employee_role_command import ChangeEmployeeRoleCommand
 from commands.change_employee_name_command import ChangeEmployeeNameCommand
 from commands.change_employee_password_command import ChangeEmployeePasswordCommand
 from commands.remove_employee_command import RemoveEmployeeCommand
+from commands.fast_forward_command import FastForwardCommand
 from core.application_data import ApplicationData
 
 
@@ -76,6 +77,8 @@ class CommandFactory:
                 return RoutesCommand(params, self.app_data)
 
             # System commands
+            case "fastforward":
+                return FastForwardCommand(params, self.app_data)
             case "system_reset":
                 return ResetCommand(params, self.app_data)
             case "logout":
