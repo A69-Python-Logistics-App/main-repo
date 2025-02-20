@@ -35,6 +35,9 @@ class CreateRouteCommand(BaseCommand):
         try:
             date = datetime.strptime(date, "%b %d %H:%M")
             date = date.replace(year=datetime.now().year)
+            if date < datetime.now():
+                raise ValueError("Date of creation can not be in the past")
+
         except:
             raise ValueError(f"Invalid date ({date}) provided!")
 

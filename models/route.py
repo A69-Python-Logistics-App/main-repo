@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from models.package import Package
 from models.truck_carpark import TruckCarPark
-from models.helpers.validation_helpers import parse_to_int
+from models.location import Location
 
 class Route:
     route_counter = 1
@@ -27,6 +27,7 @@ class Route:
     }
     
     def __init__(self, stops:list[str], departure_time: datetime):
+        Location.validate_locations(stops)
         if len(stops) < 2:
             raise ValueError("Route needs to be at least 2 stops")
         self.route_id = Route.route_counter
@@ -99,7 +100,7 @@ class Route:
         self.weight_capacity = truck_capacity
 
 
-    def add_package(self, package):
+    def add_package(self, package:Package):
         """
         This method adds a package to the current weight and updates it.
         :params: package(Package) the package to be added
@@ -108,7 +109,3 @@ class Route:
         if self.current_weight + package.weight > self.weight_capacity:
             raise ValueError(f"Package weight exceeds the capacity. Capacity is {self.weight_capacity - self.current_weight}")
         self.current_weight += package.weight
-
-    @classmethod
-    def set_internal_id(cls, ID:int):
-        cls.route_counter = parse_to_int(ID)

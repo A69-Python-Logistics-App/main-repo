@@ -1,3 +1,4 @@
+from commands.add_package_command import AddPackageCommand
 from commands.base.base_command import BaseCommand
 from commands.create_employee_command import CreateEmployeeCommand
 from commands.change_employee_role_command import ChangeEmployeeRoleCommand
@@ -63,6 +64,8 @@ class CommandFactory:
                 return CreatePackageCommand(params, self.app_data)
             case "removepackage":
                 return RemovePackageCommand(params, self.app_data)
+            case "addpackagetoroute":
+                return AddPackageCommand(params, self.app_data)
 
             # Route commands
             case "createroute":

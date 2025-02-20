@@ -29,10 +29,6 @@ class ApplicationData:
 
         self._locations = [Location(loc) for loc in Location.cities] # TODO: init locations from cities or change locations implementation
 
-    #
-    # Properties
-    #
-
     @property
     def customers(self) -> tuple:
         return tuple(self._customers)
@@ -172,6 +168,16 @@ class ApplicationData:
             if route.route_id == id_number:
                 return route
 
+    def find_route_by_locations(self,pickup_location, dropoff_locations) -> Route | None:
+        for route in self._routes:
+            if pickup_location in route.stops and dropoff_locations in route.stops:
+                if route.stops.index(dropoff_locations) > route.stops.index(pickup_location):
+                    return route
+        return None
+
+
+
+
     def find_hub_by_city(self, city: str) -> Location | None:
         for location in self._locations:
             if location.hub_name == city:
@@ -214,6 +220,10 @@ class ApplicationData:
     def assign_package_to_route(self, package_id, route_id) -> None:
         package: Package = self.find_package_by_id(package_id)
         route: Route = self.find_route_by_id(route_id)
+        if package.pickup_location not in route.stops or package.dropoff_location not in route.stops:
+            raise ValueError("Package pick up location or drop off locatation not in this route")
+        if route.stops.index(package.dropoff_location) < route.stops.index(package.pickup_location):
+            raise ValueError("Drop off location has to be after the pick up location")
         if route.weight_capacity < package.weight or route.current_weight + package.weight > route.weight_capacity:
             raise ValueError("Not enough capacity for this package")
         else:
