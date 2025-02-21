@@ -1,7 +1,7 @@
 
 from core.command_factory import CommandFactory
 from models.helpers import state
-# import traceback
+import traceback
 
 
 class Engine:
@@ -47,7 +47,7 @@ class Engine:
                 else:
                     continue
             except Exception as e:
-                # print(traceback.print_tb(e.__traceback__))
+                print(traceback.print_tb(e.__traceback__))
                 log_entry = e.args[0]
                 # exit()
 

@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-
+from models.truck_carpark import TruckCarPark
 from models.customer import Customer
 from models.helpers import state
 from models.location import Location
@@ -106,15 +106,29 @@ class ApplicationData:
         """
         if type in ["hour", "hours"]:
             self._sys_time += timedelta(hours=num)
+            self.process_deliveries()
             return f"System time is now: {self._sys_time}"
         elif type in ["day", "days"]:
             self._sys_time += timedelta(days=num)
+            self.process_deliveries()
             return f"System time is now: {self._sys_time}"
+        
         else:
             return None
         
         # TODO: fast_forward should call another function update_state or something, 
         # that must update all of the packages in the system that have an estimated time of arrival < or = to current sys time.
+
+        
+
+    def process_deliveries(self):
+        print("Process_deliveries called")
+        for route in self._routes:
+            for stop in route.stops:
+                delivered_packages = route.deliver_packages(stop)
+                for package in delivered_packages:
+                    print(f"Package #{package.id} delivered at {stop}.")
+                    self.log_entry(f"Package #{package.id} delivered at {stop}.")
 
     def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:
         """
@@ -133,14 +147,14 @@ class ApplicationData:
         return employee
 
     def create_package(self, weight, pickup, dropoff, customer_id) -> Package:
-        package = Package(weight, pickup, dropoff, customer_id)
+        package = Package(weight, pickup, dropoff, customer_id, self.system_time)
         self._packages.append(package)
 
         hub = self.find_hub_by_city(pickup)
         hub.list_of_packages_on_location.append(package.id)
 
         customer = self.find_customer_by_id(customer_id)
-        customer.add_package(package.id) # find customer and add package id
+        customer.add_package(package.id)
 
         return package
 
@@ -163,7 +177,7 @@ class ApplicationData:
         del package # Remove from memory
         return output
 
-    def create_route(self, date: datetime, *locations: list[str]) -> Route:
+    def create_route(self, date: datetime, locations: list[str]) -> Route:
         route = Route(locations, date)
         self._routes.append(route)
         return route
@@ -251,14 +265,12 @@ class ApplicationData:
             if route.route_id == id_number:
                 return route
 
-    def find_route_by_locations(self,pickup_location, dropoff_locations) -> Route | None:
+    def find_route_by_locations(self, pickup_location, dropoff_location) -> Route | None:
         for route in self._routes:
-            if pickup_location in route.stops and dropoff_locations in route.stops:
-                if route.stops.index(dropoff_locations) > route.stops.index(pickup_location):
+            if pickup_location in route.stops and dropoff_location in route.stops:
+                if route.stops.index(dropoff_location) > route.stops.index(pickup_location):
                     return route
         return None
-
-
 
 
     def find_hub_by_city(self, city: str) -> Location | None:
@@ -336,7 +348,7 @@ class ApplicationData:
         package: Package = self.find_package_by_id(package_id)
         route: Route = self.find_route_by_id(route_id)
         if package.pickup_location not in route.stops or package.dropoff_location not in route.stops:
-            raise ValueError("Package pick up location or drop off locatation not in this route")
+            raise ValueError("Package pick up location or drop off location not in this route")
         if route.stops.index(package.dropoff_location) < route.stops.index(package.pickup_location):
             raise ValueError("Drop off location has to be after the pick up location")
         if route.weight_capacity < package.weight or route.current_weight + package.weight > route.weight_capacity:
@@ -483,6 +495,15 @@ class ApplicationData:
         employee = self.find_employee_by_username(employee)
         self._employees.remove(employee)
         return f"Employee '{employee.username}' has been removed."
+    
+    def view_routes(self) -> str:
+        return "\n".join(str(route) for route in self._routes)
+
+    def view_packages(self) -> str:
+        return "\n".join(str(package) for package in self._packages)
+
+    def view_trucks(self) -> str:
+        return "\n".join(str(truck) for truck in TruckCarPark.list_all_free_trucks())
 
     #
     # Protected methods

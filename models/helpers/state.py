@@ -69,7 +69,6 @@ def dump_to_app(app_data) -> str:
 
 
 def dump_to_file(app_data):
-    # TODO: Finish implementation for saving app state
     last_user = app_data.current_employee.username if app_data.current_employee else "None"
     state: dict[str:dict] = {
         "employees": {},
@@ -87,7 +86,7 @@ def dump_to_file(app_data):
         }
 
     for customer in app_data._customers:
-        state["customers"][customer.id] = {  # TODO: Customer ID is string
+        state["customers"][customer.id] = {
             "first_name": customer.first_name,
             "last_name": customer.last_name,
             "email": customer.email,
@@ -102,13 +101,13 @@ def dump_to_file(app_data):
             "customer_id": package.customer_id,
             "status": package.status,
             "current_loc": package.current_location,
-            "date_creation": package.date_creation
+            "date_creation": package.date_creation.isoformat() if isinstance(package.date_creation, datetime) else package.date_creation
         }
 
-    for route in app_data._routes:  # TODO: Add route getters and an ID setter for initialization from history
+    for route in app_data._routes:
         state["routes"][route.route_id] = {
             "stops": route.stops,
-            "takeoff": datetime.now().isoformat()  # route.date.isoformat() # TODO: Route doesn't have takeoff date getter
+            "takeoff": route.route_stop_estimated_arrival[0].isoformat() if isinstance(route.route_stop_estimated_arrival[0], datetime) else route.route_stop_estimated_arrival[0]
         }
 
     for location in app_data._locations:
