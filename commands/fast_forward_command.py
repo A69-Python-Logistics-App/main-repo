@@ -1,4 +1,5 @@
 from commands.base.base_command import BaseCommand
+from models.helpers.validation_helpers import parse_to_int
 from models.user import User
 
 
@@ -15,10 +16,7 @@ class FastForwardCommand(BaseCommand):
         number, type = self.params
 
         # Number error checking
-        try:
-            number = int(number)
-        except:
-            raise ValueError("Invalid number for hours/days.")
+        number = parse_to_int(number)
         
         if number < 0:
             raise ValueError("Number for hours/days must be positive.")
