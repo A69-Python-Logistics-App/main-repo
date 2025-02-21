@@ -42,6 +42,7 @@ class Route:
         self.route_total_distance, self.route_stop_estimated_arrival = self.calculate_route_timeline(departure_time, stops)
         self.list_of_packages:list[Package] = []
         self.truck_car_park = TruckCarPark()
+        self.current_location = stops[0]  # Initialize current location to the first stop
 
         Route.list_of_all_routes.append(self)
 
@@ -73,7 +74,7 @@ class Route:
         estimated_arrivals = self.route_stop_estimated_arrival
         truck = self.truck_id
         result = f"Route ID: {route_id}\n"
-        result += f"Stops {" -> ".join(stops)}\n"
+        result += f"Stops {' -> '.join(stops)}\n"
         result += f"Total distance: {total_distance}km\n"
         result += f"Estimated arrivals:\n"
         for i in range(len(stops)):
@@ -81,7 +82,8 @@ class Route:
 
         result = result[:-1]
         if truck:
-            result += f"\n Assigned Truck '{self.truck_name}', ID: {self.truck_id}, with remaining capacity {self.weight_capacity - self.current_weight}kg"
+            result += f"\n Assigned Truck '{self.truck_name}' ID:{self.truck_id}, current location: {self.current_location}"
+            result += f"\n Remaining capacity: {self.weight_capacity - self.current_weight} kg" 
         else:
             result += f"\n No Truck assigned"
 
@@ -98,7 +100,7 @@ class Route:
     def assign_truck(self, truck_name: str):
         truck = self.truck_car_park.find_free_truck_by_name(truck_name)
         if truck.capacity < self.current_weight:
-            raise ValueError(f"Truck has {truck.capacity}kg capacity but {self.current_weight}kg is needed")
+            raise ValueError(f"Truck has {truck.capacity} kg capacity but {self.current_weight}kg is needed")
         self.truck_id = truck.id
         self.truck_name = truck.name
         self.weight_capacity = truck.capacity
@@ -121,9 +123,24 @@ class Route:
         Method to deliver packages.
         """
         delivered_packages = []
-        for package in self.list_of_packages:
+        for package in self.list_of_packages[:]:
             if package.dropoff_location == stop:
                 package.update_status("Delivered")
                 package.update_location(stop)
                 delivered_packages.append(package)
+                self.list_of_packages.remove(package)
+                self.current_weight -= package.weight
         return delivered_packages
+
+    def update_truck_location(self, current_time: datetime):
+        """
+        Update the truck's current location based on the estimated time of arrival.
+        :param current_time: datetime - The current system time.
+        """
+        for i, arrival_time in enumerate(self.route_stop_estimated_arrival):
+            if current_time >= arrival_time:
+                self.current_location = self.stops[i]
+            else:
+                if i > 0:
+                    self.current_location = f"In transit between {self.stops[i-1]} and {self.stops[i]}"
+                break

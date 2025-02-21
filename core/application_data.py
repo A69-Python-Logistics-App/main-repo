@@ -12,7 +12,7 @@ from models.user import User
 class ApplicationData:
 
     HISTORY = "history.json"
-    SYS_TIME_DEFAULT = "00:00 20.02.2025"
+    SYS_TIME_DEFAULT = "00:00 01.01.2025"
 
     def __init__(self):
 
@@ -117,6 +117,7 @@ class ApplicationData:
 
     def process_deliveries(self):
         for route in self._routes:
+            route.update_truck_location(self._sys_time)  # Update the truck's location
             for i, stop in enumerate(route.stops):
                 if self._sys_time >= route.route_stop_estimated_arrival[i]:  # Check if the route has reached the stop
                     delivered_packages = route.deliver_packages(stop)
