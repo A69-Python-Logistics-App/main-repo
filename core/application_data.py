@@ -177,7 +177,7 @@ class ApplicationData:
         del package # Remove from memory
         return output
 
-    def create_route(self, date: datetime, locations: list[str]) -> Route:
+    def create_route(self, date: datetime, locations: tuple) -> Route:
         route = Route(locations, date)
         self._routes.append(route)
         return route

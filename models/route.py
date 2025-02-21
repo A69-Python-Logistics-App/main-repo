@@ -27,7 +27,7 @@ class Route:
         PERTH_CODE:{SYDNEY_CODE:4016, MELBOURNE_CODE:3509, ADELAIDE_CODE:2785, ALICE_SPRINGS_CODE:2481, BRISBANE_CODE:4311,DARWIN_CODE:4025,PERTH_CODE:0},    
     }
     
-    def __init__(self, stops: list[str], departure_time: datetime):
+    def __init__(self, stops: tuple, departure_time: datetime):
         Location.validate_locations(stops)
         if len(stops) < 2:
             raise ValueError("Route needs to be at least 2 stops")
