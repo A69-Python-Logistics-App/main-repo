@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from models.package import Package
 from models.truck_carpark import TruckCarPark
 from models.location import Location
+from models.helpers.validation_helpers import parse_to_int
 
 class Route:
     route_counter = 1
@@ -84,6 +85,13 @@ class Route:
             result += f"\n No Truck assigned"
 
         return result
+    
+    @classmethod
+    def set_internal_id(self, ID:int):
+        """
+        Set class __ID to the given value.
+        """
+        Package.__ID = parse_to_int(ID)
 
         
     def assign_truck(self, truck_id: int, truck_capacity: int):

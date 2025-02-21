@@ -6,7 +6,7 @@ class Package():
 
     __ID = 1000
 
-    def __init__(self, weight:int, pickup_loc:str, dropoff_loc:str, customer_id:int):
+    def __init__(self, weight:int, pickup_loc:str, dropoff_loc:str, customer_id:int, date_creation:datetime):
 
         """
         Package with weight, pickup location, dropoff location and customer id. Contains current location, \n
@@ -21,7 +21,7 @@ class Package():
         self._dropoff_loc = dropoff_loc # dropoff location
         self._current_loc = self._pickup_loc # DEFAULT current location: at pickup
 
-        self._date_creation = datetime.now().strftime("%H:%M %d.%m.%Y") # time of package creation
+        self._date_creation = date_creation # time of package creation - Sys time
         self._package_Status = Status() # TODO: Fix implementation of Status()
         self._status = self._package_Status.current # package status: Collected, On Route, Delivered
 

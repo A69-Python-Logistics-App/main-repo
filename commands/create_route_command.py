@@ -21,9 +21,8 @@ class CreateRouteCommand(BaseCommand):
     def execute(self):
         # Unpacking values from params
         month, day, time, *stops = self.params
-
         # Make sure locations are valid
-        Location.validate_locations(*stops)
+        Location.validate_locations(stops)
 
         # Make sure the route isn't from one city to the same location
         for i in range(len(stops) - 1):

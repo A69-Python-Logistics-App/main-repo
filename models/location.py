@@ -23,7 +23,7 @@ class Location:
         return self.list_of_packages_on_location.copy()
 
     @classmethod
-    def validate_locations(cls, *locations: list[str]):
+    def validate_locations(cls, locations: tuple[str]):
         """
         Checks if locations are valid
         :param locations: accepts at least one location or more as argument(s)

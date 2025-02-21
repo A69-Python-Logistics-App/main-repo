@@ -133,7 +133,7 @@ class ApplicationData:
         return employee
 
     def create_package(self, weight, pickup, dropoff, customer_id) -> Package:
-        package = Package(weight, pickup, dropoff, customer_id)
+        package = Package(weight, pickup, dropoff, customer_id, self.system_time) # package accepts current system time now
         self._packages.append(package)
 
         hub = self.find_hub_by_city(pickup)
@@ -163,7 +163,7 @@ class ApplicationData:
         del package # Remove from memory
         return output
 
-    def create_route(self, date: datetime, *locations: list[str]) -> Route:
+    def create_route(self, date: datetime, *locations: tuple[str]) -> Route:
         route = Route(locations, date)
         self._routes.append(route)
         return route
