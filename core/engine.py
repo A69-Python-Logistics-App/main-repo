@@ -6,8 +6,9 @@ import traceback
 
 class Engine:
 
-    def __init__(self, cmdf: CommandFactory):
+    def __init__(self, cmdf: CommandFactory, debug: bool=False):
         self._command_factory = cmdf
+        self._debug = debug
 
         # Ask to load from history
         self._init_history()
@@ -47,9 +48,11 @@ class Engine:
                 else:
                     continue
             except Exception as e:
-                print(traceback.print_tb(e.__traceback__))
+                if self._debug:
+                    print(traceback.print_tb(e.__traceback__))
+                    log_entry = e.args[0]
+                    exit("Error occured in debug mode, exiting.")
                 log_entry = e.args[0]
-                # exit()
 
             print(log_entry) # printing to console before exit will be required for finding the best route
             self.log(log_entry)
