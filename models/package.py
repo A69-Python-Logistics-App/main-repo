@@ -6,6 +6,8 @@ class Package():
 
     __ID = 1000
 
+    __STATUSES = ["Collected", "Loaded", "On Route", "Delivered"]
+
     def __init__(self, weight:int, pickup_loc:str, dropoff_loc:str, customer_id:int, date_creation:datetime):
 
         """
@@ -22,8 +24,7 @@ class Package():
         self._current_loc = self._pickup_loc # DEFAULT current location: at pickup
 
         self._date_creation = date_creation # time of package creation - Sys time
-        self._package_Status = Status() # TODO: Fix implementation of Status()
-        self._status = self._package_Status.current # package status: Collected, On Route, Delivered
+        self._status = Package.__STATUSES[0] # default value
 
         # Set package id and increment
         self._package_id = Package.__ID
@@ -101,8 +102,13 @@ class Package():
         """
         self._current_loc = location
 
-    def advance_package_status(self):
+    def update_status(self, status:str):
         """
-        Advances package status.
+        Update status to given string. Raise ValueError if string not in "Collected", "Loaded", "On Route", "Delivered".
         """
-        self._status.advance_status()
+        if status not in Package.__STATUSES:
+            raise ValueError("Invalid package status")
+        self._status = status
+
+    def update_location(self, new_location:str):
+        self._current_loc = new_location

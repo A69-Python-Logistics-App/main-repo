@@ -23,7 +23,7 @@ class CreatePackageCommand(BaseCommand):
         weight = parse_to_int(weight)
 
         # Making sure the pickup and dropoff locations are valid
-        Location.validate_locations(pickup, dropoff)
+        Location.validate_locations([pickup, dropoff])
 
         # Trying to find existing customer or raise ValueError
         customer = self.app_data.find_customer_by_email(customer_email)

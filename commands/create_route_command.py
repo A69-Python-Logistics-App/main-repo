@@ -9,6 +9,7 @@ from models.user import User
 class CreateRouteCommand(BaseCommand):
 
     PERMISSION = User.MANAGER
+    USAGE = "createroute {Month} {Day} {Hour} {LOCATIONS}: (sep by space)}"
     SPECIAL_CASE = True # Skip params validation
 
     def __init__(self, params: list[str], app_data: ApplicationData):
@@ -21,6 +22,7 @@ class CreateRouteCommand(BaseCommand):
     def execute(self):
         # Unpacking values from params
         month, day, time, *stops = self.params
+
         # Make sure locations are valid
         Location.validate_locations(stops)
 

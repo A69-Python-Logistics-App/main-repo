@@ -23,13 +23,13 @@ class Location:
         return self.list_of_packages_on_location.copy()
 
     @classmethod
-    def validate_locations(cls, locations: tuple[str]):
+    def validate_locations(cls, locations: list[str]):
         """
         Checks if locations are valid
-        :param locations: accepts at least one location or more as argument(s)
+        :param locations: accepts a list of locations
         :raise ValueError: if any location is invalid
         """
         for location in locations:
-            if not location in cls.cities:
+            if location not in cls.cities:
                 raise ValueError("\n".join([f"Invalid location [{location}] provided.",
                                             f"Available locations: {', '.join(cls.cities)}"]))
