@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from models.truck_carpark import TruckCarPark
+from models.truck_car_park import TruckCarPark
 from models.customer import Customer
 from models.helpers import state
 from models.location import Location
@@ -95,8 +95,7 @@ class ApplicationData:
     #
 
 
-    # "00:00 20.02.2025"
-    def fast_forward(self, num:int, type:str):
+    def fast_forward(self, num: int, type: str):
         """
         Fast forward system time by a given number of hours or days.
         
@@ -106,29 +105,24 @@ class ApplicationData:
         """
         if type in ["hour", "hours"]:
             self._sys_time += timedelta(hours=num)
-            self.process_deliveries()
-            return f"System time is now: {self._sys_time}"
         elif type in ["day", "days"]:
             self._sys_time += timedelta(days=num)
-            self.process_deliveries()
-            return f"System time is now: {self._sys_time}"
-        
         else:
             return None
-        
-        # TODO: fast_forward should call another function update_state or something, 
-        # that must update all of the packages in the system that have an estimated time of arrival < or = to current sys time.
+
+        self.process_deliveries()
+        return f"System time is now: {self._sys_time}"
 
         
 
     def process_deliveries(self):
-        print("Process_deliveries called")
         for route in self._routes:
-            for stop in route.stops:
-                delivered_packages = route.deliver_packages(stop)
-                for package in delivered_packages:
-                    print(f"Package #{package.id} delivered at {stop}.")
-                    self.log_entry(f"Package #{package.id} delivered at {stop}.")
+            for i, stop in enumerate(route.stops):
+                if self._sys_time >= route.route_stop_estimated_arrival[i]:  # Check if the route has reached the stop
+                    delivered_packages = route.deliver_packages(stop)
+                    for package in delivered_packages:
+                        print(f"Package #{package.id} delivered at {stop}.")
+                        self.log_entry(f"Package #{package.id} delivered at {stop}.")
 
     def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:
         """

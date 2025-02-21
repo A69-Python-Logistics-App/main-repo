@@ -81,7 +81,7 @@ class Route:
 
         result = result[:-1]
         if truck:
-            result += f"\n Assign Truck with ID: {truck} and Capacity {self.weight_capacity}kg"
+            result += f"\n Assigned Truck '{self.truck_name}', ID: {self.truck_id}, with remaining capacity {self.weight_capacity - self.current_weight}kg"
         else:
             result += f"\n No Truck assigned"
 
@@ -95,18 +95,15 @@ class Route:
         Package.__ID = parse_to_int(ID)
 
         
-    def assign_truck(self, truck_id: int, truck_capacity: int):
-        free_trucks = self.truck_car_park.list_all_free_trucks()
-        if truck_id not in [truck.truck_id for truck in free_trucks]:
-            raise ValueError(f"Truck with ID:{truck_id} is not available")
-        if truck_capacity < self.current_weight:
-            raise ValueError(f"Truck has {truck_capacity}kg capacity but {self.current_weight}kg is needed")
-        self.truck_id = truck_id
-        self.weight_capacity = truck_capacity
-        for truck in self.truck_car_park.trucks:
-            if truck.truck_id == truck_id:
-                truck.assigned_route = self.route_id
-                break
+    def assign_truck(self, truck_name: str):
+        truck = self.truck_car_park.find_free_truck_by_name(truck_name)
+        if truck.capacity < self.current_weight:
+            raise ValueError(f"Truck has {truck.capacity}kg capacity but {self.current_weight}kg is needed")
+        self.truck_id = truck.id
+        self.truck_name = truck.name
+        self.weight_capacity = truck.capacity
+        truck.assigned_route = self.route_id
+        return truck
 
 
     def add_package(self, package:Package):
