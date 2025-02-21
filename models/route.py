@@ -1,6 +1,8 @@
 from datetime import datetime, timedelta
 from models.package import Package
-from models.truck_carpark import TruckCarPark
+from models.truck_car_park import TruckCarPark
+from models.location import Location
+from models.helpers.validation_helpers import parse_to_int
 
 class Route:
     route_counter = 1
@@ -25,7 +27,8 @@ class Route:
         PERTH_CODE:{SYDNEY_CODE:4016, MELBOURNE_CODE:3509, ADELAIDE_CODE:2785, ALICE_SPRINGS_CODE:2481, BRISBANE_CODE:4311,DARWIN_CODE:4025,PERTH_CODE:0},    
     }
     
-    def __init__(self, stops:list[str], departure_time: datetime):
+    def __init__(self, stops: tuple, departure_time: datetime):
+        Location.validate_locations(stops)
         if len(stops) < 2:
             raise ValueError("Route needs to be at least 2 stops")
         self.route_id = Route.route_counter
@@ -34,10 +37,11 @@ class Route:
         self.route_total_distance = 0
         self.route_stop_estimated_arrival = [departure_time]
         self.truck_id = None
-        self.weight_capacity = None
+        self.weight_capacity = 0
         self.current_weight = 0
         self.route_total_distance, self.route_stop_estimated_arrival = self.calculate_route_timeline(departure_time, stops)
         self.list_of_packages:list[Package] = []
+        self.truck_car_park = TruckCarPark()
 
         Route.list_of_all_routes.append(self)
 
@@ -77,28 +81,32 @@ class Route:
 
         result = result[:-1]
         if truck:
-            result += f"\n Assign Truck with ID: {truck} and Capacity {self.weight_capacity}kg"
+            result += f"\n Assigned Truck '{self.truck_name}', ID: {self.truck_id}, with remaining capacity {self.weight_capacity - self.current_weight}kg"
         else:
             result += f"\n No Truck assigned"
 
         return result
+    
+    @classmethod
+    def set_internal_id(self, ID:int):
+        """
+        Set class __ID to the given value.
+        """
+        Package.__ID = parse_to_int(ID)
 
         
-    def assign_truck(self, truck_id: int, truck_capacity: int):
-        """
-        This method assigns a truck to a route.
-        :params: truck_id:int and truck_capacity:int
-        :return: None. The truck is assigned to the route
-        """
-        if truck_id not in TruckCarPark.list_all_free_trucks():
-            raise ValueError(f"Truck with ID:{truck_id} is not available")
-        if truck_capacity < self.current_weight:
-            raise ValueError(f"Truck has {truck_capacity}kg capacity but {self.current_weight}kg is needed")
-        self.truck_id = truck_id
-        self.weight_capacity = truck_capacity
+    def assign_truck(self, truck_name: str):
+        truck = self.truck_car_park.find_free_truck_by_name(truck_name)
+        if truck.capacity < self.current_weight:
+            raise ValueError(f"Truck has {truck.capacity}kg capacity but {self.current_weight}kg is needed")
+        self.truck_id = truck.id
+        self.truck_name = truck.name
+        self.weight_capacity = truck.capacity
+        truck.assigned_route = self.route_id
+        return truck
 
 
-    def add_package(self, package):
+    def add_package(self, package:Package):
         """
         This method adds a package to the current weight and updates it.
         :params: package(Package) the package to be added
@@ -107,8 +115,15 @@ class Route:
         if self.current_weight + package.weight > self.weight_capacity:
             raise ValueError(f"Package weight exceeds the capacity. Capacity is {self.weight_capacity - self.current_weight}")
         self.current_weight += package.weight
-
-    @classmethod
-    def set_internal_id(cls, param):
-        cls.route_counter = int(param)
-        pass
+    
+    def deliver_packages(self, stop: str):
+        """
+        Method to deliver packages.
+        """
+        delivered_packages = []
+        for package in self.list_of_packages:
+            if package.dropoff_location == stop:
+                package.update_status("Delivered")
+                package.update_location(stop)
+                delivered_packages.append(package)
+        return delivered_packages

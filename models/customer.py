@@ -1,4 +1,4 @@
-from models.package import Package
+from models.helpers.validation_helpers import parse_to_int
 
 class Customer():
 
@@ -22,7 +22,7 @@ class Customer():
         """
         Set class __ID to the given value.
         """
-        Customer.__ID = ID
+        Customer.__ID = parse_to_int(ID)
 
     @staticmethod
     def _check_valid_name(name):

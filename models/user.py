@@ -53,12 +53,17 @@ class User:
         return value in (cls.USER, cls.MANAGER, cls.SUPERVISOR, cls.ADMIN)
 
     def can_execute(self, role: str) -> bool:
+        # Create permissions mapping
         perms = {
-            self.USER: [self.USER],
-            self.MANAGER: [self.USER, self.MANAGER],
-            self.SUPERVISOR: [self.USER, self.MANAGER, self.SUPERVISOR],
-            self.ADMIN: [self.USER, self.MANAGER, self.SUPERVISOR, self.ADMIN]
+            self.USER: [self.USER]
         }
+
+        # Add all role permissions
+        perms[self.MANAGER] = perms[self.USER] + [self.MANAGER]
+        perms[self.SUPERVISOR] = perms[self.MANAGER] + [self.SUPERVISOR]
+        perms[self.ADMIN] = perms[self.SUPERVISOR] + [self.ADMIN]
+
+        # Check if user can execute based on permissions mapping
         if role not in perms[self.role]:
             return False
         return True

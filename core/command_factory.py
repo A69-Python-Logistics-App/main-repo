@@ -1,3 +1,4 @@
+from commands.add_package_command import AddPackageCommand
 from commands.base.base_command import BaseCommand
 from commands.create_employee_command import CreateEmployeeCommand
 from commands.change_employee_role_command import ChangeEmployeeRoleCommand
@@ -17,8 +18,10 @@ from commands.change_employee_role_command import ChangeEmployeeRoleCommand
 from commands.change_employee_name_command import ChangeEmployeeNameCommand
 from commands.change_employee_password_command import ChangeEmployeePasswordCommand
 from commands.remove_employee_command import RemoveEmployeeCommand
+from commands.fast_forward_command import FastForwardCommand
+from commands.assign_truck_command import AssignTruckCommand
+from commands.add_package_to_route_command import AddPackageToRouteCommand
 from core.application_data import ApplicationData
-
 
 class CommandFactory:
     def __init__(self, app_data: ApplicationData):
@@ -57,12 +60,13 @@ class CommandFactory:
             case "customerpackages":
                 return CustomerPackagesCommand(params, self.app_data)
 
-
             # Package commands
             case "createpackage":
                 return CreatePackageCommand(params, self.app_data)
             case "removepackage":
                 return RemovePackageCommand(params, self.app_data)
+            case "addpackagetoroute":
+                return AddPackageToRouteCommand(params, self.app_data)
 
             # Route commands
             case "createroute":
@@ -71,8 +75,12 @@ class CommandFactory:
                 return RemoveRouteCommand(params, self.app_data)
             case "routes":
                 return RoutesCommand(params, self.app_data)
+            case "assigntruck":
+                return AssignTruckCommand(params, self.app_data)
 
             # System commands
+            case "fastforward":
+                return FastForwardCommand(params, self.app_data)
             case "system_reset":
                 return ResetCommand(params, self.app_data)
             case "logout":

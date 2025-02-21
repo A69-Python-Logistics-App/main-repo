@@ -9,6 +9,7 @@ from models.user import User
 class CreateRouteCommand(BaseCommand):
 
     PERMISSION = User.MANAGER
+    USAGE = "createroute {Month} {Day} {Hour} {LOCATIONS}: (sep by space)}"
     SPECIAL_CASE = True # Skip params validation
 
     def __init__(self, params: list[str], app_data: ApplicationData):
@@ -23,7 +24,7 @@ class CreateRouteCommand(BaseCommand):
         month, day, time, *stops = self.params
 
         # Make sure locations are valid
-        Location.validate_locations(*stops)
+        Location.validate_locations(stops)
 
         # Make sure the route isn't from one city to the same location
         for i in range(len(stops) - 1):
@@ -32,12 +33,15 @@ class CreateRouteCommand(BaseCommand):
 
         # Datetime
         date = " ".join((month, day, time))
-        try:
-            date = datetime.strptime(date, "%b %d %H:%M")
-            date = date.replace(year=datetime.now().year)
-        except:
-            raise ValueError(f"Invalid date ({date}) provided!")
+        # try:
+        date = datetime.strptime(date, "%b %d %H:%M")
+        date = date.replace(year=datetime.now().year)
+        # if date < datetime.now():
+            # raise ValueError("Date of creation can not be in the past")
+
+        # except:
+        #     raise ValueError(f"Invalid date ({date}) provided!")
 
         # returning the result of create_route execution
-        r = self.app_data.create_route(date, *stops)
+        r = self.app_data.create_route(date, stops)
         return f"Route #{r.route_id} from {stops[0]} to {stops[-1]} with {len(stops) - 2} stop(s) in-between created."

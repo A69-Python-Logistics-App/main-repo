@@ -1,13 +1,14 @@
 
 from core.command_factory import CommandFactory
 from models.helpers import state
-# import traceback
+import traceback
 
 
 class Engine:
 
-    def __init__(self, cmdf: CommandFactory):
+    def __init__(self, cmdf: CommandFactory, debug: bool=False):
         self._command_factory = cmdf
+        self._debug = debug
 
         # Ask to load from history
         self._init_history()
@@ -21,13 +22,18 @@ class Engine:
         # Engine loaded
         self.log("Program started")
 
+        # Welcome print
         print("=" * 10 + " Welcome to Logistics App " + "=" * 10)
+        # Startup system time print
+        print("-" * 8 + f" Time is: {self.app_data.system_time} " + "-" * 8)
+
         cmd = ""
 
         while True:
 
             # Ensure employee has logged in
             self.app_data.login()
+            # log app state till now
 
             try:
                 if cmd == "exit":
@@ -42,9 +48,12 @@ class Engine:
                 else:
                     continue
             except Exception as e:
-                # print(traceback.print_tb(e.__traceback__))
-                log_entry = e.args[0]
-                # exit()
+                if self._debug:
+                    print(traceback.print_tb(e.__traceback__))
+                    log_entry = e.args[0]
+                    exit("Error occured in debug mode, exiting.")
+                else:
+                    log_entry = e.args[0]
 
             print(log_entry) # printing to console before exit will be required for finding the best route
             self.log(log_entry)
