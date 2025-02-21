@@ -52,7 +52,8 @@ class Engine:
                     print(traceback.print_tb(e.__traceback__))
                     log_entry = e.args[0]
                     exit("Error occured in debug mode, exiting.")
-                log_entry = e.args[0]
+                else:
+                    log_entry = e.args[0]
 
             print(log_entry) # printing to console before exit will be required for finding the best route
             self.log(log_entry)
