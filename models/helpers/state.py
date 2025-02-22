@@ -17,6 +17,10 @@ def dump_to_app(app_data) -> str:
         except Exception as e:
             return f"Failed to parse state from history file:\n{e}"
 
+    # System time unpacking
+    if isinstance(state.get("time"), str):
+        app_data._sys_time = datetime.fromisoformat(state["time"])
+
     # Employees unpacking
     # employees[username]: data
     employees = state.get("employees")
@@ -44,7 +48,7 @@ def dump_to_app(app_data) -> str:
         for id_number, data in routes.items():
             id_number = int(id_number)
             r = app_data.create_route(datetime.fromisoformat(data["takeoff"]), data["stops"])
-            r.route_id = id_number
+            r.id = id_number
             max_routes_id = max(id_number, max_routes_id)
         Route.set_internal_id(max_routes_id + 1)  # TODO: Add route set_internal_id class method
 
@@ -71,6 +75,7 @@ def dump_to_app(app_data) -> str:
 def dump_to_file(app_data):
     last_user = app_data.current_employee.username if app_data.current_employee else "None"
     state: dict[str:dict] = {
+        "time": app_data.system_time.isoformat(),
         "employees": {},
         "customers": {},
         "packages": {},
@@ -105,7 +110,7 @@ def dump_to_file(app_data):
         }
 
     for route in app_data._routes:
-        state["routes"][route.route_id] = {
+        state["routes"][route.id] = {
             "stops": route.stops,
             "takeoff": route.route_stop_estimated_arrival[0].isoformat() if isinstance(route.route_stop_estimated_arrival[0], datetime) else route.route_stop_estimated_arrival[0]
         }

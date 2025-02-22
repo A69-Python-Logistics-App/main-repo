@@ -7,12 +7,13 @@ from models.package import Package
 from models.route import Route
 from models.status import Status
 from models.user import User
+from models.truck import Truck
 
 
 class ApplicationData:
 
     HISTORY = "history.json"
-    SYS_TIME_DEFAULT = "00:00 20.02.2025"
+    SYS_TIME_DEFAULT = "00:00 01.01.2025"
 
     def __init__(self):
 
@@ -33,6 +34,9 @@ class ApplicationData:
 
         # Initiate locations
         self._locations: list[Location] = [Location(loc) for loc in Location.cities]
+
+        # Truck BS
+        self._truck_car_park = TruckCarPark()
 
     @property
     def customers(self) -> tuple:
@@ -90,6 +94,10 @@ class ApplicationData:
         """
         return self._sys_time
 
+    @property
+    def truck_park(self):
+        return self._truck_car_park
+
     #
     # Write methods
     #
@@ -109,20 +117,62 @@ class ApplicationData:
             self._sys_time += timedelta(days=num)
         else:
             return None
-
+        
         self.process_deliveries()
         return f"System time is now: {self._sys_time}"
 
-        
 
     def process_deliveries(self):
+        """
+        Process deliveries for all routes based on the current system time.
+        """
         for route in self._routes:
+            self.update_trucks_location(route)  # Update the truck's location
             for i, stop in enumerate(route.stops):
                 if self._sys_time >= route.route_stop_estimated_arrival[i]:  # Check if the route has reached the stop
                     delivered_packages = route.deliver_packages(stop)
                     for package in delivered_packages:
                         print(f"Package #{package.id} delivered at {stop}.")
                         self.log_entry(f"Package #{package.id} delivered at {stop}.")
+
+    def assign_truck_to_route(self, truck_name: str, route_id:int):
+
+        truck:Truck = self._truck_car_park.find_free_truck_by_name(truck_name)
+        route:Route = self.find_route_by_id(route_id)
+        
+        if truck.range < route.route_total_distance:
+            raise ValueError(f"Truck '{truck_name}' has insufficient range for this route")
+
+        route.assign_truck(truck)
+        return truck
+    
+    def update_trucks_location(self, route: Route):
+        """
+        Update the truck's current location based on the estimated time of arrival.
+        :param route: Route - The route to update the truck's location for.
+        """
+        for i, arrival_time in enumerate(route.route_stop_estimated_arrival):
+            for truck in route.assigned_trucks:
+                if self.system_time >= arrival_time:
+                    truck.current_location = route.stops[i]
+
+                    # Check if location is the last stop
+                    if truck.current_location == route.stops[-1]:  
+                        print(f"Route #{route.id} completed. Unassigning all trucks.")
+                        self.log_entry(f"Route #{route.id} completed. Unassigning all trucks.")
+                        route.unassign_all_trucks()
+                        break
+                else:
+                    if i > 0:
+                        previous_stop = route.stops[i - 1]
+                        next_stop = route.stops[i]
+                        previous_arrival_time = route.route_stop_estimated_arrival[i - 1]
+                        total_travel_time = (arrival_time - previous_arrival_time).total_seconds()
+                        elapsed_time = (self.system_time - previous_arrival_time).total_seconds()
+
+                        if elapsed_time > 0:
+                            travel_ratio = elapsed_time / total_travel_time
+                            truck.current_location = f"between {previous_stop} and {next_stop} ({travel_ratio:.2%} completed)"
 
     def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:
         """
@@ -256,7 +306,7 @@ class ApplicationData:
         :return: Route | None
         """
         for route in self._routes:
-            if route.route_id == id_number:
+            if route.id == id_number:
                 return route
 
     def find_route_by_locations(self, pickup_location, dropoff_location) -> Route | None:
@@ -497,7 +547,7 @@ class ApplicationData:
         return "\n".join(str(package) for package in self._packages)
 
     def view_trucks(self) -> str:
-        return "\n".join(str(truck) for truck in TruckCarPark.list_all_free_trucks())
+        return "\n".join(str(truck) for truck in self._truck_car_park.list_all_free_trucks())
 
     #
     # Protected methods

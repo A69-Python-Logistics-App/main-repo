@@ -1,12 +1,12 @@
 from datetime import datetime, timedelta
 from models.package import Package
-from models.truck_car_park import TruckCarPark
 from models.location import Location
+from models.truck import Truck
 from models.helpers.validation_helpers import parse_to_int
 
 class Route:
-    route_counter = 1
-    list_of_all_routes = []
+
+    __ID = 1
 
     AVG_TRUCK_SPEED = 87
     SYDNEY_CODE = "SYD"
@@ -31,20 +31,20 @@ class Route:
         Location.validate_locations(stops)
         if len(stops) < 2:
             raise ValueError("Route needs to be at least 2 stops")
-        self.route_id = Route.route_counter
-        Route.route_counter += 1
+        
+        self.id = Route.__ID
+        Route.__ID += 1
+
         self.stops = stops
         self.route_total_distance = 0
         self.route_stop_estimated_arrival = [departure_time]
-        self.truck_id = None
+
+        self._assigned_trucks:list[Truck] = []
         self.weight_capacity = 0
         self.current_weight = 0
+
         self.route_total_distance, self.route_stop_estimated_arrival = self.calculate_route_timeline(departure_time, stops)
         self.list_of_packages:list[Package] = []
-        self.truck_car_park = TruckCarPark()
-
-        Route.list_of_all_routes.append(self)
-
         
     def calculate_route_timeline(self,departure_time, stops:list[str]):
         route_total_distance = 0
@@ -67,23 +67,21 @@ class Route:
         return route_total_distance,route_stop_estimated_arrival
     
     def __str__(self):
-        route_id = self.route_id
-        stops = self.stops
-        total_distance = self.route_total_distance
-        estimated_arrivals = self.route_stop_estimated_arrival
-        truck = self.truck_id
-        result = f"Route ID: {route_id}\n"
-        result += f"Stops {" -> ".join(stops)}\n"
-        result += f"Total distance: {total_distance}km\n"
+        result = f"Route ID: {self.id}\n"
+        result += f"Stops {' -> '.join(self.stops)}\n"
+        result += f"Total distance: {self.route_total_distance}km\n"
         result += f"Estimated arrivals:\n"
-        for i in range(len(stops)):
-            result += f" - {stops[i]}: {estimated_arrivals[i].strftime('%Y-%m-%d %H:%M')}\n"
+        for i in range(len(self.stops)):
+            result += f" - {self.stops[i]}: {self.route_stop_estimated_arrival[i].strftime('%Y-%m-%d %H:%M')}\n"
 
         result = result[:-1]
-        if truck:
-            result += f"\n Assigned Truck '{self.truck_name}', ID: {self.truck_id}, with remaining capacity {self.weight_capacity - self.current_weight}kg"
+        if len(self._assigned_trucks) > 0:
+            for truck in self._assigned_trucks:
+                result += f"\n Assigned Truck '{truck.name}' ID:{truck.id}, currently in {truck.current_location}"
+
+            result += f"\n Remaining capacity: {self.weight_capacity - self.current_weight} kg" 
         else:
-            result += f"\n No Truck assigned"
+            result += f"\n Route completed. No trucks assigned"
 
         return result
     
@@ -94,17 +92,17 @@ class Route:
         """
         Package.__ID = parse_to_int(ID)
 
-        
-    def assign_truck(self, truck_name: str):
-        truck = self.truck_car_park.find_free_truck_by_name(truck_name)
-        if truck.capacity < self.current_weight:
-            raise ValueError(f"Truck has {truck.capacity}kg capacity but {self.current_weight}kg is needed")
-        self.truck_id = truck.id
-        self.truck_name = truck.name
-        self.weight_capacity = truck.capacity
-        truck.assigned_route = self.route_id
-        return truck
+    @property
+    def assigned_trucks(self):
+        return tuple(self._assigned_trucks)
 
+    def _recalculate_capacity(self):
+        """
+        Calculate route capacity based on truck capacities.
+        """
+        self.weight_capacity = 0
+        for truck in self._assigned_trucks:
+            self.weight_capacity += truck.capacity
 
     def add_package(self, package:Package):
         """
@@ -121,9 +119,50 @@ class Route:
         Method to deliver packages.
         """
         delivered_packages = []
-        for package in self.list_of_packages:
+        for package in self.list_of_packages[:]:
             if package.dropoff_location == stop:
                 package.update_status("Delivered")
                 package.update_location(stop)
                 delivered_packages.append(package)
+                self.list_of_packages.remove(package)
+                self.current_weight -= package.weight
+                self._recalculate_capacity()
         return delivered_packages
+    
+    def update_trucks_location(self, location:str):
+        if type(location) != str:
+            raise ValueError("Update trucks location accepts string only")
+        for truck in self._assigned_trucks:
+            truck.current_location = location
+    
+    def assign_truck(self, truck:Truck):
+        """
+        Assignes a truck to route.
+        """
+        if type(truck) != Truck:
+            raise ValueError("Assign truck accepts truck type only")
+        truck.is_free = False
+        truck.current_location = self.stops[0]
+        self._assigned_trucks.append(truck)
+        self._recalculate_capacity()
+
+    def unassign_truck(self, truck:Truck):
+        """
+        Unassign a specific truck from route.
+        """
+        if type(truck) != Truck:
+            raise ValueError("Unassign truck accepts truck type only")
+        truck.current_location = "Car Park"
+        truck.is_free = True
+        self._assigned_trucks.remove(truck)
+        self._recalculate_capacity()
+    
+    def unassign_all_trucks(self):
+        """
+        Unassignes all trucks from route.
+        """
+        for truck in self._assigned_trucks:
+            truck.current_location = "Car Park"
+            truck.is_free = True
+        self._assigned_trucks.clear()
+        self._recalculate_capacity()

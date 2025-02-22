@@ -23,5 +23,5 @@ class AssignTruckCommand(BaseCommand):
         if truck_name not in [TruckCarPark.ACTROS, TruckCarPark.SCANIA, TruckCarPark.MAN]:
             raise ValueError(f"Truck name '{truck_name}' is invalid.")
 
-        truck = route.assign_truck(truck_name)
-        return f"Truck '{truck.name}' assigned to route #{route_id}."
+        truck = self.app_data.assign_truck_to_route(truck_name, route_id)
+        return f"Truck '{truck.name}' assigned to route #{route.id}."

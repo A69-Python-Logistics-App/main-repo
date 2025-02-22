@@ -15,7 +15,6 @@ class TruckCarPark:
     ACTROS_MAX_RANGE = 26000
 
     def __init__(self):
-
         
         self.trucks:list[Truck] = []
         self.initialize_trucks()
@@ -37,7 +36,7 @@ class TruckCarPark:
         self.trucks.append(truck)
 
     def list_all_free_trucks(self):
-        return [truck for truck in self.trucks if truck.is_free()]
+        return [truck for truck in self.trucks if truck.is_free]
     
     def find_free_truck_by_name(self, name:str):
         free_trucks = self.list_all_free_trucks()
@@ -45,4 +44,10 @@ class TruckCarPark:
             if truck.name == name:
                 return truck
         raise ValueError(f"No trucks with name '{name}' are available")
+    
+    def find_truck_by_id(self, id:int):
+        for truck in self.trucks:
+            if truck.id == id:
+                return truck
+        raise ValueError(f"No truck with '{id}' found")
 

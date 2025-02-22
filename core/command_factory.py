@@ -22,6 +22,7 @@ from commands.fast_forward_command import FastForwardCommand
 from commands.assign_truck_command import AssignTruckCommand
 from commands.add_package_to_route_command import AddPackageToRouteCommand
 from core.application_data import ApplicationData
+from commands.trucks_command import TrucksCommand
 
 class CommandFactory:
     def __init__(self, app_data: ApplicationData):
@@ -77,6 +78,10 @@ class CommandFactory:
                 return RoutesCommand(params, self.app_data)
             case "assigntruck":
                 return AssignTruckCommand(params, self.app_data)
+
+            # Truck commands
+            case "trucks":
+                return TrucksCommand(params, self.app_data)
 
             # System commands
             case "fastforward":
