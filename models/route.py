@@ -32,17 +32,17 @@ class Route:
         Location.validate_locations(stops)
         if len(stops) < 2:
             raise ValueError("Route needs to be at least 2 stops")
-        self.route_id = Route.route_counter
+        self.id = Route.route_counter
         Route.route_counter += 1
         self.stops = stops
         self.route_total_distance = 0
         self.route_stop_estimated_arrival = [departure_time]
+        self.truck_name = ""
         self.truck_id = 0
         self.weight_capacity = 0
         self.current_weight = 0
         self.route_total_distance, self.route_stop_estimated_arrival = self.calculate_route_timeline(departure_time, stops)
         self.list_of_packages:list[Package] = []
-        self.truck_car_park = TruckCarPark()
         self.current_location = stops[0]  # Initialize current location to the first stop
 
         Route.list_of_all_routes.append(self)
@@ -69,12 +69,12 @@ class Route:
         return route_total_distance,route_stop_estimated_arrival
     
     def __str__(self):
-        route_id = self.route_id
+        id = self.id
         stops = self.stops
         total_distance = self.route_total_distance
         estimated_arrivals = self.route_stop_estimated_arrival
         truck = self.truck_id
-        result = f"Route ID: {route_id}\n"
+        result = f"Route ID: {id}\n"
         result += f"Stops {' -> '.join(stops)}\n"
         result += f"Total distance: {total_distance}km\n"
         result += f"Estimated arrivals:\n"
@@ -96,20 +96,6 @@ class Route:
         Set class __ID to the given value.
         """
         Package.__ID = parse_to_int(ID)
-
-        
-    def assign_truck(self, truck_name: str):
-        truck:Truck = self.truck_car_park.find_free_truck_by_name(truck_name)
-        if truck.capacity < self.current_weight:
-            raise ValueError(f"Truck has {truck.capacity} kg capacity but {self.current_weight}kg is needed")
-        if truck.range < self.route_total_distance:
-            raise ValueError(f"Truck has insufficient range for this route")
-        self.truck_id = truck.id
-        self.truck_name = truck.name
-        self.weight_capacity = truck.capacity
-        truck.is_assigned = True
-        return truck
-
 
     def add_package(self, package:Package):
         """

@@ -6,16 +6,13 @@ class Truck:
         self.id = truck_id
         self.capacity = truck_capacity
         self.range = truck_range
-        self._assigned_route = False
+        self._is_free = True
 
     @property
-    def is_assigned(self):
-        return self._assigned_route
-    
-    @is_assigned.setter
-    def is_assigned(self, bool:bool):
-        self._assigned_route = bool
-        print(self._assigned_route)
-
     def is_free(self):
-        return not self._assigned_route
+        return self._is_free
+    
+    @is_free.setter
+    def is_assigned(self, bool:bool):
+        self._is_free = bool
+

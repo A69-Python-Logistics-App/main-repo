@@ -7,6 +7,7 @@ from models.package import Package
 from models.route import Route
 from models.status import Status
 from models.user import User
+from models.truck import Truck
 
 
 class ApplicationData:
@@ -33,6 +34,9 @@ class ApplicationData:
 
         # Initiate locations
         self._locations: list[Location] = [Location(loc) for loc in Location.cities]
+
+        # Truck BS
+        self._truck_car_park = TruckCarPark()
 
     @property
     def customers(self) -> tuple:
@@ -127,6 +131,22 @@ class ApplicationData:
                     for package in delivered_packages:
                         print(f"Package #{package.id} delivered at {stop}.")
                         self.log_entry(f"Package #{package.id} delivered at {stop}.")
+
+    def assign_truck_to_route(self, truck_name: str, route_id:int):
+
+        truck:Truck = self._truck_car_park.find_free_truck_by_name(truck_name)
+        route:Route = self.find_route_by_id(route_id)
+        
+        if truck.capacity < route.current_weight:
+            raise ValueError(f"Truck has {truck.capacity} kg capacity but {route.current_weight}kg is needed")
+        if truck.range < route.route_total_distance:
+            raise ValueError(f"Truck has insufficient range for this route")
+
+        route.truck_name = truck.name
+        route.truck_id = truck.id
+        route.weight_capacity = truck.capacity
+        truck.is_assigned = True
+        return truck
 
     def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:
         """
@@ -260,7 +280,7 @@ class ApplicationData:
         :return: Route | None
         """
         for route in self._routes:
-            if route.route_id == id_number:
+            if route.id == id_number:
                 return route
 
     def find_route_by_locations(self, pickup_location, dropoff_location) -> Route | None:

@@ -44,4 +44,4 @@ class CreateRouteCommand(BaseCommand):
 
         # returning the result of create_route execution
         r = self.app_data.create_route(date, stops)
-        return f"Route #{r.route_id} from {stops[0]} to {stops[-1]} with {len(stops) - 2} stop(s) in-between created."
+        return f"Route #{r.id} from {stops[0]} to {stops[-1]} with {len(stops) - 2} stop(s) in-between created."
