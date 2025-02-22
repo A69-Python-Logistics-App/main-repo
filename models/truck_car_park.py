@@ -15,7 +15,6 @@ class TruckCarPark:
     ACTROS_MAX_RANGE = 26000
 
     def __init__(self):
-
         
         self.trucks:list[Truck] = []
         self.initialize_trucks()
@@ -37,12 +36,7 @@ class TruckCarPark:
         self.trucks.append(truck)
 
     def list_all_free_trucks(self):
-        list_trucks = []
-        for truck in self.trucks:
-            if truck.is_free():
-                print(f"NAME: {truck.name} ID: {truck.id} IS ASSIGNED: {truck.is_assigned}")
-                list_trucks.append(truck)
-        return list_trucks
+        return [truck for truck in self.trucks if truck.is_free]
     
     def find_free_truck_by_name(self, name:str):
         free_trucks = self.list_all_free_trucks()
