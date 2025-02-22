@@ -1,12 +1,18 @@
 
 class Truck:
+
+    __DEFAULT_LOCATION = "Car Park"
+
     def __init__(self,truck_name:str, truck_id:int, truck_capacity:int, truck_range:int):
         self._name = truck_name
         self._id = truck_id
         self._capacity = truck_capacity
         self._range = truck_range
-        self._current_location = "Car Park"
+        self._current_location = Truck.__DEFAULT_LOCATION
         self._is_free = True
+
+    def __str__(self):
+        return f"#{self.id} {self.name.center(6, " ")} : capacity: {self.capacity}kg, range: {self.range}km | Free: {self.is_free} | Location in {self.current_location}"
 
     @property
     def name(self):
@@ -43,7 +49,11 @@ class Truck:
         if type(value) != bool:
             raise ValueError("is_free accepts bool only")
         self._is_free = value
-
-    def __str__(self):
-        return f"#{self.id} {self.name.center(6, " ")} : capacity: {self.capacity}kg, range: {self.range}km | Free: {self.is_free} | Location in {self.current_location}"
+    
+    def reset(self):
+        """
+        Sets truck location to default (Car Park) and is_free to True.
+        """
+        self._current_location = Truck.__DEFAULT_LOCATION
+        self._is_free = True
 

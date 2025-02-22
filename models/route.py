@@ -1,30 +1,32 @@
-from datetime import datetime, timedelta
-from models.package import Package
-from models.location import Location
-from models.truck import Truck
 from models.helpers.validation_helpers import parse_to_int
+from datetime import datetime, timedelta
+from models.location import Location
+from models.package import Package
+from models.truck import Truck
+
 
 class Route:
 
     __ID = 1
 
-    AVG_TRUCK_SPEED = 87
-    SYDNEY_CODE = "SYD"
-    MELBOURNE_CODE = "MEL"
-    ADELAIDE_CODE = "ADL"
-    ALICE_SPRINGS_CODE = "ASP"
-    BRISBANE_CODE = "BRI"
-    DARWIN_CODE = "DAR"
-    PERTH_CODE = "PER"
+    __AVG_TRUCK_SPEED = 87
 
-    distances = {
-        SYDNEY_CODE:{SYDNEY_CODE:0, MELBOURNE_CODE :877, ADELAIDE_CODE:1376,ALICE_SPRINGS_CODE:2762, BRISBANE_CODE:909, DARWIN_CODE:3935, PERTH_CODE:4016},
-        MELBOURNE_CODE:{SYDNEY_CODE: 877, MELBOURNE_CODE :0, ADELAIDE_CODE:725, ALICE_SPRINGS_CODE:725, BRISBANE_CODE:1765,DARWIN_CODE:3752,PERTH_CODE:3509},
-        ADELAIDE_CODE:{SYDNEY_CODE: 1376, MELBOURNE_CODE :725, ADELAIDE_CODE:0, ALICE_SPRINGS_CODE:1530, BRISBANE_CODE:1927,DARWIN_CODE:3027,PERTH_CODE:2785},
-        ALICE_SPRINGS_CODE:{SYDNEY_CODE:2762, MELBOURNE_CODE :2255, ADELAIDE_CODE:1530, ALICE_SPRINGS_CODE:0, BRISBANE_CODE:1927,DARWIN_CODE:3027,PERTH_CODE:2785},
-        BRISBANE_CODE:{SYDNEY_CODE:909, MELBOURNE_CODE:1765, ADELAIDE_CODE:1927, ALICE_SPRINGS_CODE:2993, BRISBANE_CODE:0,DARWIN_CODE:3462,PERTH_CODE:4311},
-        DARWIN_CODE:{SYDNEY_CODE:3935, MELBOURNE_CODE:3752, ADELAIDE_CODE:3027, ALICE_SPRINGS_CODE:1497, BRISBANE_CODE:3426,DARWIN_CODE:0,PERTH_CODE:4025},
-        PERTH_CODE:{SYDNEY_CODE:4016, MELBOURNE_CODE:3509, ADELAIDE_CODE:2785, ALICE_SPRINGS_CODE:2481, BRISBANE_CODE:4311,DARWIN_CODE:4025,PERTH_CODE:0},    
+    __SYDNEY_CODE = "SYD"
+    __MELBOURNE_CODE = "MEL"
+    __ADELAIDE_CODE = "ADL"
+    __ALICE_SPRINGS_CODE = "ASP"
+    __BRISBANE_CODE = "BRI"
+    __DARWIN_CODE = "DAR"
+    __PERTH_CODE = "PER"
+
+    __DISTANCES = {
+        __SYDNEY_CODE:{__SYDNEY_CODE:0, __MELBOURNE_CODE :877, __ADELAIDE_CODE:1376,__ALICE_SPRINGS_CODE:2762, __BRISBANE_CODE:909, __DARWIN_CODE:3935, __PERTH_CODE:4016},
+        __MELBOURNE_CODE:{__SYDNEY_CODE: 877, __MELBOURNE_CODE :0, __ADELAIDE_CODE:725, __ALICE_SPRINGS_CODE:725, __BRISBANE_CODE:1765,__DARWIN_CODE:3752,__PERTH_CODE:3509},
+        __ADELAIDE_CODE:{__SYDNEY_CODE: 1376, __MELBOURNE_CODE :725, __ADELAIDE_CODE:0, __ALICE_SPRINGS_CODE:1530, __BRISBANE_CODE:1927,__DARWIN_CODE:3027,__PERTH_CODE:2785},
+        __ALICE_SPRINGS_CODE:{__SYDNEY_CODE:2762, __MELBOURNE_CODE :2255, __ADELAIDE_CODE:1530, __ALICE_SPRINGS_CODE:0, __BRISBANE_CODE:1927,__DARWIN_CODE:3027,__PERTH_CODE:2785},
+        __BRISBANE_CODE:{__SYDNEY_CODE:909, __MELBOURNE_CODE:1765, __ADELAIDE_CODE:1927, __ALICE_SPRINGS_CODE:2993, __BRISBANE_CODE:0,__DARWIN_CODE:3462,__PERTH_CODE:4311},
+        __DARWIN_CODE:{__SYDNEY_CODE:3935, __MELBOURNE_CODE:3752, __ADELAIDE_CODE:3027, __ALICE_SPRINGS_CODE:1497, __BRISBANE_CODE:3426,__DARWIN_CODE:0,__PERTH_CODE:4025},
+        __PERTH_CODE:{__SYDNEY_CODE:4016, __MELBOURNE_CODE:3509, __ADELAIDE_CODE:2785, __ALICE_SPRINGS_CODE:2481, __BRISBANE_CODE:4311,__DARWIN_CODE:4025,__PERTH_CODE:0},    
     }
     
     def __init__(self, stops: tuple, departure_time: datetime):
@@ -45,26 +47,6 @@ class Route:
 
         self.route_total_distance, self.route_stop_estimated_arrival = self.calculate_route_timeline(departure_time, stops)
         self.list_of_packages:list[Package] = []
-        
-    def calculate_route_timeline(self,departure_time, stops:list[str]):
-        route_total_distance = 0
-        route_stop_estimated_arrival = [departure_time]
-        current_stop_estimated_time_of_arrival = departure_time
-
-        for i in range(len(stops) -1):
-            current_stop = stops[i]
-            next_stop = stops[i + 1]
-            distance_to_next_stop = self.distances[current_stop][next_stop]
-
-            route_total_distance += distance_to_next_stop
-
-            hours_to_next_stop = timedelta(hours=(distance_to_next_stop / self.AVG_TRUCK_SPEED))
-            next_stop_estimated_time_of_arrival = current_stop_estimated_time_of_arrival + hours_to_next_stop
-            route_stop_estimated_arrival.append(next_stop_estimated_time_of_arrival)
-
-            current_stop_estimated_time_of_arrival = next_stop_estimated_time_of_arrival
-        
-        return route_total_distance,route_stop_estimated_arrival
     
     def __str__(self):
         result = f"Route ID: {self.id}\n"
@@ -81,7 +63,7 @@ class Route:
 
             result += f"\n Remaining capacity: {self.weight_capacity - self.current_weight} kg" 
         else:
-            result += f"\n Route completed. No trucks assigned"
+            result += f"\n No trucks assigned"
 
         return result
     
@@ -103,6 +85,26 @@ class Route:
         self.weight_capacity = 0
         for truck in self._assigned_trucks:
             self.weight_capacity += truck.capacity
+
+    def calculate_route_timeline(self,departure_time, stops:list[str]):
+        route_total_distance = 0
+        route_stop_estimated_arrival = [departure_time]
+        current_stop_estimated_time_of_arrival = departure_time
+
+        for i in range(len(stops) -1):
+            current_stop = stops[i]
+            next_stop = stops[i + 1]
+            distance_to_next_stop = self.__DISTANCES[current_stop][next_stop]
+
+            route_total_distance += distance_to_next_stop
+
+            hours_to_next_stop = timedelta(hours=(distance_to_next_stop / self.__AVG_TRUCK_SPEED))
+            next_stop_estimated_time_of_arrival = current_stop_estimated_time_of_arrival + hours_to_next_stop
+            route_stop_estimated_arrival.append(next_stop_estimated_time_of_arrival)
+
+            current_stop_estimated_time_of_arrival = next_stop_estimated_time_of_arrival
+        
+        return route_total_distance,route_stop_estimated_arrival
 
     def add_package(self, package:Package):
         """
@@ -129,12 +131,6 @@ class Route:
                 self._recalculate_capacity()
         return delivered_packages
     
-    def update_trucks_location(self, location:str):
-        if type(location) != str:
-            raise ValueError("Update trucks location accepts string only")
-        for truck in self._assigned_trucks:
-            truck.current_location = location
-    
     def assign_truck(self, truck:Truck):
         """
         Assignes a truck to route.
@@ -152,17 +148,14 @@ class Route:
         """
         if type(truck) != Truck:
             raise ValueError("Unassign truck accepts truck type only")
-        truck.current_location = "Car Park"
-        truck.is_free = True
+        truck.reset()
         self._assigned_trucks.remove(truck)
         self._recalculate_capacity()
     
     def unassign_all_trucks(self):
         """
-        Unassignes all trucks from route.
+        Unassignes and resets all trucks from route.
         """
-        for truck in self._assigned_trucks:
-            truck.current_location = "Car Park"
-            truck.is_free = True
+        [truck.reset() for truck in self._assigned_trucks]
         self._assigned_trucks.clear()
         self._recalculate_capacity()

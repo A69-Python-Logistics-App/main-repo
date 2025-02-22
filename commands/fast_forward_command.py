@@ -23,13 +23,13 @@ class FastForwardCommand(BaseCommand):
         
         # Type error checking
         type = type.lower()
-        if type not in ["hour", "hours", "day", "days"]:
-            raise ValueError("Type must be either day/s or hour/s.")
+        if type not in ["minute", "minutes", "hour", "hours", "day", "days"]:
+            raise ValueError("Type must be either day/s, hour/s. or minute/s.")
         
         # Fast forward error checking - returns none if not executed properly in appdata
         output = self.app_data.fast_forward(number, type)
         if output == None:
-            raise ValueError("Fast forward general error.")
+            raise ValueError("Fast forward execution error.")
         return output
 
        

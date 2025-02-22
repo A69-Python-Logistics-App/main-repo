@@ -97,6 +97,10 @@ class ApplicationData:
     @property
     def truck_park(self):
         return self._truck_car_park
+    
+    @property
+    def system_time(self):
+        return self._sys_time
 
     #
     # Write methods
@@ -111,7 +115,9 @@ class ApplicationData:
         :param type: str - The type of units to add; either 'hours' or 'days'.
         :return: The updated system time as a string, or None if the type is invalid.
         """
-        if type in ["hour", "hours"]:
+        if type in ["minute", "minutes"]:
+            self._sys_time += timedelta(minutes=num)
+        elif type in ["hour", "hours"]:
             self._sys_time += timedelta(hours=num)
         elif type in ["day", "days"]:
             self._sys_time += timedelta(days=num)
