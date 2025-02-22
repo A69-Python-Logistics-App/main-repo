@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from models.package import Package
 from models.location import Location
+from models.truck import Truck
 from models.helpers.validation_helpers import parse_to_int
 
 class Route:
@@ -37,13 +38,13 @@ class Route:
         self.stops = stops
         self.route_total_distance = 0
         self.route_stop_estimated_arrival = [departure_time]
-        self.truck_name = ""
-        self.truck_id = 0
+
+        self._assigned_trucks:list[Truck] = []
         self.weight_capacity = 0
         self.current_weight = 0
+
         self.route_total_distance, self.route_stop_estimated_arrival = self.calculate_route_timeline(departure_time, stops)
         self.list_of_packages:list[Package] = []
-        self.current_location = stops[0]  # Initialize current location to the first stop
         
     def calculate_route_timeline(self,departure_time, stops:list[str]):
         route_total_distance = 0
@@ -74,11 +75,13 @@ class Route:
             result += f" - {self.stops[i]}: {self.route_stop_estimated_arrival[i].strftime('%Y-%m-%d %H:%M')}\n"
 
         result = result[:-1]
-        if self.truck_id:
-            result += f"\n Assigned Truck '{self.truck_name}' ID:{self.truck_id}, current location: {self.current_location}"
+        if len(self._assigned_trucks) > 0:
+            for truck in self._assigned_trucks:
+                result += f"\n Assigned Truck '{truck.name}' ID:{truck.id}, currently in {truck.current_location}"
+
             result += f"\n Remaining capacity: {self.weight_capacity - self.current_weight} kg" 
         else:
-            result += f"\n No Truck assigned"
+            result += f"\n Route completed. No trucks assigned"
 
         return result
     
@@ -88,6 +91,18 @@ class Route:
         Set class __ID to the given value.
         """
         Package.__ID = parse_to_int(ID)
+
+    @property
+    def assigned_trucks(self):
+        return tuple(self._assigned_trucks)
+
+    def _recalculate_capacity(self):
+        """
+        Calculate route capacity based on truck capacities.
+        """
+        self.weight_capacity = 0
+        for truck in self._assigned_trucks:
+            self.weight_capacity += truck.capacity
 
     def add_package(self, package:Package):
         """
@@ -111,24 +126,43 @@ class Route:
                 delivered_packages.append(package)
                 self.list_of_packages.remove(package)
                 self.current_weight -= package.weight
+                self._recalculate_capacity()
         return delivered_packages
     
-    def unassign_truck(self):
+    def update_trucks_location(self, location:str):
+        if type(location) != str:
+            raise ValueError("Update trucks location accepts string only")
+        for truck in self._assigned_trucks:
+            truck.current_location = location
+    
+    def assign_truck(self, truck:Truck):
         """
-        Unassignes truck from route.
+        Assignes a truck to route.
         """
-        self.truck_name = ""
-        self.truck_id = 0
+        if type(truck) != Truck:
+            raise ValueError("Assign truck accepts truck type only")
+        truck.is_free = False
+        truck.current_location = self.stops[0]
+        self._assigned_trucks.append(truck)
+        self._recalculate_capacity()
 
-    # def update_truck_location(self, current_time: datetime):
-    #     """
-    #     Update the truck's current location based on the estimated time of arrival.
-    #     :param current_time: datetime - The current system time.
-    #     """
-    #     for i, arrival_time in enumerate(self.route_stop_estimated_arrival):
-    #         if current_time >= arrival_time:
-    #             self.current_location = self.stops[i]
-    #         else:
-    #             if i > 0:
-    #                 self.current_location = f"In transit between {self.stops[i-1]} and {self.stops[i]}"
-    #             break
+    def unassign_truck(self, truck:Truck):
+        """
+        Unassign a specific truck from route.
+        """
+        if type(truck) != Truck:
+            raise ValueError("Unassign truck accepts truck type only")
+        truck.current_location = "Car Park"
+        truck.is_free = True
+        self._assigned_trucks.remove(truck)
+        self._recalculate_capacity()
+    
+    def unassign_all_trucks(self):
+        """
+        Unassignes all trucks from route.
+        """
+        for truck in self._assigned_trucks:
+            truck.current_location = "Car Park"
+            truck.is_free = True
+        self._assigned_trucks.clear()
+        self._recalculate_capacity()
