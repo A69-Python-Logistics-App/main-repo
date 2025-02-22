@@ -24,7 +24,7 @@ class FastForwardCommand(BaseCommand):
         # Type error checking
         type = type.lower()
         if type not in ["hour", "hours", "day", "days"]:
-            raise ValueError("Type must be either days or hours.")
+            raise ValueError("Type must be either day/s or hour/s.")
         
         # Fast forward error checking - returns none if not executed properly in appdata
         output = self.app_data.fast_forward(number, type)

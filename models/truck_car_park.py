@@ -37,7 +37,12 @@ class TruckCarPark:
         self.trucks.append(truck)
 
     def list_all_free_trucks(self):
-        return [truck for truck in self.trucks if truck.is_free()]
+        list_trucks = []
+        for truck in self.trucks:
+            if truck.is_free():
+                print(f"NAME: {truck.name} ID: {truck.id} IS ASSIGNED: {truck.is_assigned}")
+                list_trucks.append(truck)
+        return list_trucks
     
     def find_free_truck_by_name(self, name:str):
         free_trucks = self.list_all_free_trucks()
