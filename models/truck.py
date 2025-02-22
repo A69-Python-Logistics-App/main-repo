@@ -13,6 +13,6 @@ class Truck:
         return self._is_free
     
     @is_free.setter
-    def is_assigned(self, bool:bool):
+    def is_free(self, bool:bool):
         self._is_free = bool
 
