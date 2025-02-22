@@ -1,13 +1,11 @@
 from datetime import datetime, timedelta
 from models.package import Package
-from models.truck_car_park import TruckCarPark
 from models.location import Location
 from models.helpers.validation_helpers import parse_to_int
-from models.truck import Truck
 
 class Route:
-    route_counter = 1
-    list_of_all_routes = []
+
+    __ID = 1
 
     AVG_TRUCK_SPEED = 87
     SYDNEY_CODE = "SYD"
@@ -32,8 +30,10 @@ class Route:
         Location.validate_locations(stops)
         if len(stops) < 2:
             raise ValueError("Route needs to be at least 2 stops")
-        self.id = Route.route_counter
-        Route.route_counter += 1
+        
+        self.id = Route.__ID
+        Route.__ID += 1
+
         self.stops = stops
         self.route_total_distance = 0
         self.route_stop_estimated_arrival = [departure_time]
@@ -44,9 +44,6 @@ class Route:
         self.route_total_distance, self.route_stop_estimated_arrival = self.calculate_route_timeline(departure_time, stops)
         self.list_of_packages:list[Package] = []
         self.current_location = stops[0]  # Initialize current location to the first stop
-
-        Route.list_of_all_routes.append(self)
-
         
     def calculate_route_timeline(self,departure_time, stops:list[str]):
         route_total_distance = 0
@@ -69,20 +66,15 @@ class Route:
         return route_total_distance,route_stop_estimated_arrival
     
     def __str__(self):
-        id = self.id
-        stops = self.stops
-        total_distance = self.route_total_distance
-        estimated_arrivals = self.route_stop_estimated_arrival
-        truck = self.truck_id
-        result = f"Route ID: {id}\n"
-        result += f"Stops {' -> '.join(stops)}\n"
-        result += f"Total distance: {total_distance}km\n"
+        result = f"Route ID: {self.id}\n"
+        result += f"Stops {' -> '.join(self.stops)}\n"
+        result += f"Total distance: {self.route_total_distance}km\n"
         result += f"Estimated arrivals:\n"
-        for i in range(len(stops)):
-            result += f" - {stops[i]}: {estimated_arrivals[i].strftime('%Y-%m-%d %H:%M')}\n"
+        for i in range(len(self.stops)):
+            result += f" - {self.stops[i]}: {self.route_stop_estimated_arrival[i].strftime('%Y-%m-%d %H:%M')}\n"
 
         result = result[:-1]
-        if truck:
+        if self.truck_id:
             result += f"\n Assigned Truck '{self.truck_name}' ID:{self.truck_id}, current location: {self.current_location}"
             result += f"\n Remaining capacity: {self.weight_capacity - self.current_weight} kg" 
         else:
@@ -129,6 +121,8 @@ class Route:
         for i, arrival_time in enumerate(self.route_stop_estimated_arrival):
             if current_time >= arrival_time:
                 self.current_location = self.stops[i]
+                if self.current_location == self.stops[:-1]: # if the truck is at the last stop in the route, return True for is_free
+                    return True
             else:
                 if i > 0:
                     self.current_location = f"In transit between {self.stops[i-1]} and {self.stops[i]}"

@@ -5,6 +5,6 @@ from core.engine import Engine
 
 app_data = ApplicationData()
 cmdf = CommandFactory(app_data)
-engine = Engine(cmdf, debug=True)
+engine = Engine(cmdf, debug=False)
 
 engine.start()

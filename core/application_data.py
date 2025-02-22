@@ -145,7 +145,7 @@ class ApplicationData:
         route.truck_name = truck.name
         route.truck_id = truck.id
         route.weight_capacity = truck.capacity
-        truck.is_assigned = True
+        truck._is_free = False
         return truck
 
     def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:
@@ -521,7 +521,7 @@ class ApplicationData:
         return "\n".join(str(package) for package in self._packages)
 
     def view_trucks(self) -> str:
-        return "\n".join(str(truck) for truck in TruckCarPark.list_all_free_trucks())
+        return "\n".join(str(truck) for truck in self._truck_car_park.list_all_free_trucks())
 
     #
     # Protected methods
