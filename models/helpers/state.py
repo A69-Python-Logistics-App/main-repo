@@ -17,6 +17,10 @@ def dump_to_app(app_data) -> str:
         except Exception as e:
             return f"Failed to parse state from history file:\n{e}"
 
+    # System time unpacking
+    if isinstance(state.get("time"), str):
+        app_data._sys_time = datetime.fromisoformat(state["time"])
+
     # Employees unpacking
     # employees[username]: data
     employees = state.get("employees")
@@ -71,6 +75,7 @@ def dump_to_app(app_data) -> str:
 def dump_to_file(app_data):
     last_user = app_data.current_employee.username if app_data.current_employee else "None"
     state: dict[str:dict] = {
+        "time": app_data.system_time.isoformat(),
         "employees": {},
         "customers": {},
         "packages": {},
