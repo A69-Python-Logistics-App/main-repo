@@ -163,13 +163,14 @@ class ApplicationData:
 
             if self.system_time >= arrival_time:
                 route.current_location = route.stops[i]
-                if route.current_location == route.stops[:-1]: # if the truck is at the last stop in the route, return True for is_free
+                if route.current_location == route.stops[-1]: # Check if location is last
+                    print("TRUCK AND ROUTE FREE")
                     truck.is_free = True
+                    route.unassign_truck()
             else:
                 if i > 0:
                     route.current_location = f"In transit between {route.stops[i-1]} and {route.stops[i]}"
-
-            truck.is_free = False # truck is still going, return false for is_free
+                    break
 
 
     def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:

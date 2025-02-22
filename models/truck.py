@@ -19,4 +19,4 @@ class Truck:
         self._is_free = value
 
     def __str__(self):
-        return f"#{self.id}[{self.name}]: capacity: {self.capacity}kg, range: {self.range}km"
+        return f"#{self.id}[{self.name}]: capacity: {self.capacity}kg, range: {self.range}km, free: {self.is_free}"

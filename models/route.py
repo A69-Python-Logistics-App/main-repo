@@ -64,7 +64,6 @@ class Route:
             current_stop_estimated_time_of_arrival = next_stop_estimated_time_of_arrival
         
         return route_total_distance,route_stop_estimated_arrival
-
     
     def __str__(self):
         result = f"Route ID: {self.id}\n"
@@ -113,6 +112,13 @@ class Route:
                 self.list_of_packages.remove(package)
                 self.current_weight -= package.weight
         return delivered_packages
+    
+    def unassign_truck(self):
+        """
+        Unassignes truck from route.
+        """
+        self.truck_name = ""
+        self.truck_id = 0
 
     # def update_truck_location(self, current_time: datetime):
     #     """
@@ -122,10 +128,7 @@ class Route:
     #     for i, arrival_time in enumerate(self.route_stop_estimated_arrival):
     #         if current_time >= arrival_time:
     #             self.current_location = self.stops[i]
-    #             if self.current_location == self.stops[:-1]: # if the truck is at the last stop in the route, return True for is_free
-    #                 return True
     #         else:
     #             if i > 0:
     #                 self.current_location = f"In transit between {self.stops[i-1]} and {self.stops[i]}"
-
-    #         return False # truck is still going, return false for is_free
+    #             break
