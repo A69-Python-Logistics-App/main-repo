@@ -16,3 +16,5 @@ class Truck:
     def is_free(self, bool:bool):
         self._is_free = bool
 
+    def __str__(self):
+        return f"#{self.id}[{self.name}]: capacity: {self.capacity}kg, range: {self.range}km"
