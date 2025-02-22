@@ -13,6 +13,8 @@ class Truck:
         return self._is_free
     
     @is_free.setter
-    def is_free(self, bool:bool):
-        self._is_free = bool
+    def is_free(self, value:bool):
+        if type(value) != bool:
+            raise ValueError("is_free accepts bool only.")
+        self._is_free = value
 

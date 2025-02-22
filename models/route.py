@@ -64,6 +64,7 @@ class Route:
             current_stop_estimated_time_of_arrival = next_stop_estimated_time_of_arrival
         
         return route_total_distance,route_stop_estimated_arrival
+
     
     def __str__(self):
         result = f"Route ID: {self.id}\n"
@@ -113,17 +114,18 @@ class Route:
                 self.current_weight -= package.weight
         return delivered_packages
 
-    def update_truck_location(self, current_time: datetime):
-        """
-        Update the truck's current location based on the estimated time of arrival.
-        :param current_time: datetime - The current system time.
-        """
-        for i, arrival_time in enumerate(self.route_stop_estimated_arrival):
-            if current_time >= arrival_time:
-                self.current_location = self.stops[i]
-                if self.current_location == self.stops[:-1]: # if the truck is at the last stop in the route, return True for is_free
-                    return True
-            else:
-                if i > 0:
-                    self.current_location = f"In transit between {self.stops[i-1]} and {self.stops[i]}"
-                break
+    # def update_truck_location(self, current_time: datetime):
+    #     """
+    #     Update the truck's current location based on the estimated time of arrival.
+    #     :param current_time: datetime - The current system time.
+    #     """
+    #     for i, arrival_time in enumerate(self.route_stop_estimated_arrival):
+    #         if current_time >= arrival_time:
+    #             self.current_location = self.stops[i]
+    #             if self.current_location == self.stops[:-1]: # if the truck is at the last stop in the route, return True for is_free
+    #                 return True
+    #         else:
+    #             if i > 0:
+    #                 self.current_location = f"In transit between {self.stops[i-1]} and {self.stops[i]}"
+
+    #         return False # truck is still going, return false for is_free

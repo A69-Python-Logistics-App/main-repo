@@ -113,7 +113,7 @@ class ApplicationData:
             self._sys_time += timedelta(days=num)
         else:
             return None
-
+        
         self.process_deliveries()
         return f"System time is now: {self._sys_time}"
 
@@ -124,7 +124,7 @@ class ApplicationData:
         Process deliveries for all routes based on the current system time.
         """
         for route in self._routes:
-            route.update_truck_location(self._sys_time)  # Update the truck's location
+            self.update_truck_location(route.truck_id, route)  # Update the truck's location
             for i, stop in enumerate(route.stops):
                 if self._sys_time >= route.route_stop_estimated_arrival[i]:  # Check if the route has reached the stop
                     delivered_packages = route.deliver_packages(stop)
@@ -145,8 +145,28 @@ class ApplicationData:
         route.truck_name = truck.name
         route.truck_id = truck.id
         route.weight_capacity = truck.capacity
-        truck._is_free = False
+        truck.is_free = False
         return truck
+    
+    def update_truck_location(self, truck_id:int, route:Route):
+
+        """
+        Update the truck's current location based on the estimated time of arrival.
+        :param current_time: datetime - The current system time.
+        """
+        truck = self._truck_car_park.find_truck_by_id(truck_id)
+        for i, arrival_time in enumerate(route.route_stop_estimated_arrival):
+
+            if self.system_time >= arrival_time:
+                route.current_location = route.stops[i]
+                if route.current_location == route.stops[:-1]: # if the truck is at the last stop in the route, return True for is_free
+                    truck.is_free = True
+            else:
+                if i > 0:
+                    route.current_location = f"In transit between {route.stops[i-1]} and {route.stops[i]}"
+
+            truck.is_free = False # truck is still going, return false for is_free
+
 
     def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:
         """

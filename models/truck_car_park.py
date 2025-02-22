@@ -44,4 +44,10 @@ class TruckCarPark:
             if truck.name == name:
                 return truck
         raise ValueError(f"No trucks with name '{name}' are available")
+    
+    def find_truck_by_id(self, id:int):
+        for truck in self.trucks:
+            if truck.id == id:
+                return truck
+        raise ValueError(f"No truck with '{id}' found")
 
