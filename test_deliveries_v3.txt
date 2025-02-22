@@ -41,3 +41,10 @@ routes
 fastforward 1 day
 routes
 exit
+
+test testing
+createroute Jan 1 10:00 SYD MEL BRI SYD
+assigntruck ACTROS 1
+createroute Jan 1 10:00 SYD BRI SYD
+assigntruck ACTROS 2
+routes

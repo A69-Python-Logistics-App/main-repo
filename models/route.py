@@ -3,6 +3,7 @@ from models.package import Package
 from models.truck_car_park import TruckCarPark
 from models.location import Location
 from models.helpers.validation_helpers import parse_to_int
+from models.truck import Truck
 
 class Route:
     route_counter = 1
@@ -36,7 +37,7 @@ class Route:
         self.stops = stops
         self.route_total_distance = 0
         self.route_stop_estimated_arrival = [departure_time]
-        self.truck_id = None
+        self.truck_id = 0
         self.weight_capacity = 0
         self.current_weight = 0
         self.route_total_distance, self.route_stop_estimated_arrival = self.calculate_route_timeline(departure_time, stops)
@@ -98,13 +99,15 @@ class Route:
 
         
     def assign_truck(self, truck_name: str):
-        truck = self.truck_car_park.find_free_truck_by_name(truck_name)
+        truck:Truck = self.truck_car_park.find_free_truck_by_name(truck_name)
         if truck.capacity < self.current_weight:
             raise ValueError(f"Truck has {truck.capacity} kg capacity but {self.current_weight}kg is needed")
+        if truck.range < self.route_total_distance:
+            raise ValueError(f"Truck has insufficient range for this route")
         self.truck_id = truck.id
         self.truck_name = truck.name
         self.weight_capacity = truck.capacity
-        truck.assigned_route = self.route_id
+        truck.is_assigned = True
         return truck
 
 

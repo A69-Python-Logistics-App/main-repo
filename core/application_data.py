@@ -116,6 +116,9 @@ class ApplicationData:
         
 
     def process_deliveries(self):
+        """
+        Process deliveries for all routes based on the current system time.
+        """
         for route in self._routes:
             route.update_truck_location(self._sys_time)  # Update the truck's location
             for i, stop in enumerate(route.stops):
