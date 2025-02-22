@@ -16,5 +16,5 @@ class Truck:
         self._is_free = bool
 
     def __str__(self):
-        return f"#{self.id} {self.name.center(6, " ")} : capacity: {self.capacity}kg, range: {self.range}km"
+        return f"#{self.id} {self.name.center(6, " ")} : capacity: {self.capacity}kg, range: {self.range}km | Free: {self._is_free}"
 
