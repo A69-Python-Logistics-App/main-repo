@@ -18,3 +18,5 @@ class Truck:
             raise ValueError("is_free accepts bool only.")
         self._is_free = value
 
+    def __str__(self):
+        return f"#{self.id}[{self.name}]: capacity: {self.capacity}kg, range: {self.range}km"

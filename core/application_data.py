@@ -94,6 +94,10 @@ class ApplicationData:
         """
         return self._sys_time
 
+    @property
+    def truck_park(self):
+        return self._truck_car_park
+
     #
     # Write methods
     #
