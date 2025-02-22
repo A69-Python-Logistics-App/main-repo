@@ -33,7 +33,8 @@ class Engine:
 
             # Ensure employee has logged in
             self.app_data.login()
-            # log app state till now
+            # save app data after every action
+            state.dump_to_file(self.app_data)
 
             try:
                 if cmd == "exit":
