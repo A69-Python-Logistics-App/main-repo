@@ -1,3 +1,4 @@
+n
 godmode complexpass
 createemployee BartSimpson password123 manager
 logout
