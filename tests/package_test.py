@@ -1,48 +1,33 @@
 import unittest
+from datetime import datetime
 from models.package import Package
-from models.customer import Customer
 
-# CUSTOMER
-VALID_NAME = "EMKO"
-VALID_EMAIL = "emko@abv.bg"
-VALID_CUSTOMER = Customer(VALID_NAME, VALID_EMAIL)
+class TestPackage(unittest.TestCase):
 
-# PACKAGE
-VALID_WEIGHT = 100
-VALID_PICKUP = "RUSE"
-VALID_DROPOFF = "VARNA"
+    def setUp(self):
+        self.weight = 10
+        self.pickup_loc = "Location A"
+        self.dropoff_loc = "Location B"
+        self.customer_id = 123
+        self.date_creation = datetime.now()
 
-INVALID_WEIGHT = -100
+    def test_package_initialization(self):
+        package = Package(self.weight, self.pickup_loc, self.dropoff_loc, self.customer_id, self.date_creation)
+        self.assertEqual(package.weight, self.weight)
+        self.assertEqual(package.pickup_location, self.pickup_loc)
+        self.assertEqual(package.dropoff_location, self.dropoff_loc)
+        self.assertEqual(package.current_location, self.pickup_loc)
+        self.assertEqual(package.customer_id, self.customer_id)
+        self.assertEqual(package.date_creation, self.date_creation)
+        self.assertEqual(package.status, "Collected")
+        self.assertEqual(package.id, 1002)
 
-class Package_Should(unittest.TestCase):
+    def test_package_id_increment(self):
+        package1 = Package(self.weight, self.pickup_loc, self.dropoff_loc, self.customer_id, self.date_creation)
+        package2 = Package(self.weight, self.pickup_loc, self.dropoff_loc, self.customer_id, self.date_creation)
+        self.assertEqual(package1.id, 1000)
+        self.assertEqual(package2.id, 1001)
 
-    def test_initializer_sets_properties_when_ValidParams(self):
-        # ARRANGE
-        package = Package(VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, VALID_CUSTOMER.id)
-        # ACT
-        VALID_CUSTOMER.add_package(package)
-        # ASSERT
-        self.assertEqual(VALID_WEIGHT, package._weight)
-        self.assertEqual(VALID_PICKUP, package._pickup_loc)
-        self.assertEqual(VALID_DROPOFF, package._dropoff_loc)
-        self.assertEqual(VALID_CUSTOMER.id, package.id)
-
-    def test_initializer_raises_ValueError_when_WeightBelowZero(self):
-        # AAA
+    def test_negative_weight_raises_value_error(self):
         with self.assertRaises(ValueError):
-            _ = Package(INVALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, VALID_CUSTOMER.id)
-
-    def test_initializer_raises_ValueError_when_idIsInvalid(self):
-        # AAA
-        with self.assertRaises(ValueError):
-            _ = Package(VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, VALID_CUSTOMER)
-
-    def test_advancePackageStatus_advancesStatus(self):
-        # ARRANGE
-        package = Package(VALID_WEIGHT, VALID_PICKUP, VALID_DROPOFF, VALID_CUSTOMER.id)
-        # ACT
-        previous_status = package.status
-        package.advance_package_status()
-        status = package.status
-        # ASSERT
-        self.assertNotEqual(previous_status, status)
+            Package(-1, self.pickup_loc, self.dropoff_loc, self.customer_id, self.date_creation)

@@ -1,0 +1,14 @@
+godmode complexpass
+createemployee BartSimpson password123 manager
+logout
+BartSimpson password123
+createcustomer Emko Hadzh @abv.bg
+createemployee cheating password123 admin
+createemployee normie normie123 user
+logout
+normie normie123
+createroute Jan 1 10:00 SYD MEL BRI
+createemployee Vector superV supervisor
+logout
+godmode complexpass
+exit

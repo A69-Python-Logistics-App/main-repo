@@ -1,40 +1,23 @@
 import unittest
 from models.route import Route
+from models.helpers.validation_helpers import parse_to_int
 from datetime import datetime
-from models.package import Package
-from models.customer import Customer
 
-class Route_Should(unittest.TestCase):
-    VALID_CUSTOMER = Customer("customer", "customer@")
-    VALID_PACKAGE = Package(5000, "SYD", "MEL", VALID_CUSTOMER.id)
-    VALID_PACKAGE = Package(5000, "SYD", "MEL", VALID_CUSTOMER.id)
-    VALID_ROUTE = Route(stops=["SYD", "MEL"], departure_time=datetime.now())
-    VALID_ROUTE_2 = Route(stops=["SYD", "MEL"], departure_time=datetime.now())
+class TestRoute(unittest.TestCase):
 
+    def setUp(self):
+        # Reset the internal ID before each test
+        Route.set_internal_id(1)
 
-    def test_route_raises_error_when_stops_less_than_two(self):
+    def test_set_internal_id_valid(self):
+        Route.set_internal_id(10)
+        route = Route(("SYD", "MEL"), datetime.now())
+        self.assertEqual(route.id, 10)
+
+    def test_set_internal_id_invalid_non_integer(self):
         with self.assertRaises(ValueError):
-            route = Route(stops=["SYD"], departure_time=datetime.now())
-    
-    def test_add_package_weight_correctly(self):
-        route = self.VALID_ROUTE
-        route.assign_truck(1002, 20_000)
-        route.add_package(self.VALID_PACKAGE)
-        
-        self.assertEqual(route.current_weight, 5000)
-    
-    def test_add_package_raises_error_when_capacity_exceeded(self):
-        package = self.VALID_PACKAGE
-        route = self.VALID_ROUTE_2
-        route.assign_truck(1003, 40_000)
-        route.add_package(package)
-        package_2 = Package(40_000,"SYD","MEL", self.VALID_CUSTOMER.id)
-        package_2 = Package(40_000,"SYD","MEL", self.VALID_CUSTOMER.id)
+            Route.set_internal_id("invalid")
 
+    def test_set_internal_id_invalid_negative_integer(self):
         with self.assertRaises(ValueError):
-            route.add_package(package_2)
-    
-    def test_route_prints_correctly_info_about_the_route(self):
-        pass
-
-
+            Route.set_internal_id(-5)

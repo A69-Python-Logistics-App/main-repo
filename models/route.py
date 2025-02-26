@@ -72,7 +72,10 @@ class Route:
         """
         Set class __ID to the given value.
         """
-        Package.__ID = parse_to_int(ID)
+        num = parse_to_int(ID)
+        if num < 0:
+            raise ValueError("ID cannot be below zero!")
+        Route.__ID = num
 
     @property
     def assigned_trucks(self):
