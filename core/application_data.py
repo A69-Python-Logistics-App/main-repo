@@ -5,7 +5,6 @@ from models.helpers import state
 from models.location import Location
 from models.package import Package
 from models.route import Route
-from models.status import Status
 from models.user import User
 from models.truck import Truck
 
@@ -97,6 +96,10 @@ class ApplicationData:
     @property
     def truck_park(self):
         return self._truck_car_park
+    
+    @property
+    def system_time(self):
+        return self._sys_time
 
     #
     # Write methods
@@ -111,7 +114,9 @@ class ApplicationData:
         :param type: str - The type of units to add; either 'hours' or 'days'.
         :return: The updated system time as a string, or None if the type is invalid.
         """
-        if type in ["hour", "hours"]:
+        if type in ["minute", "minutes"]:
+            self._sys_time += timedelta(minutes=num)
+        elif type in ["hour", "hours"]:
             self._sys_time += timedelta(hours=num)
         elif type in ["day", "days"]:
             self._sys_time += timedelta(days=num)
@@ -173,6 +178,9 @@ class ApplicationData:
                         if elapsed_time > 0:
                             travel_ratio = elapsed_time / total_travel_time
                             truck.current_location = f"between {previous_stop} and {next_stop} ({travel_ratio:.2%} completed)"
+                            for package in route.list_of_packages:
+                                package.update_status("On Route")  # Set status to "On Route"
+                                package.update_location(f"between {previous_stop} and {next_stop}")
 
     def create_employee(self, username: str, password: str, role:str, login: bool=False) -> User:
         """
@@ -327,18 +335,6 @@ class ApplicationData:
             if location.hub_name == city:
                 return location
 
-    def find_packages_at_hub(self, hub: str) -> list[Package]:
-        """
-        Find packages at hub
-        :param hub: str - City
-        :return: list[Package]
-        """
-        packages_at_hub = []
-        for package in self._packages:
-            if package.status == Status.STATUSES[0] and package.current_location == hub:
-                packages_at_hub.append(package)
-        return packages_at_hub
-
     def find_routes_for_package(self, package_id: int) -> str:
         """
         Find routes for package
@@ -400,25 +396,7 @@ class ApplicationData:
         else:
             route.list_of_packages.append(package)
             route.current_weight += package.weight
-
-    def bulk_assign(self, hub: str, route: int) -> str:
-        """
-        TODO
-        :param hub: Location/Hub
-        :param route: int - Route id
-        :return: str - Result of operation
-        """
-        packages = self.find_packages_at_hub(hub)
-        route = self.find_route_by_id(route)
-        assigned = 0
-        for package in packages:
-            # TODO: check if package is already assigned
-            try:
-                self.assign_package_to_route(package.id, route.route_id)
-                assigned += 1
-            except ValueError:
-                continue
-        return f"A total of {assigned} packages assigned to route #{route.route_id} ({len(packages) - assigned} packages remaining)."
+            package.update_status("Loaded")  # Set status to "Loaded"
 
     def update_customer(self, customer: Customer, new_first_name: str, new_last_name: str) -> str:
         """

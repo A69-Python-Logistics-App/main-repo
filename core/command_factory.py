@@ -1,4 +1,3 @@
-from commands.add_package_command import AddPackageCommand
 from commands.base.base_command import BaseCommand
 from commands.create_employee_command import CreateEmployeeCommand
 from commands.change_employee_role_command import ChangeEmployeeRoleCommand
@@ -23,6 +22,7 @@ from commands.assign_truck_command import AssignTruckCommand
 from commands.add_package_to_route_command import AddPackageToRouteCommand
 from core.application_data import ApplicationData
 from commands.trucks_command import TrucksCommand
+from commands.system_time_command import SystemTimeCommand
 
 class CommandFactory:
     def __init__(self, app_data: ApplicationData):
@@ -84,6 +84,8 @@ class CommandFactory:
                 return TrucksCommand(params, self.app_data)
 
             # System commands
+            case "systemtime":
+                return SystemTimeCommand(params, self.app_data)
             case "fastforward":
                 return FastForwardCommand(params, self.app_data)
             case "system_reset":

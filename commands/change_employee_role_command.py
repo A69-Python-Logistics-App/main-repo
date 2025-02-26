@@ -1,8 +1,6 @@
 from commands.base.base_command import BaseCommand
 from core.application_data import ApplicationData
 from models.user import User
-from tests.create_package_command_test import valid_params
-
 
 class ChangeEmployeeRoleCommand(BaseCommand):
 

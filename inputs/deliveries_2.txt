@@ -1,0 +1,21 @@
+n
+test testing
+routes
+createcustomer Darth Sidious evilCEO@badboys.com
+createpackage 100000 DAR PER evilCEO@badboys.com
+createroute Jan 5 16:00 ASP DAR PER
+assigntruck MAN 1
+assigntruck SCANIA 1
+assigntruck ACTROS 1
+trucks
+routes
+addpackagetoroute 1000 1
+routes
+fastforward 6 days
+routes
+trucks
+fastforward 3 days
+customerpackages evilCEO@badboys.com
+routes
+trucks
+exit

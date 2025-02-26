@@ -1,8 +1,5 @@
 import string
 
-from pandas.core.computation.expressions import evaluate
-
-
 class User:
 
     # Permissions

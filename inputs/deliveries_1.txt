@@ -1,0 +1,33 @@
+n
+test testing
+createcustomer Billy Butcher butcher@yahoo.com
+customerpackages butcher@yahoo.com
+createpackage 1000 MEL BRI butcher@yahoo.com
+createroute Jan 1 10:00 SYD MEL BRI
+assigntruck MAN 1
+trucks
+routes
+addpackagetoroute 1000 1
+routes
+createcustomer Home Lander niceguy@gmail.com
+createpackage 8765 SYD MEL niceguy@gmail.com
+addpackagetoroute 1001 1
+routes
+systemtime
+fastforward 10 hours
+routes
+customerpackages niceguy@gmail.com
+customerpackages butcher@yahoo.com
+fastforward 5 minutes
+fastforward 10 hours
+trucks
+routes
+customerpackages niceguy@gmail.com
+customerpackages butcher@yahoo.com
+systemtime
+fastforward 1 day
+routes
+trucks
+customerpackages niceguy@gmail.com
+customerpackages butcher@yahoo.com
+exit
