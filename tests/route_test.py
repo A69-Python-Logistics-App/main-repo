@@ -3,8 +3,6 @@ from models.route import Route
 from datetime import datetime,timedelta
 from models.package import Package
 from models.truck import Truck
-from models.location import Location
-from models.status import Status
 
 class Route_Should(unittest.TestCase):
 
