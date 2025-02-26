@@ -118,6 +118,7 @@ class Route:
         if self.current_weight + package.weight > self.weight_capacity:
             raise ValueError(f"Package weight exceeds the capacity. Capacity is {self.weight_capacity - self.current_weight}")
         self.current_weight += package.weight
+        self.list_of_packages.append(package)
     
     def deliver_packages(self, stop: str):
         """
