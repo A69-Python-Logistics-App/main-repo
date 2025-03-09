@@ -2,7 +2,11 @@ import os
 import sqlite3 as sql
 import traceback as tb
 
+from core.application_data import ApplicationData
+
 #import pandas as pd
+
+app_data = ApplicationData()
 
 class State:
     
@@ -10,10 +14,19 @@ class State:
     
     def __init__(self, app_data, debug: bool = False):
         self._conn, self._c = self.connect(debug)
+        self._conn.row_factory = sql.Row
         self._app_data = app_data
 
     def dump_to_app(self):
-        raise NotImplementedError
+        self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
+                      {"username": "test", "password": "testing", "role": "admin"})
+        self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
+                      {"username": "test1", "password": "testing", "role": "admin"})
+        self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
+                      {"username": "pesho", "password": "testing", "role": "admin"})
+
+        self._execute("SELECT * FROM employees", {})
+        print(self._c.fetchall())
 
     def dump_to_db(self):
         raise NotImplementedError
@@ -24,14 +37,17 @@ class State:
         c = conn.cursor()
         return conn, c
 
-    def _execute(self, query: str) -> bool:
+    def _execute(self, query: str, data: dict) -> bool:
         try:
-            self._c.execute(query)
+            self._c.execute(query, data)
             self._conn.commit()
         except Exception as e:
             print(tb.print_tb(e.__traceback__))
             return False
         return True
+
+stt = State(app_data)
+stt.dump_to_app()
 
 def reset_database():
     """
