@@ -21,11 +21,11 @@ CREATE TABLE locations (
 
 -- Create Packages table
 CREATE TABLE packages (
-    id TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY,
     weight REAL NOT NULL,
     pickup_location TEXT,
     dropoff_location TEXT,
-    customer_id TEXT,
+    customer TEXT NOT NULL,
     status TEXT,
     current_location TEXT,
     date_creation TEXT
@@ -33,30 +33,25 @@ CREATE TABLE packages (
 
 -- Create Routes table
 CREATE TABLE routes (
-    id TEXT PRIMARY KEY,
-    takeoff TEXT
+    id INTEGER PRIMARY KEY,
+    takeoff TEXT,
+    start TEXT NOT NULL,
+    stops TEXT,
+    destination TEXT NOT NULL
 );
 
 -- Create Customer_Packages junction table
 CREATE TABLE customer_packages (
-    customer_id TEXT,
-    package_id TEXT,
-    PRIMARY KEY (customer_id, package_id)
-);
-
--- Create Route_Stops junction table
-CREATE TABLE route_stops (
-    route_id TEXT,
-    stop_location TEXT,
-    stop_order INTEGER,
-    PRIMARY KEY (route_id, stop_location)
+    customer TEXT NOT NULL,
+    package_id INTEGER NOT NULL,
+    PRIMARY KEY (customer, package_id)
 );
 
 -- Create Location_Packages junction table
 CREATE TABLE location_packages (
-    location_hub_name TEXT,
-    package_id TEXT,
-    PRIMARY KEY (location_hub_name, package_id)
+    hub_name TEXT,
+    package_id INTEGER,
+    PRIMARY KEY (hub_name, package_id)
 );
 
 -- Create Log table
@@ -67,11 +62,10 @@ CREATE TABLE system_log (
 );
 
 -- Create indexes for better performance
-CREATE INDEX idx_packages_customer_id           ON packages(customer_id);
+CREATE INDEX idx_packages_customer           ON packages(customer);
 CREATE INDEX idx_packages_pickup                ON packages(pickup_location);
 CREATE INDEX idx_packages_dropoff               ON packages(dropoff_location);
 CREATE INDEX idx_packages_current               ON packages(current_location);
-CREATE INDEX idx_customer_packages_customer     ON customer_packages(customer_id);
+CREATE INDEX idx_customer_packages_customer     ON customer_packages(customer);
 CREATE INDEX idx_customer_packages_package      ON customer_packages(package_id);
-CREATE INDEX idx_route_stops_route              ON route_stops(route_id);
-CREATE INDEX idx_location_packages_location     ON location_packages(location_hub_name);
+CREATE INDEX idx_location_packages_location     ON location_packages(hub_name);

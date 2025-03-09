@@ -31,6 +31,45 @@ class State:
     def dump_to_db(self):
         raise NotImplementedError
 
+    def insert_customer(self, data: dict):
+        sample_format = {
+            "first_name": data["first_name"],
+            "last_name": data["last_name"],
+            "email": data["email"] # Unique
+        }
+        # insert customer in customers
+
+    def insert_package(self, data: dict):
+        sample_data = {
+            "id": data["id"], # Unique
+            "name": data["name"],
+            "weight": data["weight"],
+            "length": data["length"],
+            "width": data["width"],
+            "height": data["height"],
+            "customer": data["customer"] # Links to customers email
+        }
+        # insert package in packages
+        # insert package in customer_packages
+
+    def insert_employee(self, data: dict):
+        sample_format = {
+            "username": data["username"], # Unique
+            "password": data["password"],
+            "role": data["role"]
+        }
+        # insert into employees
+
+    def insert_route(self, data: dict):
+        sample_format = {
+            "id": data["id"],
+            "takeoff": data["takeoff"], # datetime
+            "start": data["start"], # NON NULL
+            "stops": data["stops"],
+            "destination": data["destination"] # NON NULL
+        }
+        # insert route in routes
+
     @classmethod
     def connect(cls, debug: bool = False):
         conn = sql.connect(cls.DB_NAME if not debug else ":memory:")
@@ -58,12 +97,13 @@ def reset_database():
     try:
         os.remove(State.DB_NAME)
     except FileNotFoundError as e:
-        print(tb.print_tb(e.__traceback__))
+        pass # print(tb.print_tb(e.__traceback__))
+
 
     with open("sql_init.sql", "r") as f:
         sql_init = f.read()
-        con, c = State.connect(False)
-        c.executescript(sql_init)
-        con.commit()
+        conn, c = State.connect(False)
+        with conn:
+            c.executescript(sql_init)
 
 reset_database()
