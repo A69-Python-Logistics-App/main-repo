@@ -30,39 +30,39 @@ class State:
 
     def dump_to_app(self):
         # Username must be unique
-        self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
-                      {"username": "test", "password": "testing", "role": "admin"})
-        self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
-                      {"username": "test1", "password": "testing", "role": "supervisor"})
-        self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
-                      {"username": "pesho", "password": "testing", "role": "manager"})
+        self.insert_employee({"username": "pesho", "password": "testing", "role": "admin"})
+        self.insert_employee({"username": "pesho1", "password": "testing", "role": "supervisor"})
+        self.insert_employee({"username": "pesho2", "password": "testing", "role": "manager"})
+        self.insert_employee({"username": "pesho3", "password": "testing", "role": "user"})
 
         self._execute("SELECT * FROM employees", {})
         result = [dict(row) for row in self.c.fetchall()]
         pt.pprint(result)
 
         # Email must be unique, ID is auto-increment integer and also unique - not mentioned in the query
-        self._execute("INSERT INTO customers ('first_name', 'last_name', 'email') VALUES (:first_name, :last_name, :email)",
-                      {"first_name": "Pesho", "last_name": "Georgiev", "email": "pesho.g@gmail.com"})
-        self._execute("INSERT INTO customers ('first_name', 'last_name', 'email') VALUES (:first_name, :last_name, :email)",
-                      {"first_name": "Pesho", "last_name": "Georgiev", "email": "pesho1.g@gmail.com"})
-        self._execute("INSERT INTO customers ('first_name', 'last_name', 'email') VALUES (:first_name, :last_name, :email)",
-                      {"first_name": "Pesho", "last_name": "Georgiev", "email": "pesho2.g@gmail.com"})
+        self.insert_customer({"first_name": "Pesho", "last_name": "Georgiev", "email": "pesho.g@gmail.com"})
+        self.insert_customer({"first_name": "Pesho1", "last_name": "Georgiev", "email": "pesho1.g@gmail.com"})
+        self.insert_customer({"first_name": "Pesho2", "last_name": "Georgiev", "email": "pesho2.g@gmail.com"})
         self._execute("SELECT * FROM customers", {})
         result = [dict(row) for row in self.c.fetchall()]
         pt.pprint(result)
+
+
 
     def dump_to_db(self):
         raise NotImplementedError
 
     def insert_customer(self, data: dict):
-        sample_format = {
-            "first_name": data["first_name"],
-            "last_name": data["last_name"],
-            "email": data["email"] # Unique
-        }
-        # insert customer in customers
-        pass
+        # sample_format = {
+        #     "first_name": data["first_name"],
+        #     "last_name": data["last_name"],
+        #     "email": data["email"] # Unique
+        # }
+        query = "INSERT INTO customers ('first_name', 'last_name', 'email') VALUES (:first_name, :last_name, :email)"
+        if self._execute(query, data):
+            self._log(f"Inserted customer: {data['first_name']} {data['last_name']}")
+        else:
+            raise ValueError(f"Failed to insert customer: {data['first_name']} {data['last_name']}")
 
     def insert_package(self, data: dict):
         sample_format = {
@@ -85,6 +85,11 @@ class State:
             "role": data["role"]
         }
         # insert into employees
+        query = "INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)"
+        if self._execute(query, data):
+            self._log(f"Inserted employee: {data['username']}")
+        else:
+            raise ValueError(f"Failed to insert employee: {data['username']}")
         pass
 
     def insert_route(self, data: dict):
@@ -117,10 +122,24 @@ class State:
         try:
             self.c.execute(query, data)
             self.conn.commit()
+            self._log(f"Executed query: {query}") # this has to be before request queries because it overrides the result
+        except sql.OperationalError:
+            return False
         except Exception as e:
             pt.pprint(tb.print_tb(e.__traceback__))
             return False
         return True
+
+    def _log(self, log_entry: str):
+        self.conn.cursor().\
+            execute("INSERT INTO system_log (log_entry) VALUES (:log_entry)", {"log_entry": log_entry})
+
+    def _get_all(self, table_name: str):
+        query = f"SELECT * FROM {table_name}"
+        self._execute(query, {})
+        result = [dict(row) for row in self.c.fetchall()]
+        return result
+
 
 def reset_database():
     """
