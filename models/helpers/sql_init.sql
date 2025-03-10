@@ -21,14 +21,14 @@ CREATE TABLE locations (
 
 -- Create Packages table
 CREATE TABLE packages (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     weight REAL NOT NULL,
-    pickup_location TEXT,
-    dropoff_location TEXT,
+    pickup_location TEXT NOT NULL,
+    dropoff_location TEXT NOT NULL,
     customer TEXT NOT NULL,
-    status TEXT,
-    current_location TEXT,
-    date_creation TEXT
+    status TEXT NOT NULL,
+    current_location TEXT NOT NULL,
+    timestamp TEXT DEFAULT (DATETIME('now'))
 );
 
 -- Create Routes table
