@@ -1,12 +1,11 @@
 import os
 import sqlite3 as sql
 import traceback as tb
+import prettyprinter as pt
 
 from core.application_data import ApplicationData
 
 #import pandas as pd
-
-app_data = ApplicationData()
 
 class State:
     
@@ -14,7 +13,6 @@ class State:
     
     def __init__(self, app_data, debug: bool = False):
         self._conn, self._c = self.connect(debug)
-        self._conn.row_factory = sql.Row
         self._app_data = app_data
 
     def dump_to_app(self):
@@ -26,7 +24,8 @@ class State:
                       {"username": "pesho", "password": "testing", "role": "admin"})
 
         self._execute("SELECT * FROM employees", {})
-        print(self._c.fetchall())
+        result = [{col: row[col] for col in row.keys()} for row in self._c.fetchall()]
+        pt.pprint(result)
 
     def dump_to_db(self):
         raise NotImplementedError
@@ -73,6 +72,7 @@ class State:
     @classmethod
     def connect(cls, debug: bool = False):
         conn = sql.connect(cls.DB_NAME if not debug else ":memory:")
+        conn.row_factory = sql.Row # Must setup conn.row_factory before cursor
         c = conn.cursor()
         return conn, c
 
@@ -81,12 +81,9 @@ class State:
             self._c.execute(query, data)
             self._conn.commit()
         except Exception as e:
-            print(tb.print_tb(e.__traceback__))
+            pt.pprint(tb.print_tb(e.__traceback__))
             return False
         return True
-
-stt = State(app_data)
-stt.dump_to_app()
 
 def reset_database():
     """
@@ -97,7 +94,7 @@ def reset_database():
     try:
         os.remove(State.DB_NAME)
     except FileNotFoundError as e:
-        pass # print(tb.print_tb(e.__traceback__))
+        pass # pt.pprint(tb.print_tb(e.__traceback__))
 
 
     with open("sql_init.sql", "r") as f:
@@ -106,4 +103,7 @@ def reset_database():
         with conn:
             c.executescript(sql_init)
 
-reset_database()
+if __name__ == "__main__":
+    reset_database()
+    stt = State(ApplicationData())
+    stt.dump_to_app()
