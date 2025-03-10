@@ -29,6 +29,7 @@ class State:
     def c(self):
         return self._c
 
+    # TODO: Change name of method since the app will be using the database to get and write data instead of memory
     def dump_to_db(self):
 
         self.insert_employee({"username": "pesho", "password": "testing", "role": "admin"})
@@ -36,7 +37,7 @@ class State:
         self.insert_employee({"username": "pesho2", "password": "testing", "role": "manager"})
         self.insert_employee({"username": "pesho3", "password": "testing", "role": "user"})
 
-        pt.pprint(self.get_employees())
+        # pt.pprint(self.get_employees())
 
         self.insert_customer({"first_name": "Pesho", "last_name": "Georgiev", "email": "pesho.g@gmail.com"})
         self.insert_customer({"first_name": "Pesho1", "last_name": "Georgiev", "email": "pesho1.g@gmail.com"})
@@ -44,7 +45,8 @@ class State:
         self.insert_customer({"first_name": "Pesho3", "last_name": "Georgiev", "email": "pesho3.g@gmail.com"})
 
         self.remove_customer({"email": "pesho1.g@gmail.com"})
-        pt.pprint(self.get_customers())
+        # pt.pprint(self.get_customer_by_email("pesho.g@gmail.com")) # Prints the customer information for pesho.g@gmail.com
+        # pt.pprint(self.get_customers())
 
 
         #pt.pprint(self.get_routes())
@@ -55,7 +57,7 @@ class State:
         self.insert_route\
             ({"takeoff":"Mar 05 2025 08:00", "start": "Burgas", "stops": ["Stara Zagora", "Plovdiv"], "destination": "Sofia"})
 
-        pt.pprint(self.get_routes())
+        # pt.pprint(self.get_routes())
 
 
         #pt.pprint(self.get_packages())
@@ -63,9 +65,14 @@ class State:
         self.insert_package({"weight": 54.5, "pickup": "Stara Zagora", "dropoff": "Sofia", "customer": "pesho2.g@gmail.com"})
         self.insert_package({"weight": 1454.5, "pickup": "Burgas", "dropoff": "Sofia", "customer": "pesho3.g@gmail.com"})
 
-        pt.pprint(self.get_packages())
+        # pt.pprint(self.get_packages())
 
         # TODO: Junction tables
+
+        # find packages by customer
+        packages = self.find_packages_by_customer("pesho.g@gmail.com")
+        packages += self.find_packages_by_customer("pesho3.g@gmail.com")
+        pt.pprint(packages)
 
     def dump_to_app(self):
         raise NotImplementedError
@@ -78,9 +85,9 @@ class State:
         # }
         query = "INSERT INTO customers ('first_name', 'last_name', 'email') VALUES (:first_name, :last_name, :email)"
         if self._execute(query, data):
-            self._log(f"Inserted customer: {data['first_name']} {data['last_name']}")
+            self._log(f"Inserted customer: {data['first_name']} {data['email']}")
         else:
-            raise ValueError(f"Failed to insert customer: {data['first_name']} {data['last_name']}")
+            raise ValueError(f"Failed to insert customer: {data['first_name']} {data['email']}")
 
     def insert_package(self, data: dict):
         # sample_format = {
@@ -93,12 +100,18 @@ class State:
         query = """
             INSERT INTO packages ('weight', 'pickup_location', 'dropoff_location', 'customer', 'status', 'current_location')
             VALUES (:weight, :pickup, :dropoff, :customer, "Collected", :pickup)"""
-        if self._execute(query, data):
-            self._log(f"Inserted package at {data['pickup']} for {data['customer']}")
+        tc = self._execute(query, data)
+        if tc:
+            self._log(f"Inserted package at ({tc.lastrowid}){data['pickup']} for {data['customer']}")
         else:
             raise ValueError(f"Failed to insert package")
-        # TODO: insert package in customer_packages
-        pass
+
+        query = "INSERT INTO customer_packages ('customer', 'package_id') VALUES (:customer, :package)"
+        data.update({"package": tc.lastrowid})
+        if self._execute(query, data):
+            self._log(f"Linked package {tc.lastrowid} to customer {data['customer']}")
+        else:
+            raise ValueError(f"Failed to link package {tc.lastrowid} to customer {data['customer']}")
 
     def insert_employee(self, data: dict):
         # sample_format = {
@@ -142,26 +155,20 @@ class State:
         tc = self._execute("DELETE FROM customers WHERE email = :email", data)
         return tc.rowcount if tc else 0
 
-    @classmethod
-    def connect(cls, debug: bool = False) -> (sql.Connection, sql.Cursor):
-        conn = sql.connect(cls.DB_NAME if not debug else ":memory:")
-        conn.row_factory = sql.Row # Must setup conn.row_factory before cursor
-        c = conn.cursor()
-        return conn, c
-
     def _execute(self, query: str, data: dict) -> sql.Cursor | None:
-        try:
-            nc = self.conn.cursor()
-            nc.execute(query, data)
-            self.conn.commit()
-            self._log(f"Executed query: {query}")
-            return nc
-        except sql.OperationalError as e:
-            self._log(f"Failed to execute query: {query}\n{e}")
-            pt.pprint(tb.print_tb(e.__traceback__))
-        except Exception as e:
-            pt.pprint(tb.print_tb(e.__traceback__))
-        return None
+        # TODO: Uncomment after completion
+        # try:
+        nc = self.conn.cursor()
+        nc.execute(query, data)
+        self.conn.commit()
+        self._log(f"Executed query: {query}")
+        return nc
+        # except sql.OperationalError as e:
+        #     self._log(f"Failed to execute query: {query}\n{e}")
+        #     pt.pprint(tb.print_tb(e.__traceback__))
+        # except Exception as e:
+        #     pt.pprint(tb.print_tb(e.__traceback__))
+        # return None
 
 
     def _log(self, log_entry: str):
@@ -173,24 +180,46 @@ class State:
 
     def _get_all(self, table_name: str):
         query = f"SELECT * FROM {table_name}"
-        self._execute(query, {})
-        result = [dict(row) for row in self.c.fetchall()]
+        tc = self._execute(query, {})
+        result = [dict(row) for row in tc.fetchall()]
         return result
 
     def get_packages(self):
-        tc = self._execute("SELECT * FROM packages", {})
-        result = [dict(row) for row in tc.fetchall()]
-        return result
+        return self._get_all("packages")
+
+    def get_package_by_id(self, package_id: int):
+        packages = self.get_packages()
+        for package in packages:
+            if package["id"] == package_id:
+                return package
+        return None
+
+    def find_packages_by_customer(self, email: str) -> list:
+        package_ids = \
+            self._execute("SELECT package_id FROM customer_packages WHERE customer = :email", {"email": email})\
+                .fetchall()
+
+        return [self.get_package_by_id(package_id[0]) for package_id in package_ids]
 
     def get_customers(self):
-        tc = self._execute("SELECT * FROM customers", {})
-        result = [dict(row) for row in tc.fetchall()]
-        return result
+        return self._get_all("customers")
+
+    def get_customer_by_email(self, email: str):
+        customers = self.get_customers()
+        for customer in customers:
+            if customer["email"] == email:
+                return customer
+        return None
 
     def get_employees(self):
-        tc = self._execute("SELECT * FROM employees", {})
-        result = [dict(row) for row in tc.fetchall()]
-        return result
+        return self._get_all("employees")
+
+    def get_employee_by_username(self, username: str):
+        employees = self.get_employees()
+        for employee in employees:
+            if employee["username"] == username:
+                return employee
+        return None
 
     @classmethod
     def reset_database(cls):
@@ -210,9 +239,20 @@ class State:
             with conn:
                 c.executescript(sql_init)
 
+    @classmethod
+    def connect(cls, debug: bool = False) -> (sql.Connection, sql.Cursor):
+        conn = sql.connect(cls.DB_NAME if not debug else ":memory:")
+        conn.row_factory = sql.Row # Must setup conn.row_factory before cursor
+        c = conn.cursor()
+        return conn, c
+
+
 if __name__ == "__main__":
     State.reset_database()
     stt = State(ApplicationData())
     stt.dump_to_db()
 
-    # Currently prints 4 test employees, 3 test customers and 3 test routes
+    # Currently prints 2 customers' packages, then prints 2 packages of 1 customer by their email
+    pt.pprint(stt.find_packages_by_customer("pesho.g@gmail.com"))
+    stt.insert_package({"weight": 100000, "pickup": "Sofia", "dropoff": "Bla", "customer": "pesho.g@gmail.com"})
+    pt.pprint(stt.find_packages_by_customer("pesho.g@gmail.com"))
