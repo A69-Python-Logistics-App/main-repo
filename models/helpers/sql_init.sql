@@ -7,7 +7,7 @@ CREATE TABLE employees (
 
 -- Create Customers table
 CREATE TABLE customers (
-    id TEXT PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     first_name TEXT NOT NULL,
     last_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE
@@ -62,7 +62,7 @@ CREATE TABLE system_log (
 );
 
 -- Create indexes for better performance
-CREATE INDEX idx_packages_customer           ON packages(customer);
+CREATE INDEX idx_packages_customer              ON packages(customer);
 CREATE INDEX idx_packages_pickup                ON packages(pickup_location);
 CREATE INDEX idx_packages_dropoff               ON packages(dropoff_location);
 CREATE INDEX idx_packages_current               ON packages(current_location);

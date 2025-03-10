@@ -6,6 +6,7 @@ import prettyprinter as pt
 from core.application_data import ApplicationData
 
 #import pandas as pd
+#import numpy as np
 
 class State:
     
@@ -28,6 +29,7 @@ class State:
         return self._c
 
     def dump_to_app(self):
+        # Username must be unique
         self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
                       {"username": "test", "password": "testing", "role": "admin"})
         self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
@@ -38,6 +40,14 @@ class State:
         self._execute("SELECT * FROM employees", {})
         result = [dict(row) for row in self.c.fetchall()]
         pt.pprint(result)
+
+        # Email must be unique, ID is auto-increment integer and also unique - not mentioned in the query
+        self._execute("INSERT INTO customers ('first_name', 'last_name', 'email') VALUES (:first_name, :last_name, :email)",
+                      {"first_name": "Pesho", "last_name": "Georgiev", "email": "pesho.g@gmail.com"})
+        self._execute("INSERT INTO customers ('first_name', 'last_name', 'email') VALUES (:first_name, :last_name, :email)",
+                      {"first_name": "Pesho", "last_name": "Georgiev", "email": "pesho1.g@gmail.com"})
+        self._execute("INSERT INTO customers ('first_name', 'last_name', 'email') VALUES (:first_name, :last_name, :email)",
+                      {"first_name": "Pesho", "last_name": "Georgiev", "email": "pesho2.g@gmail.com"})
         self._execute("SELECT * FROM customers", {})
         result = [dict(row) for row in self.c.fetchall()]
         pt.pprint(result)
@@ -52,9 +62,10 @@ class State:
             "email": data["email"] # Unique
         }
         # insert customer in customers
+        pass
 
     def insert_package(self, data: dict):
-        sample_data = {
+        sample_format = {
             "id": data["id"], # Unique
             "name": data["name"],
             "weight": data["weight"],
@@ -65,6 +76,7 @@ class State:
         }
         # insert package in packages
         # insert package in customer_packages
+        pass
 
     def insert_employee(self, data: dict):
         sample_format = {
@@ -73,6 +85,7 @@ class State:
             "role": data["role"]
         }
         # insert into employees
+        pass
 
     def insert_route(self, data: dict):
         sample_format = {
@@ -83,6 +96,15 @@ class State:
             "destination": data["destination"] # NON NULL
         }
         # insert route in routes
+        pass
+
+    def remove_customer(self, data: dict):
+        sample_format = {
+            "email": data["email"]
+        }
+        # remove customer from customers
+        # remove customer from customer_packages
+        pass
 
     @classmethod
     def connect(cls, debug: bool = False):
@@ -122,3 +144,5 @@ if __name__ == "__main__":
     reset_database()
     stt = State(ApplicationData())
     stt.dump_to_app()
+
+    # Currently prints 3 test employees and 3 test customers
