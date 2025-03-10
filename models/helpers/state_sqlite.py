@@ -24,7 +24,7 @@ class State:
                       {"username": "pesho", "password": "testing", "role": "admin"})
 
         self._execute("SELECT * FROM employees", {})
-        result = [{col: row[col] for col in row.keys()} for row in self._c.fetchall()]
+        result = [dict(row) for row in self._c.fetchall()]
         pt.pprint(result)
 
     def dump_to_db(self):
