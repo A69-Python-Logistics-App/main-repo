@@ -65,6 +65,8 @@ class State:
 
         pt.pprint(self.get_packages())
 
+        # TODO: Junction tables
+
     def dump_to_app(self):
         raise NotImplementedError
 
@@ -190,27 +192,26 @@ class State:
         result = [dict(row) for row in tc.fetchall()]
         return result
 
+    @classmethod
+    def reset_database(cls):
+        """
+        Run this method to reset the database to its original/empty/ state or regenerate it
+        :return: None
+        """
+        try:
+            os.remove(cls.DB_NAME)
+        except FileNotFoundError as e:
+            pass # pt.pprint(tb.print_tb(e.__traceback__))
 
-def reset_database():
-    """
-    Run this function to reset the database to its original/empty/ state or regenerate it
-    :return: None
-    """
 
-    try:
-        os.remove(State.DB_NAME)
-    except FileNotFoundError as e:
-        pass # pt.pprint(tb.print_tb(e.__traceback__))
-
-
-    with open("sql_init.sql", "r") as f:
-        sql_init = f.read()
-        conn, c = State.connect(False)
-        with conn:
-            c.executescript(sql_init)
+        with open("sql_init.sql", "r") as f:
+            sql_init = f.read()
+            conn, c = cls.connect(False)
+            with conn:
+                c.executescript(sql_init)
 
 if __name__ == "__main__":
-    reset_database()
+    State.reset_database()
     stt = State(ApplicationData())
     stt.dump_to_db()
 
