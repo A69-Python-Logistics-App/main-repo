@@ -15,16 +15,31 @@ class State:
         self._conn, self._c = self.connect(debug)
         self._app_data = app_data
 
+    @property
+    def app_data(self):
+        return self._app_data
+
+    @property
+    def conn(self):
+        return self._conn
+
+    @property
+    def c(self):
+        return self._c
+
     def dump_to_app(self):
         self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
                       {"username": "test", "password": "testing", "role": "admin"})
         self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
-                      {"username": "test1", "password": "testing", "role": "admin"})
+                      {"username": "test1", "password": "testing", "role": "supervisor"})
         self._execute("INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)",
-                      {"username": "pesho", "password": "testing", "role": "admin"})
+                      {"username": "pesho", "password": "testing", "role": "manager"})
 
         self._execute("SELECT * FROM employees", {})
-        result = [dict(row) for row in self._c.fetchall()]
+        result = [dict(row) for row in self.c.fetchall()]
+        pt.pprint(result)
+        self._execute("SELECT * FROM customers", {})
+        result = [dict(row) for row in self.c.fetchall()]
         pt.pprint(result)
 
     def dump_to_db(self):
@@ -78,8 +93,8 @@ class State:
 
     def _execute(self, query: str, data: dict) -> bool:
         try:
-            self._c.execute(query, data)
-            self._conn.commit()
+            self.c.execute(query, data)
+            self.conn.commit()
         except Exception as e:
             pt.pprint(tb.print_tb(e.__traceback__))
             return False
