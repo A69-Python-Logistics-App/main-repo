@@ -1,3 +1,4 @@
+import json
 import os
 import sqlite3 as sql
 import traceback as tb
@@ -43,11 +44,21 @@ class State:
         self.insert_customer({"first_name": "Pesho", "last_name": "Georgiev", "email": "pesho.g@gmail.com"})
         self.insert_customer({"first_name": "Pesho1", "last_name": "Georgiev", "email": "pesho1.g@gmail.com"})
         self.insert_customer({"first_name": "Pesho2", "last_name": "Georgiev", "email": "pesho2.g@gmail.com"})
+        self.insert_customer({"first_name": "Pesho3", "last_name": "Georgiev", "email": "pesho3.g@gmail.com"})
+        self.remove_customer({"email": "pesho1.g@gmail.com"})
         self._execute("SELECT * FROM customers", {})
         result = [dict(row) for row in self.c.fetchall()]
         pt.pprint(result)
 
 
+        #pt.pprint(self.get_routes())
+        self.insert_route\
+            ({"takeoff":"Mar 01 2025 08:00", "start": "Sofia", "stops": ["Plovdiv", "Stara Zagora"], "destination": "Burgas"})
+        self.insert_route\
+            ({"takeoff":"Mar 03 2025 08:00", "start": "Plovidv", "stops": ["Stara Zagora"], "destination": "Burgas"})
+        self.insert_route\
+            ({"takeoff":"Mar 05 2025 08:00", "start": "Burgas", "stops": ["Stara Zagora", "Plovdiv"], "destination": "Sofia"})
+        pt.pprint(self.get_routes())
 
     def dump_to_db(self):
         raise NotImplementedError
@@ -79,40 +90,51 @@ class State:
         pass
 
     def insert_employee(self, data: dict):
-        sample_format = {
-            "username": data["username"], # Unique
-            "password": data["password"],
-            "role": data["role"]
-        }
+        # sample_format = {
+        #     "username": data["username"], # Unique
+        #     "password": data["password"],
+        #     "role": data["role"]
+        # }
         # insert into employees
         query = "INSERT INTO employees ('username', 'password', 'role') VALUES (:username, :password, :role)"
         if self._execute(query, data):
             self._log(f"Inserted employee: {data['username']}")
         else:
             raise ValueError(f"Failed to insert employee: {data['username']}")
-        pass
 
     def insert_route(self, data: dict):
-        sample_format = {
-            "id": data["id"],
-            "takeoff": data["takeoff"], # datetime
-            "start": data["start"], # NON NULL
-            "stops": data["stops"],
-            "destination": data["destination"] # NON NULL
-        }
-        # insert route in routes
-        pass
+        # sample_format = {
+        #     "takeoff": data["takeoff"], # datetime
+        #     "start": data["start"], # NON NULL
+        #     "stops": data["stops"],
+        #     "destination": data["destination"] # NON NULL
+        # }
+        query = "INSERT INTO routes ('takeoff', 'start', 'stops', 'destination') VALUES (:takeoff, :start, :stops, :destination)"
+        data["stops"] = json.dumps(data["stops"])
+        if self._execute(query, data):
+            self._log(f"Inserted route from {data['start']} to {data['destination']} taking off at {data['takeoff']}")
+        else:
+            raise ValueError(f"Failed to insert route from {data['start']} to {data['destination']} taking off at {data['takeoff']}")
+
+    def get_routes(self):
+        tc = self.conn.cursor()
+        tc.execute("SELECT * FROM routes")
+        routes = [dict(row) for row in tc.fetchall()]
+        for route in routes:
+            route["stops"] = json.loads(route["stops"])
+        return routes
 
     def remove_customer(self, data: dict):
-        sample_format = {
-            "email": data["email"]
-        }
-        # remove customer from customers
-        # remove customer from customer_packages
-        pass
+        # sample_format = {
+        #     "email": data["email"]
+        # }
+        # TODO: remove customer from customer_packages
+        tc = self.conn.cursor()
+        tc.execute("DELETE FROM customers WHERE email = :email", data)
+        return tc.rowcount
 
     @classmethod
-    def connect(cls, debug: bool = False):
+    def connect(cls, debug: bool = False) -> (sql.Connection, sql.Cursor):
         conn = sql.connect(cls.DB_NAME if not debug else ":memory:")
         conn.row_factory = sql.Row # Must setup conn.row_factory before cursor
         c = conn.cursor()
@@ -164,4 +186,4 @@ if __name__ == "__main__":
     stt = State(ApplicationData())
     stt.dump_to_app()
 
-    # Currently prints 3 test employees and 3 test customers
+    # Currently prints 4 test employees, 3 test customers and 3 test routes

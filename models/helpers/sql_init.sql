@@ -33,7 +33,7 @@ CREATE TABLE packages (
 
 -- Create Routes table
 CREATE TABLE routes (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
     takeoff TEXT,
     start TEXT NOT NULL,
     stops TEXT,
