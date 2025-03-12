@@ -18,6 +18,7 @@ class CreateEmployeeCommand(BaseCommand):
 
         # Unpack
         username, password, role = self.params
+        role = role.lower()
 
         # Check if username exists
         if self.app_data.find_employee_by_username(username):

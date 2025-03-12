@@ -15,6 +15,7 @@ class ChangeEmployeeRoleCommand(BaseCommand):
 
     def execute(self):
         employee, role = self.params
+        role = role.lower()
 
         # Check if user is trying to change own role
         if employee == self.app_data.current_employee.username:

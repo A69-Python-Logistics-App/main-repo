@@ -5,11 +5,11 @@ from models.user import User
 class UpdateCustomerCommand(BaseCommand):
 
     PERMISSION = User.USER
+    PARAMS = 3
     USAGE = "updatecustomer {email} {new_first_name} {new_last_name}"
 
     def __init__(self, params, app_data):
         super().__init__(params, app_data)
-        self.validate_params(3)
 
     def execute(self) -> str:
         email, new_first_name, new_last_name = self.params

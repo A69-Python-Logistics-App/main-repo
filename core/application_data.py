@@ -242,7 +242,7 @@ class ApplicationData:
             total_weight += package.weight
             unassigned += 1
 
-        id_number = route.route_id
+        id_number = route.id
 
         # Remove route from app data
         self._routes.remove(route)
