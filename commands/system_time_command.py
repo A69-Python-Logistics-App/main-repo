@@ -11,4 +11,4 @@ class SystemTimeCommand(BaseCommand):
         super().__init__(params, app_data)
 
     def execute(self):
-        return f"Time is: {self.app_data.system_time}"
+        return f"System time is: {self.app_data.system_time}"

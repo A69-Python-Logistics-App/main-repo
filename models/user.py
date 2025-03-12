@@ -41,8 +41,8 @@ class User:
     def password(self, password: str):
         if len(password) < 6 or len(password) > 18:
             raise ValueError(f"Invalid password provided ({len(password)} characters long, expected 6-18)!")
-        if not set(password).issubset(set(string.ascii_letters + string.digits + "_-*@#$")):
-            raise ValueError(f"Invalid characters in password. Use only characters, digits and [_, -, *, @, #, $]!")
+        if not set(password).issubset(set(string.ascii_letters + string.digits + "_-*!@#$")):
+            raise ValueError(f"Invalid characters in password. Use only characters, digits and [_, -, *, !, @, #, $]!")
         self._password = password
 
     @classmethod
