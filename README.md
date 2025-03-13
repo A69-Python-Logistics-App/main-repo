@@ -36,7 +36,7 @@ pip install -r requirements.txt
 | `removepackage`          | Remove a package with ID.                                            | `removepackage 1000`                               |
 | `createroute`            | Schedule a route with a date and locations.                          | `createroute Mar 2 11:30 SYD MEL BRI`              |
 | `removeroute`            | Remove a route with ID.                                              | `removeroute 1`                                    |
-| `assigntruck`            | Assign a truck (SCANIA, MAN, ACTROS) to a given route (id).          | `assigntruck MAN 1`                                |
+| `assigntruck`            | Assign a truck (Scania, MAN, Actros) to a given route (ID).          | `assigntruck MAN 1`                                |
 | `addpackagetoroute`      | Add a package to a given route, using their IDs.                     | `addpackagetoroute 1000 1`                         |
 | `fastforward`            | Advances the system time by the given amount (minutes, hours, days). | `fastforward 2 days`                               |
 | `systemtime`             | Show the current system time.                                        | `systemtime`                                       |
