@@ -3,7 +3,6 @@
 *A package and route management system designed for streamlined logistics operations, featuring SQLite3 integration and robust role-based command execution.*
 
 ## Table of Contents
-- [Table of Contents](#table-of-contents)
 - [Features](#features)
 - [Prerequisites](#prerequisites)
 - [Commands](#commands)
